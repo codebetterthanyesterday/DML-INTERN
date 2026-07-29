@@ -17,7 +17,7 @@ function InputField({ id, label, type = "text", placeholder, value, onChange, er
       <div className="relative">
         <input id={id} type={type} value={value} onChange={onChange} placeholder={placeholder} autoComplete={id}
           className={`w-full px-3.5 py-2.5 ${suffix ? "pr-10" : ""} rounded-lg border bg-slate-50 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:bg-white transition-all ${
-            error ? "border-red-300 focus:ring-red-400" : "border-slate-200 focus:ring-slate-800"
+            error ? "border-red-300 focus:ring-red-400" : "border-slate-200 focus:ring-red-500"
           }`} />
         {suffix && <div className="absolute right-3 top-1/2 -translate-y-1/2">{suffix}</div>}
       </div>
@@ -31,19 +31,19 @@ function UploadZone({ label, fieldName, onFileChange, fileName }: {
   onFileChange: (name: string, file: File | null) => void; fileName?: string
 }) {
   return (
-    <label className="relative flex flex-col items-center justify-center gap-1.5 p-5 rounded-xl border-2 border-dashed border-slate-200 hover:border-slate-800 bg-slate-50 hover:bg-slate-100 transition-all cursor-pointer group min-h-[80px]">
+    <label className="relative flex flex-col items-center justify-center gap-1.5 p-5 rounded-xl border-2 border-dashed border-slate-200 hover:border-red-400 bg-slate-50 hover:bg-red-50 transition-all cursor-pointer group min-h-[80px]">
       <input type="file" className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
         accept="image/*,.pdf" onChange={(e) => onFileChange(fieldName, e.target.files?.[0] ?? null)} />
       {fileName ? (
         <>
-          <FileText className="w-6 h-6 text-slate-800" />
-          <span className="text-xs font-semibold text-slate-800 text-center">{fileName}</span>
-          <span className="text-xs text-slate-500">Klik untuk ganti</span>
+          <FileText className="w-6 h-6 text-red-500" />
+          <span className="text-xs font-semibold text-red-600 text-center">{fileName}</span>
+          <span className="text-xs text-slate-400">Klik untuk ganti</span>
         </>
       ) : (
         <>
-          <UploadCloud className="w-6 h-6 text-slate-400 group-hover:text-slate-800 transition-colors" />
-          <span className="text-xs font-semibold text-slate-600 group-hover:text-slate-800 text-center transition-colors">{label}</span>
+          <UploadCloud className="w-6 h-6 text-slate-400 group-hover:text-red-500 transition-colors" />
+          <span className="text-xs font-semibold text-slate-600 group-hover:text-red-600 text-center transition-colors">{label}</span>
           <span className="text-xs text-slate-400">JPG, PNG, atau PDF · Maks. 5MB</span>
         </>
       )}
@@ -101,7 +101,7 @@ export default function RegisterBusinessPage() {
     <div className="min-h-screen bg-slate-50 px-4 py-12">
       {/* Logo */}
       <div className="flex flex-col items-center gap-3 mb-8">
-        <div className="w-12 h-12 rounded-2xl bg-red-600 flex items-center justify-center shadow-lg shadow-red-200">
+        <div className="w-12 h-12 rounded-2xl bg-blue-950 flex items-center justify-center shadow-lg shadow-blue-900/20">
           <svg viewBox="0 0 32 32" fill="none" className="w-7 h-7">
             <rect x="2" y="8" width="28" height="4" rx="2" fill="white" />
             <rect x="2" y="16" width="20" height="4" rx="2" fill="white" fillOpacity="0.7" />
@@ -129,7 +129,7 @@ export default function RegisterBusinessPage() {
           {/* Kolom kiri — Data Perusahaan */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-lg shadow-slate-100/80 p-7 space-y-4">
             <div className="flex items-center gap-2 mb-2">
-              <span className="w-6 h-6 rounded-full bg-slate-800 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">1</span>
+              <span className="w-6 h-6 rounded-full bg-red-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">1</span>
               <h2 className="text-xs font-bold text-slate-700 uppercase tracking-widest">Data Perusahaan</h2>
             </div>
 
@@ -166,7 +166,7 @@ export default function RegisterBusinessPage() {
           {/* Kolom kanan — Upload Dokumen */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-lg shadow-slate-100/80 p-7 flex flex-col gap-5">
             <div className="flex items-center gap-2">
-              <span className="w-6 h-6 rounded-full bg-slate-800 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">2</span>
+              <span className="w-6 h-6 rounded-full bg-red-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">2</span>
               <h2 className="text-xs font-bold text-slate-700 uppercase tracking-widest">Upload Dokumen Legalitas</h2>
             </div>
 
@@ -181,13 +181,13 @@ export default function RegisterBusinessPage() {
             </p>
 
             <button type="submit" disabled={isPending}
-              className="w-full py-3 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-bold text-sm shadow-md shadow-slate-300 transition-all disabled:opacity-60 mt-auto">
+              className="w-full py-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-sm shadow-md shadow-red-200 transition-all disabled:opacity-60 mt-auto">
               {isPending ? "Mengirim Pendaftaran..." : "Kirim Pendaftaran"}
             </button>
 
             <p className="text-center text-xs text-slate-500">
               Sudah punya akun?{" "}
-              <Link href="/login" className="text-slate-800 font-semibold hover:text-slate-900">Masuk</Link>
+              <Link href="/login" className="text-red-600 font-semibold hover:text-red-700">Masuk</Link>
             </p>
           </div>
         </div>

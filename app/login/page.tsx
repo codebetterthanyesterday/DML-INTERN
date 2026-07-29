@@ -35,7 +35,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-4 py-12">
       {/* Logo */}
       <div className="mb-8 flex flex-col items-center gap-3">
-        <div className="w-12 h-12 rounded-2xl bg-red-600 flex items-center justify-center shadow-lg shadow-red-200">
+        <div className="w-12 h-12 rounded-2xl bg-blue-950 flex items-center justify-center shadow-lg shadow-blue-900/20">
           <svg viewBox="0 0 32 32" fill="none" className="w-7 h-7">
             <rect x="2" y="8" width="28" height="4" rx="2" fill="white" />
             <rect x="2" y="16" width="20" height="4" rx="2" fill="white" fillOpacity="0.7" />
@@ -51,9 +51,9 @@ export default function LoginPage() {
 
         {/* Success banner */}
         {justRegistered && (
-          <div className="flex items-start gap-2 p-3 rounded-xl bg-red-50 border border-red-200 mb-5">
-            <ShieldCheck className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-red-700 font-medium leading-snug">
+          <div className="flex items-start gap-2 p-3 rounded-xl bg-blue-50 border border-blue-200 mb-5">
+            <ShieldCheck className="w-4 h-4 text-blue-950 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-blue-900 font-medium leading-snug">
               {justRegistered === "business"
                 ? "Akun bisnis berhasil didaftarkan! Tunggu verifikasi Admin 1-2 hari kerja."
                 : "Akun berhasil dibuat! Silakan masuk."}
@@ -63,7 +63,7 @@ export default function LoginPage() {
 
         {/* Error */}
         {error && (
-          <div className="p-3 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs mb-5">
+          <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs mb-5">
             {error}
           </div>
         )}
@@ -75,7 +75,7 @@ export default function LoginPage() {
             <input
               id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)}
               placeholder="nama@email.com" required autoComplete="email"
-              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:bg-white transition-all"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900 focus:bg-white transition-all"
             />
           </div>
 
@@ -87,7 +87,7 @@ export default function LoginPage() {
                 id="password" type={showPassword ? "text" : "password"} value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••" required autoComplete="current-password"
-                className="w-full px-3.5 py-2.5 pr-10 rounded-lg border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:bg-white transition-all"
+                className="w-full px-3.5 py-2.5 pr-10 rounded-lg border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900 focus:bg-white transition-all"
               />
               <button type="button" onClick={() => setShowPassword(v => !v)} tabIndex={-1}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
@@ -98,14 +98,14 @@ export default function LoginPage() {
 
           {/* Lupa kata sandi */}
           <div className="text-right">
-            <Link href="#" className="text-xs text-slate-800 hover:text-slate-900 font-medium transition-colors">
+            <Link href="#" className="text-xs text-red-600 hover:text-red-700 font-medium transition-colors">
               Lupa kata sandi?
             </Link>
           </div>
 
           {/* Tombol Masuk */}
           <button type="submit" disabled={isPending}
-            className="w-full py-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-sm shadow-md shadow-red-200 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
+            className="w-full py-3 rounded-lg bg-blue-950 hover:bg-blue-900 text-white font-bold text-sm shadow-md shadow-blue-900/20 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
             {isPending ? "Memproses..." : "Masuk"}
           </button>
         </form>
@@ -113,7 +113,7 @@ export default function LoginPage() {
         {/* Footer */}
         <p className="text-center text-xs text-slate-500 mt-5">
           Belum punya akun?{" "}
-          <Link href="/register" className="text-red-600 font-semibold hover:text-red-700 transition-colors">
+          <Link href="/register" className="text-blue-950 font-semibold hover:text-blue-900 transition-colors">
             Daftar
           </Link>
         </p>

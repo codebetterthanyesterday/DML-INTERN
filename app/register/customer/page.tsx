@@ -62,7 +62,7 @@ export default function RegisterCustomerPage() {
       <div className="relative">
         <input id={id} type={type} value={value} onChange={onChange} placeholder={placeholder} autoComplete={id}
           className={`w-full px-3.5 py-2.5 ${suffix ? "pr-10" : ""} rounded-lg border bg-slate-50 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:bg-white transition-all ${
-            err ? "border-red-300 focus:ring-red-400" : "border-slate-200 focus:ring-red-500"
+            err ? "border-red-300 focus:ring-red-400" : "border-slate-200 focus:ring-blue-900"
           }`} />
         {suffix && <div className="absolute right-3 top-1/2 -translate-y-1/2">{suffix}</div>}
       </div>
@@ -74,7 +74,7 @@ export default function RegisterCustomerPage() {
     <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-4 py-12">
       {/* Logo */}
       <div className="mb-8 flex flex-col items-center gap-3">
-        <div className="w-12 h-12 rounded-2xl bg-red-600 flex items-center justify-center shadow-lg shadow-red-200">
+        <div className="w-12 h-12 rounded-2xl bg-blue-950 flex items-center justify-center shadow-lg shadow-blue-900/20">
           <svg viewBox="0 0 32 32" fill="none" className="w-7 h-7">
             <rect x="2" y="8" width="28" height="4" rx="2" fill="white" />
             <rect x="2" y="16" width="20" height="4" rx="2" fill="white" fillOpacity="0.7" />
@@ -129,27 +129,27 @@ export default function RegisterCustomerPage() {
             <label className="flex items-start gap-2.5 cursor-pointer group">
               <button type="button" onClick={() => { setAgreed(v => !v); setFieldErrors(fe => { const n = {...fe}; delete n.terms; return n }) }}
                 className={`mt-0.5 w-4 h-4 rounded flex-shrink-0 flex items-center justify-center border-2 transition-all ${
-                  agreed ? "bg-red-600 border-red-600" : "bg-white border-slate-300 group-hover:border-red-400"
+                  agreed ? "bg-blue-950 border-blue-950" : "bg-white border-slate-300 group-hover:border-blue-900"
                 }`}>
                 {agreed && <Check className="w-2.5 h-2.5 text-white" />}
               </button>
               <span className="text-xs text-slate-600 leading-snug">
                 Setuju{" "}
-                <Link href="#" className="text-red-600 font-semibold hover:underline">Syarat & Ketentuan</Link>
+                <Link href="#" className="text-blue-950 font-semibold hover:underline">Syarat & Ketentuan</Link>
               </span>
             </label>
             {fieldErrors.terms && <p className="text-red-500 text-xs mt-1">{fieldErrors.terms}</p>}
           </div>
 
           <button type="submit" disabled={isPending}
-            className="w-full py-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-sm shadow-md shadow-red-200 transition-all disabled:opacity-60 mt-1">
+            className="w-full py-3 rounded-lg bg-blue-950 hover:bg-blue-900 text-white font-bold text-sm shadow-md shadow-blue-900/20 transition-all disabled:opacity-60 mt-1">
             {isPending ? "Memproses..." : "Buat Akun"}
           </button>
         </form>
 
         <p className="text-center text-xs text-slate-500 mt-5">
           Sudah punya akun?{" "}
-          <Link href="/login" className="text-red-600 font-semibold hover:text-red-700 transition-colors">Masuk</Link>
+          <Link href="/login" className="text-blue-950 font-semibold hover:text-blue-900 transition-colors">Masuk</Link>
         </p>
       </div>
     </div>
