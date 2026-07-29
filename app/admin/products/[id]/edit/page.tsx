@@ -19,5 +19,10 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
   // Bind the product ID into the action
   const boundAction = updateProduct.bind(null, id);
 
-  return <ProductForm action={boundAction} categories={categories} product={product} mode="edit" />;
+  const productForClient = {
+    ...product,
+    price: product.price ? product.price.toNumber() : null,
+  };
+
+  return <ProductForm action={boundAction} categories={categories} product={productForClient} mode="edit" />;
 }

@@ -1,6 +1,4 @@
-"use client"
-
-import { Header } from "@/components/shared/Header"
+import { AuthAwareHeader } from "@/components/shared/AuthAwareHeader"
 import { Footer } from "@/components/shared/Footer"
 import { 
   Building2, 
@@ -12,10 +10,10 @@ import {
   ArrowRight
 } from "lucide-react"
 
-export default function TentangPage() {
+export default async function TentangPage() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
-      <Header />
+      <AuthAwareHeader />
 
       <main className="flex-1 w-full">
         {/* HERO SECTION - Foto Pabrik */}

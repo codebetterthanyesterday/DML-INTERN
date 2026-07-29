@@ -98,7 +98,7 @@ function LoginContent() {
 
           {/* Lupa kata sandi */}
           <div className="text-right">
-            <Link href="#" className="text-xs text-red-600 hover:text-red-700 font-medium transition-colors">
+            <Link href="/forgot" className="text-xs text-red-600 hover:text-red-700 font-medium transition-colors">
               Lupa kata sandi?
             </Link>
           </div>

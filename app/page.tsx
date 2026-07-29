@@ -1,13 +1,24 @@
 import Link from "next/link"
-import { ArrowRight, Factory, ShieldCheck, ShoppingBag, Menu, Star } from "lucide-react"
-import { Header } from "@/components/shared/Header"
+import { ArrowRight, Factory, ShieldCheck, ShoppingBag, Star } from "lucide-react"
+import { AuthAwareHeader } from "@/components/shared/AuthAwareHeader"
 import { Footer } from "@/components/shared/Footer"
+import { auth } from "@/lib/auth"
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const session = await auth()
+  const isLoggedIn = !!session?.user
+  const userRole = session?.user?.role
+  const dashboardHref =
+    userRole === "ADMIN"
+      ? "/admin/dashboard"
+      : userRole === "BUSINESS"
+      ? "/business"
+      : "/customer"
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       {/* NAVBAR */}
-      <Header />
+      <AuthAwareHeader />
 
       <main className="flex-1 flex flex-col">
         {/* HERO SECTION */}
@@ -28,12 +39,32 @@ export default function LandingPage() {
                 Dari produk retail harian hingga suplai industri berat (B2B). Kami menyediakan rubber sheet, seal, gasket, dan conveyor belt terbaik di kelasnya.
               </p>
               <div className="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
-                <Link href="/katalog" className="w-full sm:w-auto px-8 py-3.5 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-lg shadow-red-600/30 transition-all flex items-center justify-center gap-2">
+                <Link
+                  href="/katalog"
+                  id="hero-catalog-btn"
+                  className="w-full sm:w-auto px-8 py-3.5 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-lg shadow-red-600/30 transition-all flex items-center justify-center gap-2"
+                >
                   Lihat Katalog <ArrowRight className="w-4 h-4" />
                 </Link>
-                <Link href="/register/business" className="w-full sm:w-auto px-8 py-3.5 text-sm font-bold text-blue-100 bg-blue-900/40 hover:bg-blue-900/60 border border-blue-800 rounded-xl transition-all flex items-center justify-center">
-                  Ajukan Penawaran B2B
-                </Link>
+
+                {/* Dynamic secondary CTA */}
+                {isLoggedIn ? (
+                  <Link
+                    href={dashboardHref}
+                    id="hero-dashboard-btn"
+                    className="w-full sm:w-auto px-8 py-3.5 text-sm font-bold text-blue-100 bg-blue-900/40 hover:bg-blue-900/60 border border-blue-800 rounded-xl transition-all flex items-center justify-center gap-2"
+                  >
+                    Dashboard Saya <ArrowRight className="w-4 h-4" />
+                  </Link>
+                ) : (
+                  <Link
+                    href="/register/business"
+                    id="hero-b2b-btn"
+                    className="w-full sm:w-auto px-8 py-3.5 text-sm font-bold text-blue-100 bg-blue-900/40 hover:bg-blue-900/60 border border-blue-800 rounded-xl transition-all flex items-center justify-center"
+                  >
+                    Ajukan Penawaran B2B
+                  </Link>
+                )}
               </div>
             </div>
             
@@ -98,7 +129,7 @@ export default function LandingPage() {
               <h2 className="text-sm font-bold text-red-600 uppercase tracking-widest mb-2">— Produk Unggulan</h2>
               <p className="text-3xl font-extrabold text-slate-900 tracking-tight">Jelajahi Pilihan Terbaik Kami</p>
             </div>
-            <Link href="#" className="text-sm font-semibold text-blue-950 hover:text-red-600 flex items-center gap-1 transition-colors">
+            <Link href="/katalog" className="text-sm font-semibold text-blue-950 hover:text-red-600 flex items-center gap-1 transition-colors" id="see-all-products-link">
               Lihat Semua Produk <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -122,9 +153,24 @@ export default function LandingPage() {
                   <p className="text-xs text-slate-500 mb-4 line-clamp-2">Material tahan aus dan oli, cocok untuk alas mesin dan aplikasi industri berat.</p>
                   <div className="flex items-center justify-between">
                     <span className="text-lg font-extrabold text-blue-950">Rp 125.000</span>
-                    <button className="w-8 h-8 rounded-full bg-blue-50 text-blue-950 flex items-center justify-center hover:bg-blue-950 hover:text-white transition-colors">
-                      <ShoppingBag className="w-4 h-4" />
-                    </button>
+                    {isLoggedIn ? (
+                      <button
+                        id={`add-to-cart-${i}`}
+                        className="w-8 h-8 rounded-full bg-blue-950 text-white flex items-center justify-center hover:bg-red-600 transition-colors"
+                        title="Tambah ke Keranjang"
+                      >
+                        <ShoppingBag className="w-4 h-4" />
+                      </button>
+                    ) : (
+                      <Link
+                        href="/login"
+                        id={`product-login-${i}`}
+                        className="w-8 h-8 rounded-full bg-blue-50 text-blue-950 flex items-center justify-center hover:bg-blue-950 hover:text-white transition-colors"
+                        title="Masuk untuk membeli"
+                      >
+                        <ShoppingBag className="w-4 h-4" />
+                      </Link>
+                    )}
                   </div>
                 </div>
               </div>

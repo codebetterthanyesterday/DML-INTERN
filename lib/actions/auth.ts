@@ -8,6 +8,22 @@ import { z } from "zod"
 
 export async function loginAction(formData: FormData) {
   try {
+    const email = formData.get("email") as string
+
+    // Pre-flight: check if this is a business account awaiting/denied verification
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: { role: true, businessStatus: true },
+    })
+    if (user?.role === "BUSINESS") {
+      if (user.businessStatus === "PENDING") {
+        return { error: "Akun bisnis Anda sedang menunggu verifikasi Admin (1–2 hari kerja)." }
+      }
+      if (user.businessStatus === "REJECTED") {
+        return { error: "Akun bisnis Anda tidak dapat diverifikasi. Hubungi kami untuk informasi lebih lanjut." }
+      }
+    }
+
     const payload = Object.fromEntries(formData.entries())
     await signIn("credentials", {
       ...payload,
@@ -144,5 +160,34 @@ export async function registerBusinessAction(prevState: any, formData: FormData)
   } catch (error) {
     console.error("Register Business Error:", error)
     return { error: "Gagal mendaftar akun bisnis. Silakan coba lagi." }
+  }
+}
+
+export async function forgotPasswordAction(email: string) {
+  try {
+    // Validate email
+    const parsed = z.string().email().safeParse(email)
+    if (!parsed.success) {
+      return { error: "Email tidak valid." }
+    }
+
+    // Check if user exists
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: { id: true },
+    })
+
+    if (!user) {
+      // Return success anyway to prevent email enumeration attacks
+      return { success: true }
+    }
+
+    // Simulate sending email (in a real app, generate a token and send email via resend/nodemailer)
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+
+    return { success: true }
+  } catch (error) {
+    console.error("Forgot Password Error:", error)
+    return { error: "Gagal mengirim link reset kata sandi. Silakan coba lagi." }
   }
 }

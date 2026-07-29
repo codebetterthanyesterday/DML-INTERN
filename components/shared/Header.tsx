@@ -2,15 +2,166 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu } from "lucide-react"
+import { signOut } from "next-auth/react"
+import { Menu, ShieldAlert, LayoutDashboard, LogOut, User, Building2, Settings } from "lucide-react"
+import type { Session } from "next-auth"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
-export function Header() {
+interface HeaderProps {
+  session?: Session | null
+}
+
+const navLinks = [
+  { name: "Beranda", href: "/" },
+  { name: "Katalog", href: "/katalog" },
+  { name: "Tentang", href: "/tentang" },
+  { name: "Kontak", href: "/kontak" },
+]
+
+function getInitials(name?: string | null): string {
+  if (!name) return "U"
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .substring(0, 2)
+    .toUpperCase()
+}
+
+function getDashboardLink(role?: string): { href: string; label: string } {
+  switch (role) {
+    case "ADMIN":
+      return { href: "/admin/dashboard", label: "Panel Admin" }
+    case "BUSINESS":
+      return { href: "/business", label: "Dashboard Bisnis" }
+    case "CUSTOMER":
+    default:
+      return { href: "/customer", label: "Dashboard Saya" }
+  }
+}
+
+function UserMenu({ session }: { session: Session }) {
+  const { user } = session
+  const isBusinessPending = user.role === "BUSINESS" && (user as any).businessStatus === "PENDING"
+  const initials = getInitials(user.name)
+  const dashboard = getDashboardLink(user.role)
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          id="user-menu-trigger"
+          className="relative flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-200 bg-white hover:bg-slate-50 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-950 focus:ring-offset-1"
+        >
+          {/* Pending badge */}
+          {isBusinessPending && (
+            <span className="absolute -top-1 -right-1 flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+            </span>
+          )}
+          <Avatar className="h-7 w-7">
+            <AvatarFallback className="bg-blue-950 text-white text-[10px] font-bold">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+          <span className="text-xs font-semibold text-slate-700 hidden sm:block max-w-[100px] truncate">
+            {user.name?.split(" ")[0]}
+          </span>
+        </button>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent align="end" className="w-56">
+        {/* Identity */}
+        <DropdownMenuLabel className="py-3">
+          <div className="flex flex-col space-y-0.5">
+            <p className="text-sm font-semibold text-slate-900 truncate">{user.name}</p>
+            <p className="text-xs text-slate-500 truncate">{user.email}</p>
+            {/* Role badge */}
+            <span className={`mt-1.5 inline-flex w-fit items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+              user.role === "ADMIN"
+                ? "bg-red-100 text-red-700"
+                : user.role === "BUSINESS"
+                ? "bg-blue-100 text-blue-800"
+                : "bg-slate-100 text-slate-600"
+            }`}>
+              {user.role === "ADMIN" ? "👑 Admin" : user.role === "BUSINESS" ? "🏢 Bisnis" : "👤 Pelanggan"}
+            </span>
+          </div>
+        </DropdownMenuLabel>
+
+        {/* Pending verification warning */}
+        {isBusinessPending && (
+          <>
+            <DropdownMenuSeparator />
+            <div className="mx-1 my-1 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2.5 flex items-start gap-2">
+              <ShieldAlert className="w-3.5 h-3.5 text-amber-600 mt-0.5 flex-shrink-0" />
+              <p className="text-[11px] leading-relaxed text-amber-800 font-medium">
+                Akun bisnis Anda sedang dalam proses verifikasi.
+              </p>
+            </div>
+          </>
+        )}
+
+        <DropdownMenuSeparator />
+
+        {/* Dashboard link */}
+        <DropdownMenuItem asChild>
+          <Link
+            href={dashboard.href}
+            className="flex items-center gap-2 cursor-pointer"
+            id="user-menu-dashboard"
+          >
+            {user.role === "ADMIN" ? (
+              <Settings className="w-4 h-4 text-slate-400" />
+            ) : user.role === "BUSINESS" ? (
+              <Building2 className="w-4 h-4 text-slate-400" />
+            ) : (
+              <LayoutDashboard className="w-4 h-4 text-slate-400" />
+            )}
+            <span>{dashboard.label}</span>
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem asChild>
+          <Link href={user.role === "ADMIN" ? "/admin/dashboard" : `/${user.role.toLowerCase()}/profile`} className="flex items-center gap-2 cursor-pointer" id="user-menu-profile">
+            <User className="w-4 h-4 text-slate-400" />
+            <span>Profil Saya</span>
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
+        {/* Logout */}
+        <DropdownMenuItem
+          id="user-menu-logout"
+          className="flex items-center gap-2 text-red-600 focus:text-red-700 focus:bg-red-50 cursor-pointer"
+          onClick={() => signOut({ callbackUrl: "/" })}
+        >
+          <LogOut className="w-4 h-4" />
+          <span>Keluar</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+export function Header({ session }: HeaderProps) {
   const pathname = usePathname()
+  const isLoggedIn = !!session?.user
 
   return (
     <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2" id="header-logo">
           <div className="w-8 h-8 rounded-lg bg-blue-950 flex items-center justify-center shadow-md">
             <svg viewBox="0 0 32 32" fill="none" className="w-5 h-5">
               <rect x="2" y="8" width="28" height="4" rx="2" fill="white" />
@@ -22,21 +173,53 @@ export function Header() {
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8">
-          <Link href="/" className={`text-sm ${pathname === "/" ? "font-bold text-blue-950" : "font-medium text-slate-500 hover:text-blue-950 transition-colors"}`}>Beranda</Link>
-          <Link href="/katalog" className={`text-sm ${pathname.startsWith("/katalog") ? "font-bold text-blue-950" : "font-medium text-slate-500 hover:text-blue-950 transition-colors"}`}>Katalog</Link>
-          <Link href="/tentang" className={`text-sm ${pathname === "/tentang" ? "font-bold text-blue-950" : "font-medium text-slate-500 hover:text-blue-950 transition-colors"}`}>Tentang</Link>
-          <Link href="/kontak" className={`text-sm ${pathname === "/kontak" ? "font-bold text-blue-950" : "font-medium text-slate-500 hover:text-blue-950 transition-colors"}`}>Kontak</Link>
+        <nav className="hidden md:flex items-center gap-8" id="header-nav">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`text-sm ${
+                (link.href === "/" ? pathname === "/" : pathname.startsWith(link.href))
+                  ? "font-bold text-blue-950"
+                  : "font-medium text-slate-500 hover:text-blue-950 transition-colors"
+              }`}
+            >
+              {link.name}
+            </Link>
+          ))}
         </nav>
 
-        <div className="hidden md:flex items-center gap-3">
-          <Link href="/login" className="px-4 py-2 text-sm font-semibold text-blue-950 hover:bg-slate-100 rounded-lg transition-colors">Masuk</Link>
-          <Link href="/register" className="px-4 py-2 text-sm font-bold text-white bg-blue-950 hover:bg-blue-900 rounded-lg shadow-md shadow-blue-900/20 transition-all">Daftar</Link>
+        {/* Auth Section */}
+        <div className="hidden md:flex items-center gap-3" id="header-auth">
+          {isLoggedIn ? (
+            <UserMenu session={session} />
+          ) : (
+            <>
+              <Link
+                href="/login"
+                id="header-login-btn"
+                className="px-4 py-2 text-sm font-semibold text-blue-950 hover:bg-slate-100 rounded-lg transition-colors"
+              >
+                Masuk
+              </Link>
+              <Link
+                href="/register"
+                id="header-register-btn"
+                className="px-4 py-2 text-sm font-bold text-white bg-blue-950 hover:bg-blue-900 rounded-lg shadow-md shadow-blue-900/20 transition-all"
+              >
+                Daftar
+              </Link>
+            </>
+          )}
         </div>
 
-        <button className="md:hidden text-slate-600 hover:text-blue-950">
-          <Menu className="w-6 h-6" />
-        </button>
+        {/* Mobile: Hamburger + optional avatar */}
+        <div className="flex items-center gap-3 md:hidden">
+          {isLoggedIn && <UserMenu session={session} />}
+          <button className="text-slate-600 hover:text-blue-950" id="header-mobile-menu" aria-label="Menu">
+            <Menu className="w-6 h-6" />
+          </button>
+        </div>
       </div>
     </header>
   )

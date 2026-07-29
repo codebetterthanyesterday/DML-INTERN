@@ -19,7 +19,8 @@ import { ArrowLeft, Save, Loader2, AlertCircle } from "lucide-react";
 import type { Product, Category, ProductImage } from "@prisma/client";
 import type { ProductFormState } from "@/lib/actions/products";
 
-type ProductWithRelations = Product & {
+type ProductWithRelations = Omit<Product, "price"> & {
+  price: number | null;
   category: Category;
   images: ProductImage[];
 };

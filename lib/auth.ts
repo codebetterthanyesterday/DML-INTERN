@@ -53,6 +53,11 @@ export const authConfig: NextAuthConfig = {
           const passwordsMatch = await bcrypt.compare(password, user.passwordHash)
 
           if (passwordsMatch) {
+            // Block business accounts that are not yet verified
+            if (user.role === "BUSINESS" && user.businessStatus !== "ACTIVE") {
+              return null
+            }
+
             return {
               id: user.id,
               name: user.name,

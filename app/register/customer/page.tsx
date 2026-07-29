@@ -135,7 +135,7 @@ export default function RegisterCustomerPage() {
               </button>
               <span className="text-xs text-slate-600 leading-snug">
                 Setuju{" "}
-                <Link href="#" className="text-blue-950 font-semibold hover:underline">Syarat & Ketentuan</Link>
+                <span className="text-blue-950 font-semibold">Syarat &amp; Ketentuan</span>
               </span>
             </label>
             {fieldErrors.terms && <p className="text-red-500 text-xs mt-1">{fieldErrors.terms}</p>}

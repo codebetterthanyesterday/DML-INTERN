@@ -33,7 +33,8 @@ import { MoreHorizontal, Pencil, Trash2, ToggleLeft, ToggleRight, ImageOff } fro
 import { deleteProduct, toggleProductStatus } from "@/lib/actions/products";
 import type { Product, Category, ProductImage } from "@prisma/client";
 
-type ProductWithRelations = Product & {
+type ProductWithRelations = Omit<Product, "price"> & {
+  price: number | null;
   category: Category;
   images: ProductImage[];
 };

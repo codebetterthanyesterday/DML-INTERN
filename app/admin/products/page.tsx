@@ -20,7 +20,11 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const { q = "", type = "ALL", status = "ALL" } = params;
 
-  const products = await getAdminProducts(q, type, status);
+  const productsRaw = await getAdminProducts(q, type, status);
+  const products = productsRaw.map((p) => ({
+    ...p,
+    price: p.price ? p.price.toNumber() : null,
+  }));
 
   const stats = {
     total: products.length,
