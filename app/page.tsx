@@ -1,65 +1,231 @@
-import Image from "next/image";
+import Link from "next/link"
+import { ArrowRight, Factory, ShieldCheck, ShoppingBag, Menu, Star } from "lucide-react"
 
-export default function Home() {
+export default function LandingPage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+      {/* NAVBAR */}
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-blue-950 flex items-center justify-center shadow-md">
+              <svg viewBox="0 0 32 32" fill="none" className="w-5 h-5">
+                <rect x="2" y="8" width="28" height="4" rx="2" fill="white" />
+                <rect x="2" y="16" width="20" height="4" rx="2" fill="white" fillOpacity="0.7" />
+                <rect x="2" y="24" width="24" height="4" rx="2" fill="white" fillOpacity="0.5" />
+              </svg>
+            </div>
+            <span className="text-lg font-extrabold text-blue-950 tracking-tight">DML Platform</span>
+          </div>
+
+          {/* Desktop Nav */}
+          <nav className="hidden md:flex items-center gap-8">
+            <Link href="/" className="text-sm font-semibold text-blue-950">Beranda</Link>
+            <Link href="#" className="text-sm font-medium text-slate-500 hover:text-blue-950 transition-colors">Katalog</Link>
+            <Link href="#" className="text-sm font-medium text-slate-500 hover:text-blue-950 transition-colors">Tentang</Link>
+            <Link href="#" className="text-sm font-medium text-slate-500 hover:text-blue-950 transition-colors">Kontak</Link>
+          </nav>
+
+          <div className="hidden md:flex items-center gap-3">
+            <Link href="/login" className="px-4 py-2 text-sm font-semibold text-blue-950 hover:bg-slate-100 rounded-lg transition-colors">
+              Masuk
+            </Link>
+            <Link href="/register" className="px-4 py-2 text-sm font-bold text-white bg-blue-950 hover:bg-blue-900 rounded-lg shadow-md shadow-blue-900/20 transition-all">
+              Daftar
+            </Link>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button className="md:hidden text-slate-600 hover:text-blue-950">
+            <Menu className="w-6 h-6" />
+          </button>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+      </header>
+
+      <main className="flex-1 flex flex-col">
+        {/* HERO SECTION */}
+        <section className="relative bg-blue-950 overflow-hidden">
+          {/* Background decoration */}
+          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
+          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full bg-blue-900 blur-3xl opacity-50 pointer-events-none"></div>
+          
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 flex flex-col md:flex-row items-center">
+            <div className="md:w-1/2 text-center md:text-left z-10">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-900/50 border border-blue-800 text-blue-200 text-xs font-semibold uppercase tracking-wider mb-6">
+                <ShieldCheck className="w-4 h-4" /> Solusi Karet Terbaik
+              </div>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight mb-6">
+                Material Karet Berkualitas untuk Segala <span className="text-red-500">Kebutuhan</span>.
+              </h1>
+              <p className="text-lg text-blue-200 mb-8 max-w-xl mx-auto md:mx-0">
+                Dari produk retail harian hingga suplai industri berat (B2B). Kami menyediakan rubber sheet, seal, gasket, dan conveyor belt terbaik di kelasnya.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
+                <Link href="#" className="w-full sm:w-auto px-8 py-3.5 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-lg shadow-red-600/30 transition-all flex items-center justify-center gap-2">
+                  Lihat Katalog <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link href="#" className="w-full sm:w-auto px-8 py-3.5 text-sm font-bold text-blue-100 bg-blue-900/40 hover:bg-blue-900/60 border border-blue-800 rounded-xl transition-all flex items-center justify-center">
+                  Ajukan Penawaran B2B
+                </Link>
+              </div>
+            </div>
+            
+            <div className="md:w-1/2 mt-12 md:mt-0 z-10 flex justify-center md:justify-end">
+              {/* Abstract 3D shape or placeholder for product visual */}
+              <div className="relative w-72 h-72 sm:w-96 sm:h-96">
+                <div className="absolute inset-0 bg-gradient-to-tr from-red-600 to-blue-600 rounded-3xl rotate-6 opacity-80 shadow-2xl blur-[2px]"></div>
+                <div className="absolute inset-0 bg-white rounded-3xl -rotate-3 shadow-xl overflow-hidden border border-slate-200 flex flex-col">
+                  <div className="bg-slate-100 h-48 border-b border-slate-200 flex items-center justify-center">
+                    <Factory className="w-20 h-20 text-slate-300" />
+                  </div>
+                  <div className="p-6 flex-1 flex flex-col justify-between">
+                    <div>
+                      <div className="w-16 h-4 bg-red-100 rounded mb-3"></div>
+                      <div className="w-3/4 h-6 bg-slate-200 rounded mb-2"></div>
+                      <div className="w-1/2 h-4 bg-slate-200 rounded"></div>
+                    </div>
+                    <div className="flex justify-between items-end">
+                      <div className="w-24 h-6 bg-slate-800 rounded"></div>
+                      <div className="w-10 h-10 bg-slate-200 rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* VALUE PROPOSITIONS */}
+        <section className="py-16 bg-white relative z-20 -mt-10 sm:-mt-16 mx-4 sm:mx-6 lg:mx-auto max-w-7xl rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100">
+          <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-100">
+            <div className="p-8 text-center flex flex-col items-center group">
+              <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-950 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+                <ShoppingBag className="w-7 h-7" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Rumah Tangga & Retail</h3>
+              <p className="text-sm text-slate-500">Pesan satuan dengan harga terbaik. Pengiriman cepat langsung ke alamat Anda.</p>
+            </div>
+            
+            <div className="p-8 text-center flex flex-col items-center group">
+              <div className="w-14 h-14 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+                <Factory className="w-7 h-7" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Industri & Bisnis (B2B)</h3>
+              <p className="text-sm text-slate-500">Kapasitas besar, negosiasi harga (RFQ), dan metode pembayaran fleksibel/berjangka.</p>
+            </div>
+            
+            <div className="p-8 text-center flex flex-col items-center group">
+              <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-950 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+                <ShieldCheck className="w-7 h-7" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Kualitas & Sertifikasi</h3>
+              <p className="text-sm text-slate-500">Standar industri terjamin. Material tersertifikasi yang tahan terhadap kondisi ekstrem.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* FEATURED PRODUCTS */}
+        <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+            <div>
+              <h2 className="text-sm font-bold text-red-600 uppercase tracking-widest mb-2">— Produk Unggulan</h2>
+              <p className="text-3xl font-extrabold text-slate-900 tracking-tight">Jelajahi Pilihan Terbaik Kami</p>
+            </div>
+            <Link href="#" className="text-sm font-semibold text-blue-950 hover:text-red-600 flex items-center gap-1 transition-colors">
+              Lihat Semua Produk <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="group bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300">
+                <div className="aspect-[4/3] bg-slate-100 flex items-center justify-center relative overflow-hidden">
+                  <div className="absolute inset-0 bg-blue-950/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <Factory className="w-16 h-16 text-slate-300 group-hover:scale-110 transition-transform duration-500" />
+                  <div className="absolute top-3 right-3 bg-white px-2 py-1 rounded text-[10px] font-bold text-slate-600 shadow-sm">
+                    SKU-{1000+i}
+                  </div>
+                </div>
+                <div className="p-5">
+                  <div className="flex items-center gap-1 mb-2">
+                    <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                    <span className="text-xs font-medium text-slate-600">4.9</span>
+                  </div>
+                  <h3 className="text-base font-bold text-slate-900 mb-1 group-hover:text-blue-950 transition-colors">Rubber Sheet Premium {i}</h3>
+                  <p className="text-xs text-slate-500 mb-4 line-clamp-2">Material tahan aus dan oli, cocok untuk alas mesin dan aplikasi industri berat.</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg font-extrabold text-blue-950">Rp 125.000</span>
+                    <button className="w-8 h-8 rounded-full bg-blue-50 text-blue-950 flex items-center justify-center hover:bg-blue-950 hover:text-white transition-colors">
+                      <ShoppingBag className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
       </main>
+
+      {/* FOOTER */}
+      <footer className="bg-slate-900 pt-16 pb-8 border-t border-slate-800 mt-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+            <div className="md:col-span-2">
+              <div className="flex items-center gap-2 mb-6">
+                <div className="w-8 h-8 rounded-lg bg-red-600 flex items-center justify-center">
+                  <svg viewBox="0 0 32 32" fill="none" className="w-5 h-5">
+                    <rect x="2" y="8" width="28" height="4" rx="2" fill="white" />
+                    <rect x="2" y="16" width="20" height="4" rx="2" fill="white" fillOpacity="0.7" />
+                    <rect x="2" y="24" width="24" height="4" rx="2" fill="white" fillOpacity="0.5" />
+                  </svg>
+                </div>
+                <span className="text-xl font-extrabold text-white tracking-tight">DML Platform</span>
+              </div>
+              <p className="text-sm text-slate-400 leading-relaxed max-w-sm mb-6">
+                Platform B2B dan Retail terpercaya untuk produk material karet, gasket, seal, dan perlengkapan industri lainnya.
+              </p>
+              <div className="flex gap-4">
+                {/* Social Placeholders */}
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-red-600 transition-colors cursor-pointer text-white">
+                    {/* Icon placeholder */}
+                    <span className="text-xs font-bold">in</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div>
+              <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-5">Perusahaan</h4>
+              <ul className="space-y-3">
+                <li><Link href="#" className="text-sm text-slate-400 hover:text-white transition-colors">Tentang Kami</Link></li>
+                <li><Link href="#" className="text-sm text-slate-400 hover:text-white transition-colors">Katalog Produk</Link></li>
+                <li><Link href="#" className="text-sm text-slate-400 hover:text-white transition-colors">Sertifikasi</Link></li>
+                <li><Link href="#" className="text-sm text-slate-400 hover:text-white transition-colors">Hubungi Kami</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-5">Bantuan</h4>
+              <ul className="space-y-3">
+                <li><Link href="#" className="text-sm text-slate-400 hover:text-white transition-colors">Cara Belanja</Link></li>
+                <li><Link href="#" className="text-sm text-slate-400 hover:text-white transition-colors">Pengajuan RFQ</Link></li>
+                <li><Link href="#" className="text-sm text-slate-400 hover:text-white transition-colors">Syarat & Ketentuan</Link></li>
+                <li><Link href="#" className="text-sm text-slate-400 hover:text-white transition-colors">Kebijakan Privasi</Link></li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-xs text-slate-500">
+              © {new Date().getFullYear()} DML Platform. Hak Cipta Dilindungi.
+            </p>
+            <div className="flex gap-4">
+              <span className="text-xs text-slate-600 font-medium">🇮🇩 Indonesia</span>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
-  );
+  )
 }
