@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Wireframe - PT Duta Mitra Luhur</title>
+  <style>
+    :root {
+      --ink: #2b2b2b;
+      --line: #8a8a8a;
+      --line-soft: #c7c7c7;
+      --panel: #f4f4f2;
+      --paper: #ffffff;
+      --accent: #5c6b57;
+      --tag: #e8e8e4;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Courier New', ui-monospace, monospace;
+      background: #e9e9e6;
+      color: var(--ink);
+      padding: 24px;
+    }
+
+    .toolbar {
+      max-width: 1180px;
+      margin: 0 auto 16px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .toolbar h1 {
+      font-size: 15px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 0 16px 0 0;
+      font-weight: 700;
+    }
+
+    .tab {
+      border: 1px solid var(--line);
+      background: var(--paper);
+      padding: 7px 14px;
+      font-size: 12px;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      font-family: inherit;
+      color: var(--ink);
+    }
+
+    .tab.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .canvas {
+      max-width: 1180px;
+      margin: 0 auto;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      padding: 0;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .frame-label {
+      font-size: 11px;
+      padding: 8px 14px;
+      border-bottom: 1px dashed var(--line-soft);
+      color: #666;
+      letter-spacing: 0.04em;
+    }
+
+    .box {
+      border: 1.5px solid var(--line);
+    }
+
+    .box-dashed {
+      border: 1.5px dashed var(--line-soft);
+    }
+
+    .lbl {
+      font-size: 11px;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .fill {
+      background: var(--panel);
+    }
+
+    .x-pattern {
+      background-image: linear-gradient(45deg, var(--line-soft) 1px, transparent 1px), linear-gradient(-45deg, var(--line-soft) 1px, transparent 1px);
+      background-size: 14px 14px;
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .col {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .btn {
+      border: 1.5px solid var(--ink);
+      padding: 8px 16px;
+      font-size: 12px;
+      text-align: center;
+      display: inline-block;
+      background: #fff;
+    }
+
+    .btn.solid {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .tagpill {
+      border: 1px solid var(--line-soft);
+      background: var(--tag);
+      font-size: 10px;
+      padding: 3px 8px;
+      display: inline-block;
+    }
+
+    .pad {
+      padding: 16px;
+    }
+
+    .annot {
+      font-size: 10px;
+      color: #8a4b2f;
+      font-style: italic;
+    }
+
+    hr.thin {
+      border: none;
+      border-top: 1px solid var(--line-soft);
+      margin: 12px 0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="toolbar">
+    <h1>Mockup // Web PT Duta Mitra Luhur</h1>
+    <button class="tab active" data-page="p1">01 Beranda</button>
+    <button class="tab" data-page="p2">02 Katalog</button>
+    <button class="tab" data-page="p3">03 Info Produk</button>
+    <button class="tab" data-page="p4">04 Keranjang & Bayar</button>
+    <button class="tab" data-page="p5">05 Form Penawaran (B2B)</button>
+    <button class="tab" data-page="p6">06 Panel Admin</button>
+  </div>
+
+  <div class="canvas">
+
+    <!-- PAGE 1: BERANDA -->
+    <div class="page active" id="p1">
+      <div class="frame-label">01 / BERANDA — Tampilan publik sebelum login</div>
+      <div class="pad col">
+        <div class="row" style="justify-content:space-between;align-items:center;">
+          <div class="lbl">[ Logo ] PT Duta Mitra Luhur</div>
+          <div class="row lbl">
+            <span>Beranda</span><span>Katalog Eceran</span><span>Katalog Industri</span><span>Tentang
+              Kami</span><span>Hubungi Kami</span>
+            <span class="btn" style="padding:4px 10px;">Masuk</span>
+            <span class="btn solid" style="padding:4px 10px;">Daftar</span>
+          </div>
+        </div>
+        <hr class="thin">
+        <div class="box x-pattern" style="height:220px;display:flex;align-items:center;justify-content:center;">
+          <div class="lbl" style="text-align:center;">Banner Utama — Menampilkan tagline dan foto produk andalan
+            kita<br><br>[Tombol: Cek Katalog] [Tombol: Minta Penawaran B2B]</div>
+        </div>
+        <div class="row">
+          <div class="box fill pad" style="flex:1;text-align:center;">
+            <div class="lbl">Ikon</div>
+            <div>Kebutuhan Rumah Tangga & Eceran</div>
+          </div>
+          <div class="box fill pad" style="flex:1;text-align:center;">
+            <div class="lbl">Ikon</div>
+            <div>Kebutuhan Industri & Skala Besar (B2B)</div>
+          </div>
+          <div class="box fill pad" style="flex:1;text-align:center;">
+            <div class="lbl">Ikon</div>
+            <div>Terjamin & Tersertifikasi</div>
+          </div>
+        </div>
+        <div class="lbl">— Pilihan Produk Terbaik —</div>
+        <div class="row">
+          <div class="box" style="flex:1;height:130px;" data-p></div>
+          <div class="box" style="flex:1;height:130px;"></div>
+          <div class="box" style="flex:1;height:130px;"></div>
+          <div class="box" style="flex:1;height:130px;"></div>
+        </div>
+        <div class="lbl">— Keunggulan Kami — (info soal sertifikat, jangkauan pengiriman, dll)</div>
+        <div class="box fill" style="height:70px;"></div>
+        <div class="row lbl"
+          style="justify-content:space-between;border-top:1px solid var(--line-soft);padding-top:10px;">
+          <span>Bagian Bawah: Alamat pabrik, info kontak, dan sosmed</span>
+          <span>Kebijakan Privasi · Syarat & Ketentuan</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE 2: KATALOG -->
+    <div class="page" id="p2">
+      <div class="frame-label">02 / KATALOG — Dengan fitur penyaringan Eceran vs Industri</div>
+      <div class="pad row" style="align-items:flex-start;">
+        <div class="col box-dashed pad" style="width:220px;">
+          <div class="lbl">PENYARINGAN</div>
+          <div class="tagpill">☐ Eceran</div>
+          <div class="tagpill">☐ Industri</div>
+          <hr class="thin">
+          <div class="lbl">Kategori</div>
+          <div>☐ Matras & Alas Karet</div>
+          <div>☐ Seal & Gasket</div>
+          <div>☐ Lembaran Karet (Rubber Sheet)</div>
+          <div>☐ Conveyor Belt</div>
+          <div>☐ Sandal & Sepatu Karet</div>
+          <hr class="thin">
+          <div class="lbl">Kisaran Harga</div>
+          <div class="box fill" style="height:26px;"></div>
+        </div>
+        <div class="col" style="flex:1;">
+          <div class="row" style="justify-content:space-between;">
+            <div class="box fill" style="width:60%;height:32px;"><span class="lbl"
+                style="margin-left:8px;line-height:32px;">🔍 Mau cari apa...</span></div>
+            <div class="lbl">Urutkan dari: Paling Baru ▾</div>
+          </div>
+          <div class="row" style="flex-wrap:wrap;gap:12px;">
+            <div class="box col" style="width:23%;">
+              <div class="box fill" style="height:100px;"></div>
+              <div class="pad" style="padding:8px;">
+                <div class="tagpill">ECERAN</div>
+                <div class="lbl">Nama Produknya</div>
+                <div>Rp 000.000</div>
+              </div>
+            </div>
+            <div class="box col" style="width:23%;">
+              <div class="box fill" style="height:100px;"></div>
+              <div class="pad" style="padding:8px;">
+                <div class="tagpill">INDUSTRI</div>
+                <div class="lbl">Nama Produknya</div>
+                <div class="annot">Harga hubungi admin (Minta Penawaran)</div>
+              </div>
+            </div>
+            <div class="box col" style="width:23%;">
+              <div class="box fill" style="height:100px;"></div>
+              <div class="pad" style="padding:8px;">
+                <div class="tagpill">ECERAN</div>
+                <div class="lbl">Nama Produknya</div>
+                <div>Rp 000.000</div>
+              </div>
+            </div>
+            <div class="box col" style="width:23%;">
+              <div class="box fill" style="height:100px;"></div>
+              <div class="pad" style="padding:8px;">
+                <div class="tagpill">ECERAN</div>
+                <div class="lbl">Nama Produknya</div>
+                <div>Rp 000.000</div>
+              </div>
+            </div>
+          </div>
+          <div class="lbl" style="text-align:center;">◂ 1 2 3 ... 8 ▸</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE 3: INFO PRODUK -->
+    <div class="page" id="p3">
+      <div class="frame-label">03 / INFO PRODUK — Tampilannya beda antara pembeli eceran dan industri</div>
+      <div class="pad row" style="align-items:flex-start;">
+        <div class="col" style="width:40%;">
+          <div class="box x-pattern" style="height:260px;"></div>
+          <div class="row">
+            <div class="box fill" style="width:23%;height:60px;"></div>
+            <div class="box fill" style="width:23%;height:60px;"></div>
+            <div class="box fill" style="width:23%;height:60px;"></div>
+            <div class="box fill" style="width:23%;height:60px;"></div>
+          </div>
+        </div>
+        <div class="col" style="flex:1;">
+          <div class="tagpill">INDUSTRI</div>
+          <div class="lbl" style="font-size:16px;">Nama Produknya — Rubber Sheet SBR</div>
+          <div class="lbl">Kode: 000-000 · Kategori: Lembaran Karet</div>
+          <hr class="thin">
+          <div class="lbl">SPESIFIKASI LENGKAP</div>
+          <div>Tebal: ___ mm &nbsp;|&nbsp; Bahan: ___ &nbsp;|&nbsp; Kekerasan: ___ Shore A</div>
+          <div>Ukuran per roll: ___ &nbsp;|&nbsp; Minimal pesan: ___ meter</div>
+          <hr class="thin">
+          <div class="annot">Kalo pembeli eceran → harga langsung kelihatan + ada tombol "Masuk Keranjang"</div>
+          <div class="annot">Kalo pembeli industri → harga disembunyikan (Hubungi Admin) + tombol "Minta Penawaran"
+          </div>
+          <div class="row" style="margin-top:8px;">
+            <div class="box fill" style="width:80px;height:34px;"><span class="lbl"
+                style="line-height:34px;margin-left:10px;">Jml</span></div>
+            <div class="btn solid">Minta Penawaran / Masukin Keranjang</div>
+          </div>
+          <hr class="thin">
+          <div class="lbl">KETERANGAN PRODUK</div>
+          <div class="box fill" style="height:60px;"></div>
+        </div>
+      </div>
+      <div class="pad">
+        <div class="lbl">— APA KATA MEREKA? (Cuma muncul di produk eceran) —</div>
+        <div class="box fill" style="height:50px;"></div>
+      </div>
+    </div>
+
+    <!-- PAGE 4: KERANJANG -->
+    <div class="page" id="p4">
+      <div class="frame-label">04 / KERANJANG &amp; PEMBAYARAN — Khusus pembeli eceran</div>
+      <div class="pad row" style="align-items:flex-start;">
+        <div class="col" style="flex:1;">
+          <div class="lbl">ISI KERANJANG</div>
+          <div class="row box-dashed pad" style="align-items:center;">
+            <div class="box fill" style="width:60px;height:60px;"></div>
+            <div class="col" style="flex:1;">
+              <div class="lbl">Nama Produknya</div>
+              <div>Rp 000.000 x Jml [ - 2 + ]</div>
+            </div>
+            <div class="annot">Buang</div>
+          </div>
+          <div class="row box-dashed pad" style="align-items:center;">
+            <div class="box fill" style="width:60px;height:60px;"></div>
+            <div class="col" style="flex:1;">
+              <div class="lbl">Nama Produknya</div>
+              <div>Rp 000.000 x Jml [ - 1 + ]</div>
+            </div>
+            <div class="annot">Buang</div>
+          </div>
+          <hr class="thin">
+          <div class="lbl">MAU DIKIRIM KE MANA?</div>
+          <div class="box fill" style="height:60px;"></div>
+          <div class="lbl">PILIHAN KURIR</div>
+          <div class="row">
+            <div class="tagpill">Biasa</div>
+            <div class="tagpill">Cepat</div>
+            <div class="tagpill">Ambil Sendiri ke Gudang</div>
+          </div>
+        </div>
+        <div class="col box-dashed pad" style="width:280px;">
+          <div class="lbl">RINCIAN BIAYA</div>
+          <div>Total Harga Barang: Rp 000.000</div>
+          <div>Biaya Kurir: Rp 00.000</div>
+          <div>Total Semuanya: <b>Rp 000.000</b></div>
+          <hr class="thin">
+          <div class="lbl">MAU BAYAR PAKAI APA?</div>
+          <div class="tagpill">QRIS</div>
+          <div class="tagpill">Transfer Bank (VA)</div>
+          <div class="tagpill">Gopay/Ovo/Dana</div>
+          <div class="btn solid" style="margin-top:10px;text-align:center;">Lanjut Bayar</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE 5: FORM PENAWARAN -->
+    <div class="page" id="p5">
+      <div class="frame-label">05 / FORM MINTA PENAWARAN — Khusus B2B, pembeli harus masuk pakai Akun Bisnis</div>
+      <div class="pad row" style="align-items:flex-start;">
+        <div class="col" style="flex:1;">
+          <div class="lbl">BARANG YANG MAU DITAWAR</div>
+          <div class="row box-dashed pad" style="align-items:center;">
+            <div class="col" style="flex:1;">
+              <div class="lbl">Nama Produknya — Rubber Sheet SBR</div>
+            </div>
+            <div class="box fill" style="width:70px;height:32px;"><span class="lbl"
+                style="line-height:32px;margin-left:8px;">Banyak</span></div>
+            <div class="box fill" style="width:120px;height:32px;"><span class="lbl"
+                style="line-height:32px;margin-left:8px;">Satuan: meter</span></div>
+          </div>
+          <div class="lbl">ADA REQUEST KHUSUS? (Misal ukuran/spek beda)</div>
+          <div class="box fill" style="height:70px;"></div>
+          <div class="btn" style="width:fit-content;">+ Sekalian Tambah Barang Lain</div>
+          <hr class="thin">
+          <div class="lbl">INFO PENGIRIMAN & TARGET WAKTU</div>
+          <div class="row">
+            <div class="box fill" style="flex:1;height:34px;"><span class="lbl"
+                style="line-height:34px;margin-left:8px;">Mau Dikirim ke Kota Mana?</span></div>
+            <div class="box fill" style="flex:1;height:34px;"><span class="lbl"
+                style="line-height:34px;margin-left:8px;">Kapan Barang Ini Dibutuhkan?</span></div>
+          </div>
+        </div>
+        <div class="col box-dashed pad" style="width:280px;">
+          <div class="lbl">DATA PERUSAHAAN (Otomatis dari profil)</div>
+          <div>Nama PT/CV: ___________</div>
+          <div>Status NPWP: Sudah Dicek ✔</div>
+          <div>Nama PIC: ___________</div>
+          <hr class="thin">
+          <div class="annot">Nanti pas diklik kirim, statusnya berubah jadi "Menunggu Dicek Admin"</div>
+          <div class="btn solid" style="margin-top:8px;text-align:center;">Kirim Permintaan Sekarang</div>
+        </div>
+      </div>
+      <div class="pad">
+        <div class="lbl">— DAFTAR PENAWARAN YANG PERNAH SAYA MINTA —</div>
+        <div class="row box-dashed pad">
+          <div style="flex:1;">RFQ-0001 · 3 macam barang</div>
+          <div class="tagpill">Sudah Dikasih Harga</div>
+          <div class="annot">Cek Detailnya</div>
+        </div>
+        <div class="row box-dashed pad">
+          <div style="flex:1;">RFQ-0002 · 1 macam barang</div>
+          <div class="tagpill">Masih Dicek Admin</div>
+          <div class="annot">Cek Detailnya</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE 6: PANEL ADMIN -->
+    <div class="page" id="p6">
+      <div class="frame-label">06 / PANEL ADMIN — Ruang kerja buat ngurusin semuanya</div>
+      <div class="pad row" style="align-items:flex-start;">
+        <div class="col box-dashed pad" style="width:200px;">
+          <div class="lbl">MENU UTAMA</div>
+          <div>▸ Ringkasan</div>
+          <div>▸ Atur Produk & Kategori</div>
+          <div>▸ Daftar Pesanan Eceran</div>
+          <div>▸ Urus Permintaan Penawaran</div>
+          <div>▸ Cek Pendaftar Akun Bisnis</div>
+          <div>▸ Rekap Laporan</div>
+        </div>
+        <div class="col" style="flex:1;">
+          <div class="row">
+            <div class="box fill pad" style="flex:1;text-align:center;">
+              <div class="lbl">Orderan Masuk</div>
+              <div style="font-size:20px;">12</div>
+            </div>
+            <div class="box fill pad" style="flex:1;text-align:center;">
+              <div class="lbl">Penawaran Belum Dijawab</div>
+              <div style="font-size:20px;">5</div>
+            </div>
+            <div class="box fill pad" style="flex:1;text-align:center;">
+              <div class="lbl">Akun Bisnis Minta Approval</div>
+              <div style="font-size:20px;">3</div>
+            </div>
+            <div class="box fill pad" style="flex:1;text-align:center;">
+              <div class="lbl">Omzet Bulan Ini</div>
+              <div style="font-size:20px;">Rp ___</div>
+            </div>
+          </div>
+          <div class="lbl">— PERMINTAAN PENAWARAN (RFQ) BARU MASUK —</div>
+          <div class="row box-dashed pad" style="align-items:center;">
+            <div style="flex:1;">RFQ-0003 · PT Sumber Jaya · 2 macam barang</div>
+            <div class="tagpill">Belum Dicek</div>
+            <div class="btn">Kasih Harga</div>
+          </div>
+          <div class="row box-dashed pad" style="align-items:center;">
+            <div style="flex:1;">RFQ-0004 · CV Mitra Karet · 1 macam barang</div>
+            <div class="tagpill">Belum Dicek</div>
+            <div class="btn">Kasih Harga</div>
+          </div>
+          <div class="lbl">— GRAFIK PENJUALAN (Eceran dibanding Industri) —</div>
+          <div class="box x-pattern" style="height:140px;"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.page).classList.add('active');
+      });
+    });
+  </script>
+</body>
+
+</html>
