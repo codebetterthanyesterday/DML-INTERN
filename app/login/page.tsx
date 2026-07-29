@@ -1,12 +1,12 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useState, useTransition, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Eye, EyeOff, ShieldCheck } from "lucide-react"
 import { loginAction } from "@/lib/actions/auth"
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
@@ -119,5 +119,17 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="animate-pulse text-sm text-slate-500 font-medium">Memuat...</div>
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   )
 }
