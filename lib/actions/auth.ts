@@ -33,7 +33,7 @@ const customerSchema = z.object({
   phone: z.string().min(8, "No. HP tidak valid"),
   password: z.string().min(6, "Minimal 6 karakter"),
   terms: z.literal("on", {
-    errorMap: () => ({ message: "Anda harus menyetujui S&K" }),
+    message: "Anda harus menyetujui S&K",
   }),
 })
 
