@@ -12,6 +12,7 @@ export default auth((req) => {
     nextUrl.pathname === "/login" ||
     nextUrl.pathname.startsWith("/register") ||
     nextUrl.pathname.startsWith("/forgot") ||
+    nextUrl.pathname.startsWith("/reset") ||
     nextUrl.pathname === "/" ||
     nextUrl.pathname.startsWith("/katalog") ||
     nextUrl.pathname.startsWith("/produk") ||

@@ -15,6 +15,7 @@ function LoginContent() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
   const justRegistered = searchParams.get("registered")
+  const justReset = searchParams.get("reset")
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -49,7 +50,7 @@ function LoginContent() {
       <div className="w-full max-w-sm bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-100/80 p-8">
         <h1 className="text-xl font-bold text-slate-900 text-center mb-6">Masuk ke Akun</h1>
 
-        {/* Success banner */}
+        {/* Success banner (Register) */}
         {justRegistered && (
           <div className="flex items-start gap-2 p-3 rounded-xl bg-blue-50 border border-blue-200 mb-5">
             <ShieldCheck className="w-4 h-4 text-blue-950 flex-shrink-0 mt-0.5" />
@@ -57,6 +58,16 @@ function LoginContent() {
               {justRegistered === "business"
                 ? "Akun bisnis berhasil didaftarkan! Tunggu verifikasi Admin 1-2 hari kerja."
                 : "Akun berhasil dibuat! Silakan masuk."}
+            </p>
+          </div>
+        )}
+
+        {/* Success banner (Reset Password) */}
+        {justReset === "success" && (
+          <div className="flex items-start gap-2 p-3 rounded-xl bg-green-50 border border-green-200 mb-5">
+            <ShieldCheck className="w-4 h-4 text-green-700 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-green-700 font-medium leading-snug">
+              Kata sandi berhasil diperbarui! Silakan masuk dengan kata sandi baru Anda.
             </p>
           </div>
         )}

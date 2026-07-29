@@ -191,3 +191,27 @@ export async function forgotPasswordAction(email: string) {
     return { error: "Gagal mengirim link reset kata sandi. Silakan coba lagi." }
   }
 }
+
+export async function resetPasswordAction(formData: FormData) {
+  try {
+    const password = formData.get("password") as string
+    const confirmPassword = formData.get("confirmPassword") as string
+    
+    if (!password || password.length < 6) {
+      return { error: "Kata sandi minimal 6 karakter." }
+    }
+    
+    if (password !== confirmPassword) {
+      return { error: "Konfirmasi kata sandi tidak cocok." }
+    }
+    
+    // Simulate updating password in the database
+    // In a real app, you would verify the reset token here, hash the new password, and update the user record
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+    
+    return { success: true }
+  } catch (error) {
+    console.error("Reset Password Error:", error)
+    return { error: "Gagal mengatur ulang kata sandi. Silakan coba lagi." }
+  }
+}

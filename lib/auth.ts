@@ -54,7 +54,7 @@ export const authConfig: NextAuthConfig = {
 
           if (passwordsMatch) {
             // Block business accounts that are not yet verified
-            if (user.role === "BUSINESS" && user.businessStatus !== "ACTIVE") {
+            if (user.role === "BUSINESS" && user.businessStatus !== "APPROVED") {
               return null
             }
 
