@@ -1,46 +1,13 @@
 import Link from "next/link"
 import { ArrowRight, Factory, ShieldCheck, ShoppingBag, Menu, Star } from "lucide-react"
+import { Header } from "@/components/shared/Header"
+import { Footer } from "@/components/shared/Footer"
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       {/* NAVBAR */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-blue-950 flex items-center justify-center shadow-md">
-              <svg viewBox="0 0 32 32" fill="none" className="w-5 h-5">
-                <rect x="2" y="8" width="28" height="4" rx="2" fill="white" />
-                <rect x="2" y="16" width="20" height="4" rx="2" fill="white" fillOpacity="0.7" />
-                <rect x="2" y="24" width="24" height="4" rx="2" fill="white" fillOpacity="0.5" />
-              </svg>
-            </div>
-            <span className="text-lg font-extrabold text-blue-950 tracking-tight">DML Platform</span>
-          </div>
-
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-8">
-            <Link href="/" className="text-sm font-semibold text-blue-950">Beranda</Link>
-            <Link href="#" className="text-sm font-medium text-slate-500 hover:text-blue-950 transition-colors">Katalog</Link>
-            <Link href="#" className="text-sm font-medium text-slate-500 hover:text-blue-950 transition-colors">Tentang</Link>
-            <Link href="#" className="text-sm font-medium text-slate-500 hover:text-blue-950 transition-colors">Kontak</Link>
-          </nav>
-
-          <div className="hidden md:flex items-center gap-3">
-            <Link href="/login" className="px-4 py-2 text-sm font-semibold text-blue-950 hover:bg-slate-100 rounded-lg transition-colors">
-              Masuk
-            </Link>
-            <Link href="/register" className="px-4 py-2 text-sm font-bold text-white bg-blue-950 hover:bg-blue-900 rounded-lg shadow-md shadow-blue-900/20 transition-all">
-              Daftar
-            </Link>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button className="md:hidden text-slate-600 hover:text-blue-950">
-            <Menu className="w-6 h-6" />
-          </button>
-        </div>
-      </header>
+      <Header />
 
       <main className="flex-1 flex flex-col">
         {/* HERO SECTION */}
@@ -61,10 +28,10 @@ export default function LandingPage() {
                 Dari produk retail harian hingga suplai industri berat (B2B). Kami menyediakan rubber sheet, seal, gasket, dan conveyor belt terbaik di kelasnya.
               </p>
               <div className="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
-                <Link href="#" className="w-full sm:w-auto px-8 py-3.5 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-lg shadow-red-600/30 transition-all flex items-center justify-center gap-2">
+                <Link href="/katalog" className="w-full sm:w-auto px-8 py-3.5 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-lg shadow-red-600/30 transition-all flex items-center justify-center gap-2">
                   Lihat Katalog <ArrowRight className="w-4 h-4" />
                 </Link>
-                <Link href="#" className="w-full sm:w-auto px-8 py-3.5 text-sm font-bold text-blue-100 bg-blue-900/40 hover:bg-blue-900/60 border border-blue-800 rounded-xl transition-all flex items-center justify-center">
+                <Link href="/register/business" className="w-full sm:w-auto px-8 py-3.5 text-sm font-bold text-blue-100 bg-blue-900/40 hover:bg-blue-900/60 border border-blue-800 rounded-xl transition-all flex items-center justify-center">
                   Ajukan Penawaran B2B
                 </Link>
               </div>
@@ -167,65 +134,7 @@ export default function LandingPage() {
       </main>
 
       {/* FOOTER */}
-      <footer className="bg-slate-900 pt-16 pb-8 border-t border-slate-800 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-            <div className="md:col-span-2">
-              <div className="flex items-center gap-2 mb-6">
-                <div className="w-8 h-8 rounded-lg bg-red-600 flex items-center justify-center">
-                  <svg viewBox="0 0 32 32" fill="none" className="w-5 h-5">
-                    <rect x="2" y="8" width="28" height="4" rx="2" fill="white" />
-                    <rect x="2" y="16" width="20" height="4" rx="2" fill="white" fillOpacity="0.7" />
-                    <rect x="2" y="24" width="24" height="4" rx="2" fill="white" fillOpacity="0.5" />
-                  </svg>
-                </div>
-                <span className="text-xl font-extrabold text-white tracking-tight">DML Platform</span>
-              </div>
-              <p className="text-sm text-slate-400 leading-relaxed max-w-sm mb-6">
-                Platform B2B dan Retail terpercaya untuk produk material karet, gasket, seal, dan perlengkapan industri lainnya.
-              </p>
-              <div className="flex gap-4">
-                {/* Social Placeholders */}
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-red-600 transition-colors cursor-pointer text-white">
-                    {/* Icon placeholder */}
-                    <span className="text-xs font-bold">in</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-5">Perusahaan</h4>
-              <ul className="space-y-3">
-                <li><Link href="#" className="text-sm text-slate-400 hover:text-white transition-colors">Tentang Kami</Link></li>
-                <li><Link href="#" className="text-sm text-slate-400 hover:text-white transition-colors">Katalog Produk</Link></li>
-                <li><Link href="#" className="text-sm text-slate-400 hover:text-white transition-colors">Sertifikasi</Link></li>
-                <li><Link href="#" className="text-sm text-slate-400 hover:text-white transition-colors">Hubungi Kami</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-5">Bantuan</h4>
-              <ul className="space-y-3">
-                <li><Link href="#" className="text-sm text-slate-400 hover:text-white transition-colors">Cara Belanja</Link></li>
-                <li><Link href="#" className="text-sm text-slate-400 hover:text-white transition-colors">Pengajuan RFQ</Link></li>
-                <li><Link href="#" className="text-sm text-slate-400 hover:text-white transition-colors">Syarat & Ketentuan</Link></li>
-                <li><Link href="#" className="text-sm text-slate-400 hover:text-white transition-colors">Kebijakan Privasi</Link></li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-xs text-slate-500">
-              © {new Date().getFullYear()} DML Platform. Hak Cipta Dilindungi.
-            </p>
-            <div className="flex gap-4">
-              <span className="text-xs text-slate-600 font-medium">🇮🇩 Indonesia</span>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }
