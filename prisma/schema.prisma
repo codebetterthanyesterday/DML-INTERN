@@ -92,6 +92,14 @@ enum PaymentStatus {
   FAILED
 }
 
+enum NotificationType {
+  NEW_ORDER
+  NEW_QUOTE
+  PAYMENT_RECEIVED
+  SYSTEM_ALERT
+  BUSINESS_VERIFICATION
+}
+
 // ============================================
 // USER & AKUN BISNIS
 // ============================================
@@ -115,6 +123,7 @@ model User {
   orders            Order[]
   quotes            Quote[]
   reviews           Review[]
+  notifications     Notification[]
 
   @@map("users")
 }
@@ -371,4 +380,26 @@ model Review {
 
   @@index([productId])
   @@map("reviews")
+}
+
+// ============================================
+// NOTIFIKASI (SISTEM)
+// ============================================
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String?          // Nullable jika notifikasi broadcast (misal untuk semua ADMIN)
+  type      NotificationType
+  title     String
+  message   String
+  linkUrl   String?          // URL tujuan ketika di klik (misal: /admin/orders/[id])
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  user      User?            @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([isRead])
+  @@map("notifications")
 }

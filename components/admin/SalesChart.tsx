@@ -15,7 +15,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-export type ChartDataItem = { month: string; retail: number; industrial: number };
+export type ChartDataItem = { label: string; retail: number; industrial: number };
 
 const chartConfig = {
   retail: {
@@ -40,11 +40,10 @@ export function SalesChart({ data }: { data: ChartDataItem[] }) {
           <BarChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
             <CartesianGrid vertical={false} strokeDasharray="3 3" />
             <XAxis
-              dataKey="month"
+              dataKey="label"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              tickFormatter={(value) => value.slice(0, 3)}
             />
             <ChartTooltip content={<ChartTooltipContent />} />
             <Bar dataKey="retail" fill="var(--color-retail)" radius={4} />

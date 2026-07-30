@@ -127,7 +127,7 @@ export default async function AdminDashboardPage() {
     const d = new Date();
     d.setMonth(d.getMonth() - i);
     const monthStr = monthNames[d.getMonth()];
-    chartDataMap.set(monthStr, { month: monthStr, retail: 0, industrial: 0 });
+    chartDataMap.set(monthStr, { label: monthStr, retail: 0, industrial: 0 });
   }
 
   ordersForChart.forEach(o => {

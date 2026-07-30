@@ -16,6 +16,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { AdminSidebar } from "./AdminSidebar";
 import { signOut } from "next-auth/react";
+import { AdminNotificationsDropdown } from "./AdminNotificationsDropdown";
 
 export function AdminTopbar({ user }: { user?: { name?: string | null; email?: string | null } }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -99,15 +100,7 @@ export function AdminTopbar({ user }: { user?: { name?: string | null; email?: s
           </div>
           
           <div className="flex items-center gap-2 md:gap-4">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="relative text-slate-500 hover:text-blue-950 hover:bg-slate-100 focus-visible:ring-2"
-              aria-label="Notifikasi"
-            >
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-1.5 right-1.5 flex h-2 w-2 rounded-full bg-red-600"></span>
-            </Button>
+            <AdminNotificationsDropdown />
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
