@@ -15,9 +15,166 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ShoppingCart, FileText, Building2, Wallet } from "lucide-react";
-import { SalesChart } from "@/components/admin/SalesChart";
+import { SalesChart, ChartDataItem } from "@/components/admin/SalesChart";
+import prisma from "@/lib/prisma";
 
-export default function AdminDashboardPage() {
+export default async function AdminDashboardPage() {
+  const startOfThisMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  const startOfLastMonth = new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1);
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+  const startOfYesterday = new Date(startOfToday);
+  startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+
+  const [
+    newOrdersToday,
+    newOrdersYesterday,
+    rfqPendingCount,
+    businessPendingCount,
+    completedOrdersThisMonth,
+    completedOrdersLastMonth,
+    completedInvoicesThisMonth,
+    completedInvoicesLastMonth,
+    recentQuotes,
+    ordersForChart,
+    invoicesForChart,
+  ] = await Promise.all([
+    prisma.order.count({ where: { createdAt: { gte: startOfToday } } }),
+    prisma.order.count({ where: { createdAt: { gte: startOfYesterday, lt: startOfToday } } }),
+    prisma.quote.count({ where: { status: 'PENDING' } }),
+    prisma.user.count({ where: { businessStatus: 'PENDING' } }),
+    
+    // Revenue this month (B2C)
+    prisma.order.findMany({
+      where: {
+        paymentStatus: 'PAID',
+        createdAt: { gte: startOfThisMonth }
+      },
+      select: { totalAmount: true }
+    }),
+    // Revenue last month (B2C)
+    prisma.order.findMany({
+      where: {
+        paymentStatus: 'PAID',
+        createdAt: { gte: startOfLastMonth, lt: startOfThisMonth }
+      },
+      select: { totalAmount: true }
+    }),
+
+    // Revenue this month (B2B)
+    prisma.invoice.findMany({
+      where: {
+        status: 'PAID',
+        createdAt: { gte: startOfThisMonth }
+      },
+      select: { amount: true }
+    }),
+    // Revenue last month (B2B)
+    prisma.invoice.findMany({
+      where: {
+        status: 'PAID',
+        createdAt: { gte: startOfLastMonth, lt: startOfThisMonth }
+      },
+      select: { amount: true }
+    }),
+
+    // Recent RFQs
+    prisma.quote.findMany({
+      take: 5,
+      orderBy: { createdAt: 'desc' },
+      include: { user: true }
+    }),
+
+    // Data for Chart (B2C) - last 6 months
+    prisma.order.findMany({
+      where: {
+        paymentStatus: 'PAID',
+        createdAt: { gte: new Date(new Date().setMonth(new Date().getMonth() - 5)) }
+      },
+      select: { totalAmount: true, createdAt: true }
+    }),
+
+    // Data for Chart (B2B) - last 6 months
+    prisma.invoice.findMany({
+      where: {
+        status: 'PAID',
+        createdAt: { gte: new Date(new Date().setMonth(new Date().getMonth() - 5)) }
+      },
+      select: { amount: true, createdAt: true }
+    }),
+  ]);
+
+  const calculateTotal = (orders: { totalAmount: any }[], invoices: { amount: any }[]) => {
+    const ordersTotal = orders.reduce((sum, o) => sum + Number(o.totalAmount), 0);
+    const invoicesTotal = invoices.reduce((sum, i) => sum + Number(i.amount), 0);
+    return ordersTotal + invoicesTotal;
+  };
+
+  const revenueThisMonth = calculateTotal(completedOrdersThisMonth, completedInvoicesThisMonth);
+  const revenueLastMonth = calculateTotal(completedOrdersLastMonth, completedInvoicesLastMonth);
+
+  const revenueGrowth = revenueLastMonth === 0 
+    ? (revenueThisMonth > 0 ? 100 : 0) 
+    : Math.round(((revenueThisMonth - revenueLastMonth) / revenueLastMonth) * 100);
+
+  const newOrdersGrowth = newOrdersToday - newOrdersYesterday;
+
+  // Chart data formatting
+  const chartDataMap = new Map<string, ChartDataItem>();
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date();
+    d.setMonth(d.getMonth() - i);
+    const monthStr = monthNames[d.getMonth()];
+    chartDataMap.set(monthStr, { month: monthStr, retail: 0, industrial: 0 });
+  }
+
+  ordersForChart.forEach(o => {
+    const monthStr = monthNames[o.createdAt.getMonth()];
+    if (chartDataMap.has(monthStr)) {
+      const data = chartDataMap.get(monthStr)!;
+      data.retail += Number(o.totalAmount);
+    }
+  });
+
+  invoicesForChart.forEach(i => {
+    const monthStr = monthNames[i.createdAt.getMonth()];
+    if (chartDataMap.has(monthStr)) {
+      const data = chartDataMap.get(monthStr)!;
+      data.industrial += Number(i.amount);
+    }
+  });
+
+  const chartData = Array.from(chartDataMap.values());
+
+  const formatCurrencyCompact = (amount: number) => {
+    return new Intl.NumberFormat('id-ID', { 
+      notation: "compact", 
+      compactDisplay: "short",
+      style: 'currency', 
+      currency: 'IDR',
+      maximumFractionDigits: 1
+    }).format(amount);
+  };
+
+  const getBadgeProps = (status: string) => {
+    switch (status) {
+      case 'PENDING':
+        return { label: 'Menunggu Review', className: 'bg-red-50 text-red-600 hover:bg-red-100 font-bold border-red-100' };
+      case 'REVIEWED':
+        return { label: 'Sedang Direview', className: 'bg-orange-50 text-orange-600 hover:bg-orange-100 font-bold border-orange-100' };
+      case 'QUOTED':
+        return { label: 'Menunggu Customer', className: 'bg-blue-50 text-blue-700 border-blue-200 font-bold' };
+      case 'ACCEPTED':
+        return { label: 'Disetujui', className: 'bg-green-100 text-green-700 hover:bg-green-100 font-bold border-green-200' };
+      case 'REJECTED':
+        return { label: 'Ditolak', className: 'bg-slate-100 text-slate-700 border-slate-200 font-bold' };
+      default:
+        return { label: status, className: 'bg-slate-100 text-slate-700 border-slate-200 font-bold' };
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -35,8 +192,10 @@ export default function AdminDashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-extrabold text-blue-950">12</div>
-            <p className="text-xs font-semibold text-green-600 mt-1">+2 dari hari kemarin</p>
+            <div className="text-3xl font-extrabold text-blue-950">{newOrdersToday}</div>
+            <p className={`text-xs font-semibold mt-1 ${newOrdersGrowth >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+              {newOrdersGrowth > 0 ? '+' : ''}{newOrdersGrowth} dari hari kemarin
+            </p>
           </CardContent>
         </Card>
         <Card className="hover:shadow-lg hover:shadow-red-900/5 transition-all border-slate-200 group">
@@ -47,7 +206,7 @@ export default function AdminDashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-extrabold text-blue-950">5</div>
+            <div className="text-3xl font-extrabold text-blue-950">{rfqPendingCount}</div>
             <p className="text-xs font-semibold text-red-500 mt-1">Perlu review harga</p>
           </CardContent>
         </Card>
@@ -59,7 +218,7 @@ export default function AdminDashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-extrabold text-blue-950">3</div>
+            <div className="text-3xl font-extrabold text-blue-950">{businessPendingCount}</div>
             <p className="text-xs font-semibold text-slate-500 mt-1">Menunggu verifikasi</p>
           </CardContent>
         </Card>
@@ -71,8 +230,10 @@ export default function AdminDashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-extrabold text-blue-950">Rp 124.5M</div>
-            <p className="text-xs font-semibold text-green-600 mt-1">+15% dari bulan lalu</p>
+            <div className="text-3xl font-extrabold text-blue-950">{formatCurrencyCompact(revenueThisMonth)}</div>
+            <p className={`text-xs font-semibold mt-1 ${revenueGrowth >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+              {revenueGrowth > 0 ? '+' : ''}{revenueGrowth}% dari bulan lalu
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -94,54 +255,35 @@ export default function AdminDashboardPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableRow className="hover:bg-slate-50 border-slate-100">
-                  <TableCell className="font-bold text-blue-950">RFQ-0003</TableCell>
-                  <TableCell className="font-medium text-slate-700">PT Sumber Jaya</TableCell>
-                  <TableCell>
-                    <Badge variant="secondary" className="bg-red-50 text-red-600 hover:bg-red-100 font-bold border-red-100">
-                      Menunggu Review
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button size="sm" className="bg-blue-950 hover:bg-blue-900 text-white font-bold shadow-md shadow-blue-900/20">Beri Harga</Button>
-                  </TableCell>
-                </TableRow>
-                <TableRow className="hover:bg-slate-50 border-slate-100">
-                  <TableCell className="font-bold text-blue-950">RFQ-0004</TableCell>
-                  <TableCell className="font-medium text-slate-700">CV Maju Bersama</TableCell>
-                  <TableCell>
-                    <Badge variant="secondary" className="bg-red-50 text-red-600 hover:bg-red-100 font-bold border-red-100">
-                      Menunggu Review
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button size="sm" className="bg-blue-950 hover:bg-blue-900 text-white font-bold shadow-md shadow-blue-900/20">Beri Harga</Button>
-                  </TableCell>
-                </TableRow>
-                <TableRow className="hover:bg-slate-50 border-slate-100">
-                  <TableCell className="font-bold text-blue-950">RFQ-0002</TableCell>
-                  <TableCell className="font-medium text-slate-700">PT Industri Global</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 font-bold">
-                      Menunggu Customer
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button size="sm" variant="outline" className="border-slate-300 text-slate-700 font-bold hover:bg-slate-50">Lihat</Button>
-                  </TableCell>
-                </TableRow>
-                <TableRow className="hover:bg-slate-50 border-slate-100">
-                  <TableCell className="font-bold text-blue-950">RFQ-0001</TableCell>
-                  <TableCell className="font-medium text-slate-700">PT Teknik Utama</TableCell>
-                  <TableCell>
-                    <Badge className="bg-green-100 text-green-700 hover:bg-green-100 font-bold border-green-200">
-                      Disetujui
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button size="sm" variant="outline" className="border-slate-300 text-slate-700 font-bold hover:bg-slate-50">Lihat</Button>
-                  </TableCell>
-                </TableRow>
+                {recentQuotes.length > 0 ? (
+                  recentQuotes.map((quote) => {
+                    const badge = getBadgeProps(quote.status);
+                    return (
+                      <TableRow key={quote.id} className="hover:bg-slate-50 border-slate-100">
+                        <TableCell className="font-bold text-blue-950">{quote.quoteNumber}</TableCell>
+                        <TableCell className="font-medium text-slate-700">{quote.user?.companyName || quote.user?.name}</TableCell>
+                        <TableCell>
+                          <Badge variant="secondary" className={badge.className}>
+                            {badge.label}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {(quote.status === 'PENDING' || quote.status === 'REVIEWED') ? (
+                            <Button size="sm" className="bg-blue-950 hover:bg-blue-900 text-white font-bold shadow-md shadow-blue-900/20">Beri Harga</Button>
+                          ) : (
+                            <Button size="sm" variant="outline" className="border-slate-300 text-slate-700 font-bold hover:bg-slate-50">Lihat</Button>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center text-slate-500 py-6 font-medium">
+                      Tidak ada antrian RFQ terbaru.
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </CardContent>
@@ -149,7 +291,7 @@ export default function AdminDashboardPage() {
 
         {/* Grafik Penjualan */}
         <div className="lg:col-span-3">
-          <SalesChart />
+          <SalesChart data={chartData} />
         </div>
       </div>
     </div>

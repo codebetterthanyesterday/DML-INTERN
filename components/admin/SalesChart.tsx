@@ -15,14 +15,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-const chartData = [
-  { month: "Jan", retail: 186, industrial: 80 },
-  { month: "Feb", retail: 305, industrial: 200 },
-  { month: "Mar", retail: 237, industrial: 120 },
-  { month: "Apr", retail: 73, industrial: 190 },
-  { month: "May", retail: 209, industrial: 130 },
-  { month: "Jun", retail: 214, industrial: 140 },
-];
+export type ChartDataItem = { month: string; retail: number; industrial: number };
 
 const chartConfig = {
   retail: {
@@ -35,16 +28,16 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function SalesChart() {
+export function SalesChart({ data }: { data: ChartDataItem[] }) {
   return (
     <Card className="border-slate-200">
       <CardHeader>
         <CardTitle className="text-blue-950 font-bold">Grafik Penjualan</CardTitle>
-        <CardDescription className="text-slate-500 font-medium">Januari - Juni 2026</CardDescription>
+        <CardDescription className="text-slate-500 font-medium">6 Bulan Terakhir</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="min-h-[250px] w-full">
-          <BarChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+          <BarChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
             <CartesianGrid vertical={false} strokeDasharray="3 3" />
             <XAxis
               dataKey="month"
