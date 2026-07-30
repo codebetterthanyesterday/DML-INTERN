@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { signOut } from "next-auth/react"
+import { useState } from "react"
 import { Menu, ShieldAlert, LayoutDashboard, LogOut, User, Building2, Settings } from "lucide-react"
 import type { Session } from "next-auth"
 import {
@@ -13,6 +14,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
 interface HeaderProps {
@@ -157,6 +165,7 @@ function UserMenu({ session }: { session: Session }) {
 export function Header({ session }: HeaderProps) {
   const pathname = usePathname()
   const isLoggedIn = !!session?.user
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   return (
     <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200">
@@ -216,9 +225,101 @@ export function Header({ session }: HeaderProps) {
         {/* Mobile: Hamburger + optional avatar */}
         <div className="flex items-center gap-3 md:hidden">
           {isLoggedIn && <UserMenu session={session} />}
-          <button className="text-slate-600 hover:text-blue-950" id="header-mobile-menu" aria-label="Menu">
-            <Menu className="w-6 h-6" />
-          </button>
+          
+          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+            <SheetTrigger asChild>
+              <button 
+                className="relative flex flex-col justify-center items-center w-8 h-8 rounded-md focus:outline-none group z-50" 
+                id="header-mobile-menu" 
+                aria-label="Menu"
+              >
+                <span className={`block w-5 h-[2px] bg-slate-600 rounded-full transition-all duration-300 ease-out ${isMobileMenuOpen ? 'rotate-45 translate-y-[6px]' : '-translate-y-1 group-hover:bg-blue-950'}`}></span>
+                <span className={`block w-5 h-[2px] bg-slate-600 rounded-full transition-all duration-300 ease-out ${isMobileMenuOpen ? 'opacity-0' : 'opacity-100 group-hover:bg-blue-950'}`}></span>
+                <span className={`block w-5 h-[2px] bg-slate-600 rounded-full transition-all duration-300 ease-out ${isMobileMenuOpen ? '-rotate-45 -translate-y-[6px]' : 'translate-y-1 group-hover:bg-blue-950'}`}></span>
+              </button>
+            </SheetTrigger>
+            
+            <SheetContent side="left" className="w-[300px] sm:w-[350px] p-0 flex flex-col border-r-0 shadow-2xl">
+              <SheetHeader className="p-6 border-b border-slate-100 text-left">
+                <SheetTitle asChild>
+                  <Link href="/" className="flex items-center gap-2 w-fit" onClick={() => setIsMobileMenuOpen(false)}>
+                    <div className="w-8 h-8 rounded-lg bg-blue-950 flex items-center justify-center shadow-md">
+                      <svg viewBox="0 0 32 32" fill="none" className="w-5 h-5">
+                        <rect x="2" y="8" width="28" height="4" rx="2" fill="white" />
+                        <rect x="2" y="16" width="20" height="4" rx="2" fill="white" fillOpacity="0.7" />
+                        <rect x="2" y="24" width="24" height="4" rx="2" fill="white" fillOpacity="0.5" />
+                      </svg>
+                    </div>
+                    <span className="text-lg font-extrabold text-blue-950 tracking-tight">DML Platform</span>
+                  </Link>
+                </SheetTitle>
+              </SheetHeader>
+              
+              <div className="flex-1 overflow-y-auto py-6 px-4">
+                <nav className="flex flex-col gap-2">
+                  {navLinks.map((link) => {
+                    const isActive = (link.href === "/" ? pathname === "/" : pathname.startsWith(link.href))
+                    return (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className={`flex items-center px-4 py-3 rounded-xl text-base font-medium transition-all ${
+                          isActive
+                            ? "bg-blue-50 text-blue-950"
+                            : "text-slate-600 hover:bg-slate-50 hover:text-blue-950"
+                        }`}
+                      >
+                        {link.name}
+                      </Link>
+                    )
+                  })}
+                </nav>
+              </div>
+
+              <div className="p-6 border-t border-slate-100 bg-slate-50/50">
+                {isLoggedIn ? (
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-10 w-10 border border-slate-200 shadow-sm">
+                        <AvatarFallback className="bg-blue-950 text-white font-bold">
+                          {getInitials(session.user.name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-bold text-slate-900">{session.user.name}</span>
+                        <span className="text-xs text-slate-500 truncate">{session.user.email}</span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => signOut({ callbackUrl: "/" })}
+                      className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 transition-colors focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-1"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Keluar
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-3">
+                    <Link
+                      href="/login"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center justify-center w-full py-2.5 rounded-lg text-sm font-semibold text-blue-950 bg-white border border-slate-200 hover:bg-slate-50 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-950 focus:ring-offset-1"
+                    >
+                      Masuk
+                    </Link>
+                    <Link
+                      href="/register"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center justify-center w-full py-2.5 rounded-lg text-sm font-bold text-white bg-blue-950 hover:bg-blue-900 shadow-md shadow-blue-900/20 transition-all focus:outline-none focus:ring-2 focus:ring-blue-950 focus:ring-offset-1"
+                    >
+                      Daftar
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>
