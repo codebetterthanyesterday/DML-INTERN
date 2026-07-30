@@ -77,7 +77,7 @@ export default function AdminDashboardPage() {
         </Card>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-7">
         {/* Antrian RFQ Terbaru */}
         <Card className="lg:col-span-4 border-slate-200 min-w-0">
           <CardHeader>

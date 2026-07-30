@@ -29,47 +29,72 @@ async function OrdersContent({ searchParams }: PageProps) {
   const statCards = [
     {
       label: "Total Pesanan",
+      subLabel: "Semua Transaksi",
       value: allStats.ALL ?? 0,
       icon: ShoppingCart,
-      color: "bg-blue-50 text-blue-950",
-      iconColor: "text-blue-400",
+      accentBorder: "border-t-blue-600",
+      iconBg: "bg-blue-500/10 text-blue-600 ring-1 ring-blue-500/20",
+      badgeBg: "bg-blue-50 text-blue-700 border-blue-100",
     },
     {
       label: "Baru / Pending",
+      subLabel: "Butuh Tindakan",
       value: allStats.PENDING ?? 0,
       icon: Clock,
-      color: "bg-amber-50 text-amber-800",
-      iconColor: "text-amber-400",
+      accentBorder: "border-t-amber-500",
+      iconBg: "bg-amber-500/10 text-amber-600 ring-1 ring-amber-500/20",
+      badgeBg: "bg-amber-50 text-amber-700 border-amber-100",
+      hasPulse: true,
     },
     {
       label: "Diproses",
+      subLabel: "Dalam Pengiriman",
       value: (allStats.PROCESSING ?? 0) + (allStats.SHIPPED ?? 0),
       icon: Package,
-      color: "bg-slate-50 text-slate-700",
-      iconColor: "text-slate-400",
+      accentBorder: "border-t-indigo-500",
+      iconBg: "bg-indigo-500/10 text-indigo-600 ring-1 ring-indigo-500/20",
+      badgeBg: "bg-indigo-50 text-indigo-700 border-indigo-100",
     },
     {
       label: "Selesai",
+      subLabel: "Transaksi Sukses",
       value: allStats.COMPLETED ?? 0,
       icon: TrendingUp,
-      color: "bg-green-50 text-green-800",
-      iconColor: "text-green-400",
+      accentBorder: "border-t-emerald-500",
+      iconBg: "bg-emerald-500/10 text-emerald-600 ring-1 ring-emerald-500/20",
+      badgeBg: "bg-emerald-50 text-emerald-700 border-emerald-100",
     },
   ];
 
   return (
     <>
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((card) => (
           <div
             key={card.label}
-            className={`rounded-xl border border-slate-200 px-4 py-3.5 flex items-center gap-3 ${card.color}`}
+            className={`relative overflow-hidden rounded-2xl bg-[#fbfbfb] border border-slate-200/80 ${card.accentBorder} border-t-4 p-5 flex flex-col justify-between gap-4 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group`}
           >
-            <card.icon className={`w-5 h-5 shrink-0 ${card.iconColor}`} />
-            <div>
-              <div className="text-2xl font-extrabold leading-none">{card.value}</div>
-              <div className="text-xs font-semibold opacity-70 mt-0.5">{card.label}</div>
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <p className="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider truncate">{card.label}</p>
+                <p className="text-3xl font-black text-blue-950 tracking-tight mt-1">{card.value}</p>
+              </div>
+              <div className={`p-3 rounded-xl ${card.iconBg} transition-transform group-hover:scale-110 shrink-0`}>
+                <card.icon className="w-5 h-5 shrink-0" />
+              </div>
+            </div>
+
+            <div className="flex">
+              <span className={`text-[10px] font-bold px-2.5 py-1 rounded-md border ${card.badgeBg} flex items-center gap-1.5 w-fit`}>
+                {card.hasPulse && (
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                  </span>
+                )}
+                {card.subLabel}
+              </span>
             </div>
           </div>
         ))}

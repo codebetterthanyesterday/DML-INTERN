@@ -2,10 +2,9 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { getAdminProducts } from "@/lib/actions/products";
 import { ProductTable } from "@/components/admin/products/ProductTable";
+import { ProductFilters } from "@/components/admin/products/ProductFilters";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Plus, Package, Search } from "lucide-react";
+import { Plus, Package } from "lucide-react";
 
 export const metadata = {
   title: "Kelola Produk — DML Admin",
@@ -73,63 +72,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <form className="flex-1 relative max-w-md" method="GET">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <Input
-            name="q"
-            defaultValue={q}
-            placeholder="Cari nama produk atau SKU..."
-            className="pl-9 bg-white border-slate-200 focus:border-blue-900"
-          />
-          {/* Preserve other params */}
-          {type !== "ALL" && <input type="hidden" name="type" value={type} />}
-          {status !== "ALL" && <input type="hidden" name="status" value={status} />}
-        </form>
-        <div className="flex gap-2 flex-wrap">
-          {/* Type filter */}
-          {(["ALL", "RETAIL", "INDUSTRIAL", "BOTH"] as const).map((t) => (
-            <Link
-              key={t}
-              href={`/admin/products?${new URLSearchParams({ ...(q ? { q } : {}), type: t, ...(status !== "ALL" ? { status } : {}) }).toString()}`}
-            >
-              <Badge
-                variant="outline"
-                className={`cursor-pointer font-bold text-xs px-3 py-1.5 transition-colors ${
-                  type === t
-                    ? "bg-blue-950 text-white border-blue-950 hover:bg-blue-900"
-                    : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-                }`}
-              >
-                {t === "ALL" ? "Semua Tipe" : t === "BOTH" ? "Keduanya" : t.charAt(0) + t.slice(1).toLowerCase()}
-              </Badge>
-            </Link>
-          ))}
-          <div className="w-px bg-slate-200" />
-          {/* Status filter */}
-          {(["ALL", "ACTIVE", "INACTIVE"] as const).map((s) => (
-            <Link
-              key={s}
-              href={`/admin/products?${new URLSearchParams({ ...(q ? { q } : {}), ...(type !== "ALL" ? { type } : {}), status: s }).toString()}`}
-            >
-              <Badge
-                variant="outline"
-                className={`cursor-pointer font-bold text-xs px-3 py-1.5 transition-colors ${
-                  status === s
-                    ? s === "ACTIVE"
-                      ? "bg-green-600 text-white border-green-600 hover:bg-green-700"
-                      : s === "INACTIVE"
-                      ? "bg-orange-500 text-white border-orange-500"
-                      : "bg-blue-950 text-white border-blue-950"
-                    : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-                }`}
-              >
-                {s === "ALL" ? "Semua Status" : s === "ACTIVE" ? "Aktif" : "Nonaktif"}
-              </Badge>
-            </Link>
-          ))}
-        </div>
-      </div>
+      <ProductFilters currentQ={q} currentType={type} currentStatus={status} />
 
       {/* Table */}
       <Suspense fallback={<div className="text-slate-400 text-sm py-8 text-center">Memuat produk...</div>}>

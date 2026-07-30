@@ -16,6 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import {
   Search,
   FileText,
@@ -484,16 +485,13 @@ export function RFQClient({
   const totalPages = Math.ceil(total / pageSize);
 
   return (
-    <div
-      className="flex gap-0 rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden"
-      style={{ minHeight: "70vh" }}
-    >
-      {/* ── Left: RFQ List ── */}
+    <>
       <div
-        className={`flex flex-col border-r border-slate-100 transition-all duration-300 ${
-          selectedQuote ? "hidden lg:flex lg:w-[52%]" : "flex w-full"
-        }`}
+        className="flex flex-col rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden"
+        style={{ minHeight: "70vh" }}
       >
+        {/* ── RFQ List ── */}
+        <div className="flex flex-col w-full">
         {/* Status Tabs */}
         <div className="flex items-center border-b border-slate-100 overflow-x-auto shrink-0 px-4">
           {STATUS_TABS.map((tab) => (
@@ -636,34 +634,14 @@ export function RFQClient({
           </div>
         )}
       </div>
+      </div>
 
-      {/* ── Right: Detail Panel ── */}
-      {selectedQuote ? (
-        <div className="flex flex-col w-full lg:w-[48%]">
-          {/* Mobile back */}
-          <div className="lg:hidden shrink-0 border-b border-slate-100 px-4 py-2.5">
-            <button
-              onClick={() => setSelectedQuote(null)}
-              className="flex items-center gap-1.5 text-sm font-bold text-slate-500 hover:text-blue-950 transition-colors focus-visible:ring-2 focus-visible:ring-blue-950 focus-visible:outline-none rounded px-2 py-1 -ml-2"
-              aria-label="Kembali ke daftar RFQ"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Kembali
-            </button>
-          </div>
-          <RFQDetailPanel quote={selectedQuote} onClose={() => setSelectedQuote(null)} />
-        </div>
-      ) : (
-        <div className="hidden lg:flex flex-col flex-1 items-center justify-center gap-4 text-slate-300">
-          <div className="w-16 h-16 rounded-2xl bg-slate-50 border-2 border-dashed border-slate-200 flex items-center justify-center">
-            <FileText className="w-7 h-7 text-slate-300" />
-          </div>
-          <div className="text-center">
-            <p className="text-sm font-bold text-slate-400">Pilih pengajuan RFQ</p>
-            <p className="text-xs text-slate-300 mt-0.5">untuk mereview dan memberi harga</p>
-          </div>
-        </div>
-      )}
-    </div>
+      {/* ── Detail Overlay (Sheet) ── */}
+      <Sheet open={!!selectedQuote} onOpenChange={(open) => !open && setSelectedQuote(null)}>
+        <SheetContent className="p-0 sm:max-w-xl w-full flex flex-col overflow-hidden outline-none">
+          {selectedQuote && <RFQDetailPanel quote={selectedQuote} onClose={() => setSelectedQuote(null)} />}
+        </SheetContent>
+      </Sheet>
+    </>
   );
 }

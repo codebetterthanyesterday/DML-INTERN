@@ -14,6 +14,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import {
   Search,
   X,
@@ -365,16 +366,13 @@ export function VerificationClient({
   const totalPages = Math.ceil(total / pageSize);
 
   return (
-    <div
-      className="flex gap-0 rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden"
-      style={{ minHeight: "70vh" }}
-    >
-      {/* ── Left: List ── */}
+    <>
       <div
-        className={`flex flex-col border-r border-slate-100 transition-all duration-300 ${
-          selectedItem ? "hidden lg:flex lg:w-[45%]" : "flex w-full"
-        }`}
+        className="flex flex-col rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden"
+        style={{ minHeight: "70vh" }}
       >
+        {/* ── List ── */}
+        <div className="flex flex-col w-full">
         {/* Status Tabs */}
         <div className="flex items-center border-b border-slate-100 overflow-x-auto shrink-0 px-4">
           {STATUS_TABS.map((tab) => (
@@ -511,37 +509,22 @@ export function VerificationClient({
           </div>
         )}
       </div>
+      </div>
 
-      {/* ── Right: Detail Panel ── */}
-      {selectedItem ? (
-        <div className="flex flex-col w-full lg:w-[55%]">
-          {/* Mobile back */}
-          <div className="lg:hidden shrink-0 border-b border-slate-100 px-4 py-2.5">
-            <button
-              onClick={() => setSelectedItem(null)}
-              className="flex items-center gap-1.5 text-sm font-bold text-slate-500 hover:text-blue-950 transition-colors focus-visible:ring-2 focus-visible:ring-blue-950 focus-visible:outline-none rounded px-2 py-1 -ml-2"
-              aria-label="Kembali ke daftar verifikasi"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Kembali
-            </button>
-          </div>
-          <VerificationDetailPanel verification={selectedItem} onClose={() => {
-            setSelectedItem(null);
-            router.refresh();
-          }} />
-        </div>
-      ) : (
-        <div className="hidden lg:flex flex-col flex-1 items-center justify-center gap-4 text-slate-300">
-          <div className="w-16 h-16 rounded-2xl bg-slate-50 border-2 border-dashed border-slate-200 flex items-center justify-center">
-            <Building2 className="w-7 h-7 text-slate-300" />
-          </div>
-          <div className="text-center">
-            <p className="text-sm font-bold text-slate-400">Pilih pengajuan verifikasi</p>
-            <p className="text-xs text-slate-300 mt-0.5">untuk mereview dokumen legalitas</p>
-          </div>
-        </div>
-      )}
-    </div>
+      {/* ── Detail Overlay (Sheet) ── */}
+      <Sheet open={!!selectedItem} onOpenChange={(open) => !open && setSelectedItem(null)}>
+        <SheetContent className="p-0 sm:max-w-xl w-full flex flex-col overflow-hidden outline-none">
+          {selectedItem && (
+            <VerificationDetailPanel 
+              verification={selectedItem} 
+              onClose={() => {
+                setSelectedItem(null);
+                router.refresh();
+              }} 
+            />
+          )}
+        </SheetContent>
+      </Sheet>
+    </>
   );
 }

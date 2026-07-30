@@ -13,6 +13,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  Sheet,
+  SheetContent,
+} from "@/components/ui/sheet";
+import {
   Search,
   ShoppingCart,
   ChevronRight,
@@ -377,17 +381,14 @@ export function OrdersClient({
   const totalPages = Math.ceil(total / pageSize);
 
   return (
-    <div className="flex gap-0 rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden"
-         style={{ minHeight: "70vh" }}>
+    <>
+      <div className="flex flex-col rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden"
+           style={{ minHeight: "70vh" }}>
 
-      {/* ── Left Panel: Order List ── */}
-      <div
-        className={`flex flex-col border-r border-slate-100 transition-all duration-300 ${
-          selectedOrder ? "hidden lg:flex lg:w-[55%]" : "flex w-full"
-        }`}
-      >
+        {/* ── Order List ── */}
+        <div className="flex flex-col flex-1 min-w-0 w-full">
         {/* Tabs */}
-        <div className="flex items-center gap-0 border-b border-slate-100 overflow-x-auto shrink-0 px-4">
+        <div className="flex items-center gap-0 border-b border-slate-100 overflow-x-auto shrink-0 px-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {STATUS_TABS.map((tab) => (
             <button
               key={tab.key}
@@ -474,8 +475,8 @@ export function OrdersClient({
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <span className="font-mono text-xs font-extrabold text-blue-950">
                           {order.orderNumber}
                         </span>
@@ -537,35 +538,16 @@ export function OrdersClient({
             </div>
           </div>
         )}
-      </div>
+      </div></div>
 
-      {/* ── Right Panel: Detail ── */}
-      {selectedOrder ? (
-        <div className={`flex flex-col ${selectedOrder ? "flex w-full lg:w-[45%]" : "hidden"}`}>
-          {/* Mobile back button */}
-          <div className="lg:hidden shrink-0 border-b border-slate-100 px-4 py-2.5">
-            <button
-              onClick={() => setSelectedOrder(null)}
-              className="flex items-center gap-1.5 text-sm font-bold text-slate-500 hover:text-blue-950 transition-colors focus-visible:ring-2 focus-visible:ring-blue-950 focus-visible:outline-none rounded px-2 py-1 -ml-2"
-              aria-label="Kembali ke daftar pesanan"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Kembali
-            </button>
-          </div>
-          <OrderDetailPanel order={selectedOrder} onClose={() => setSelectedOrder(null)} />
-        </div>
-      ) : (
-        <div className="hidden lg:flex flex-col flex-1 items-center justify-center gap-4 text-slate-300">
-          <div className="w-16 h-16 rounded-2xl bg-slate-50 border-2 border-dashed border-slate-200 flex items-center justify-center">
-            <ShoppingCart className="w-7 h-7 text-slate-300" />
-          </div>
-          <div className="text-center">
-            <p className="text-sm font-bold text-slate-400">Pilih pesanan</p>
-            <p className="text-xs text-slate-300 mt-0.5">untuk melihat detail & update status</p>
-          </div>
-        </div>
-      )}
-    </div>
+      {/* ── Detail Overlay ── */}
+      <Sheet open={!!selectedOrder} onOpenChange={(open) => !open && setSelectedOrder(null)}>
+        <SheetContent className="w-full sm:max-w-md p-0 flex flex-col bg-white" side="right" showCloseButton={false}>
+          {selectedOrder && (
+            <OrderDetailPanel order={selectedOrder} onClose={() => setSelectedOrder(null)} />
+          )}
+        </SheetContent>
+      </Sheet>
+    </>
   );
 }

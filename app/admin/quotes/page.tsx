@@ -28,54 +28,79 @@ async function RFQContent({ searchParams }: PageProps) {
       label: "Total RFQ",
       value: allStats.ALL ?? 0,
       icon: FileText,
-      color: "bg-blue-50 text-blue-950",
-      iconColor: "text-blue-400",
+      color: "bg-[#fbfbfb] text-blue-950",
+      iconColor: "text-blue-600",
+      iconBg: "bg-blue-500/10 ring-1 ring-blue-500/20",
+      accentBorder: "border-t-blue-600 border-t-4",
+      subLabel: "Semua Pengajuan",
+      badgeBg: "bg-blue-50 text-blue-700 border-blue-100",
     },
     {
       label: "Perlu Ditinjau",
       value: (allStats.PENDING ?? 0) + (allStats.REVIEWED ?? 0),
       icon: Clock,
-      color: "bg-amber-50 text-amber-800",
-      iconColor: "text-amber-400",
+      color: "bg-[#fbfbfb] text-amber-950",
+      iconColor: "text-amber-600",
+      iconBg: "bg-amber-500/10 ring-1 ring-amber-500/20",
+      accentBorder: "border-t-amber-500 border-t-4",
       urgent: ((allStats.PENDING ?? 0) + (allStats.REVIEWED ?? 0)) > 0,
+      subLabel: "Perlu Tindakan",
+      badgeBg: "bg-amber-50 text-amber-700 border-amber-100",
     },
     {
       label: "Penawaran Terkirim",
       value: allStats.QUOTED ?? 0,
       icon: Send,
-      color: "bg-purple-50 text-purple-800",
-      iconColor: "text-purple-400",
+      color: "bg-[#fbfbfb] text-purple-950",
+      iconColor: "text-purple-600",
+      iconBg: "bg-purple-500/10 ring-1 ring-purple-500/20",
+      accentBorder: "border-t-purple-500 border-t-4",
+      subLabel: "Menunggu Customer",
+      badgeBg: "bg-purple-50 text-purple-700 border-purple-100",
     },
     {
       label: "Diterima",
       value: allStats.ACCEPTED ?? 0,
       icon: CheckCircle2,
-      color: "bg-green-50 text-green-800",
-      iconColor: "text-green-400",
+      color: "bg-[#fbfbfb] text-emerald-950",
+      iconColor: "text-emerald-600",
+      iconBg: "bg-emerald-500/10 ring-1 ring-emerald-500/20",
+      accentBorder: "border-t-emerald-500 border-t-4",
+      subLabel: "Telah Disetujui",
+      badgeBg: "bg-emerald-50 text-emerald-700 border-emerald-100",
     },
   ];
 
   return (
     <>
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((card) => (
           <div
             key={card.label}
-            className={`rounded-xl border px-4 py-3.5 flex items-center gap-3 ${card.color} ${
-              card.urgent ? "border-amber-300 ring-1 ring-amber-200" : "border-slate-200"
-            }`}
+            className={`relative overflow-hidden rounded-2xl border border-slate-200/80 px-5 py-5 flex flex-col justify-between gap-4 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group ${card.color} ${card.accentBorder}`}
           >
-            <card.icon className={`w-5 h-5 shrink-0 ${card.iconColor}`} />
-            <div>
-              <div className="text-2xl font-extrabold leading-none">{card.value}</div>
-              <div className="text-xs font-semibold opacity-70 mt-0.5">{card.label}</div>
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <p className="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider truncate">{card.label}</p>
+                <p className="text-3xl font-black tracking-tight mt-1">{card.value}</p>
+              </div>
+              <div className={`p-3 rounded-xl ${card.iconBg} transition-transform group-hover:scale-110 shrink-0`}>
+                <card.icon className={`w-5 h-5 shrink-0 ${card.iconColor}`} />
+              </div>
             </div>
-            {card.urgent && (
-              <span className="ml-auto text-[10px] font-extrabold bg-amber-200 text-amber-800 rounded-full px-1.5 py-0.5 leading-none">
-                !
+
+            <div className="flex">
+              <span className={`text-[10px] font-bold px-2.5 py-1 rounded-md border ${card.badgeBg} flex items-center gap-1.5 w-fit`}>
+                {card.urgent && (
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                  </span>
+                )}
+                {card.subLabel}
               </span>
-            )}
+            </div>
           </div>
         ))}
       </div>
