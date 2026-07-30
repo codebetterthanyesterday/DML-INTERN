@@ -101,7 +101,7 @@ export function ProductForm({ action, categories, product, mode }: ProductFormPr
                 {state.fieldErrors?.name && <p className="text-xs text-red-500 font-medium">{state.fieldErrors.name}</p>}
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <Label htmlFor="sku" className="text-sm font-bold text-slate-700">
                     SKU <span className="text-red-500">*</span>
@@ -170,7 +170,7 @@ export function ProductForm({ action, categories, product, mode }: ProductFormPr
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="space-y-1 sm:col-span-2">
                   <Label htmlFor="price" className="text-sm font-bold text-slate-700">
                     Harga (Rp)
@@ -234,7 +234,7 @@ export function ProductForm({ action, categories, product, mode }: ProductFormPr
             <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
               <h2 className="text-sm font-extrabold text-blue-950 uppercase tracking-widest">Spesifikasi Teknis</h2>
               <p className="text-xs text-slate-400 -mt-2">Isi yang relevan, kosongkan yang tidak berlaku.</p>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
                   { name: "ketebalan", label: "Ketebalan", placeholder: "contoh: 3mm" },
                   { name: "material", label: "Material", placeholder: "contoh: SBR, EPDM, Natural" },

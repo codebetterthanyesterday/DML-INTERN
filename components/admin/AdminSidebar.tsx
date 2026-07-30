@@ -48,11 +48,12 @@ export function AdminSidebar() {
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors",
+                  "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-blue-950 focus-visible:outline-none",
                   isActive
-                    ? "bg-red-50 text-red-600"
-                    : "text-slate-500 hover:bg-slate-50 hover:text-blue-950"
+                    ? "bg-red-50 text-red-700"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-blue-950"
                 )}
+                aria-current={isActive ? "page" : undefined}
               >
                 <item.icon
                   className={cn(
@@ -70,11 +71,12 @@ export function AdminSidebar() {
           <Link
             href="/admin/settings"
             className={cn(
-              "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors",
+              "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-blue-950 focus-visible:outline-none",
               pathname === "/admin/settings"
-                ? "bg-red-50 text-red-600"
-                : "text-slate-500 hover:bg-slate-50 hover:text-blue-950"
+                ? "bg-red-50 text-red-700"
+                : "text-slate-600 hover:bg-slate-50 hover:text-blue-950"
             )}
+            aria-current={pathname === "/admin/settings" ? "page" : undefined}
           >
             <Settings className="h-5 w-5 shrink-0 text-slate-400 group-hover:text-blue-950" aria-hidden="true" />
             Pengaturan

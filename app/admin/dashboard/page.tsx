@@ -79,7 +79,7 @@ export default function AdminDashboardPage() {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
         {/* Antrian RFQ Terbaru */}
-        <Card className="lg:col-span-4 border-slate-200">
+        <Card className="lg:col-span-4 border-slate-200 min-w-0">
           <CardHeader>
             <CardTitle className="text-blue-950 font-bold">Antrian RFQ Terbaru</CardTitle>
           </CardHeader>

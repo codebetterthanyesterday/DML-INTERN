@@ -157,7 +157,8 @@ function OrderDetailPanel({
         </div>
         <button
           onClick={onClose}
-          className="rounded-lg p-2 text-slate-400 hover:text-blue-950 hover:bg-slate-100 transition-colors -mt-1 -mr-1"
+          className="rounded-lg p-2 text-slate-400 hover:text-blue-950 hover:bg-slate-100 transition-colors -mt-1 -mr-1 focus-visible:ring-2 focus-visible:ring-blue-950 focus-visible:outline-none"
+          aria-label="Tutup panel detail"
         >
           <X className="w-4 h-4" />
         </button>
@@ -545,7 +546,8 @@ export function OrdersClient({
           <div className="lg:hidden shrink-0 border-b border-slate-100 px-4 py-2.5">
             <button
               onClick={() => setSelectedOrder(null)}
-              className="flex items-center gap-1.5 text-sm font-bold text-slate-500 hover:text-blue-950 transition-colors"
+              className="flex items-center gap-1.5 text-sm font-bold text-slate-500 hover:text-blue-950 transition-colors focus-visible:ring-2 focus-visible:ring-blue-950 focus-visible:outline-none rounded px-2 py-1 -ml-2"
+              aria-label="Kembali ke daftar pesanan"
             >
               <ArrowLeft className="w-4 h-4" />
               Kembali
