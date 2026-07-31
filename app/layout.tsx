@@ -4,6 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SessionProvider } from "@/components/providers/SessionProvider";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 
@@ -35,6 +36,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <SessionProvider>
           <TooltipProvider>{children}</TooltipProvider>
+          <Toaster position="bottom-right" />
         </SessionProvider>
       </body>
     </html>
