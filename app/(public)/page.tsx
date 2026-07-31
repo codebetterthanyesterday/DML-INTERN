@@ -3,6 +3,7 @@ import { ArrowRight, Factory, ShieldCheck, ShoppingBag, Star } from "lucide-reac
 import { AuthAwareHeader } from "@/components/shared/AuthAwareHeader"
 import { Footer } from "@/components/shared/Footer"
 import { auth } from "@/lib/auth"
+import prisma from "@/lib/prisma"
 
 export default async function LandingPage() {
   const session = await auth()
@@ -14,6 +15,22 @@ export default async function LandingPage() {
       : userRole === "BUSINESS"
         ? "/business"
         : "/customer"
+
+  // Fetch featured products dynamically
+  const featuredProducts = await prisma.product.findMany({
+    where: { isActive: true },
+    take: 4,
+    include: {
+      images: {
+        take: 1,
+        orderBy: { displayOrder: 'asc' }
+      },
+      reviews: {
+        select: { rating: true }
+      }
+    },
+    orderBy: { createdAt: 'desc' }
+  })
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
@@ -123,46 +140,72 @@ export default async function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="group bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300">
-                <div className="aspect-[4/3] bg-slate-100 flex items-center justify-center relative overflow-hidden">
-                  <div className="absolute inset-0 bg-blue-950/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  <Factory className="w-16 h-16 text-slate-300 group-hover:scale-110 transition-transform duration-500" />
-                  <div className="absolute top-3 right-3 bg-white px-2 py-1 rounded text-[10px] font-bold text-slate-600 shadow-sm">
-                    SKU-{1000 + i}
-                  </div>
-                </div>
-                <div className="p-5">
-                  <div className="flex items-center gap-1 mb-2">
-                    <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                    <span className="text-xs font-medium text-slate-600">4.9</span>
-                  </div>
-                  <h3 className="text-base font-bold text-slate-900 mb-1 group-hover:text-blue-950 transition-colors">Rubber Sheet Premium {i}</h3>
-                  <p className="text-xs text-slate-500 mb-4 line-clamp-2">Material tahan aus dan oli, cocok untuk alas mesin dan aplikasi industri berat.</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-lg font-extrabold text-blue-950">Rp 125.000</span>
-                    {isLoggedIn ? (
-                      <button
-                        id={`add-to-cart-${i}`}
-                        className="w-8 h-8 rounded-full bg-blue-950 text-white flex items-center justify-center hover:bg-red-600 transition-colors"
-                        title="Tambah ke Keranjang"
-                      >
-                        <ShoppingBag className="w-4 h-4" />
-                      </button>
+            {featuredProducts.map((product) => {
+              const avgRating = product.reviews.length > 0 
+                ? (product.reviews.reduce((acc, r) => acc + r.rating, 0) / product.reviews.length).toFixed(1)
+                : '0.0'
+                
+              const priceDisplay = product.price 
+                ? new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(Number(product.price))
+                : "Hubungi Kami"
+
+              const imageUrl = product.images[0]?.url
+
+              return (
+                <div key={product.id} className="group bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 flex flex-col">
+                  <Link href={`/katalog/${product.slug}`} className="block aspect-[4/3] bg-slate-100 flex items-center justify-center relative overflow-hidden group/img">
+                    <div className="absolute inset-0 bg-blue-950/5 opacity-0 group-hover:opacity-100 transition-opacity z-10"></div>
+                    {imageUrl ? (
+                      <img src={imageUrl} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 relative z-0" />
                     ) : (
-                      <Link
-                        href="/login"
-                        id={`product-login-${i}`}
-                        className="w-8 h-8 rounded-full bg-blue-50 text-blue-950 flex items-center justify-center hover:bg-blue-950 hover:text-white transition-colors"
-                        title="Masuk untuk membeli"
-                      >
-                        <ShoppingBag className="w-4 h-4" />
-                      </Link>
+                      <Factory className="w-16 h-16 text-slate-300 group-hover:scale-110 transition-transform duration-500 relative z-0" />
                     )}
+                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-1 rounded text-[10px] font-bold text-slate-600 shadow-sm z-20">
+                      {product.sku}
+                    </div>
+                  </Link>
+                  <div className="p-5 flex flex-col flex-1">
+                    <div className="flex items-center gap-1 mb-2">
+                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                      <span className="text-xs font-medium text-slate-600">{avgRating === '0.0' ? 'Baru' : avgRating}</span>
+                    </div>
+                    <Link href={`/katalog/${product.slug}`} className="block mb-1 group-hover:text-blue-950 transition-colors">
+                      <h3 className="text-base font-bold text-slate-900 line-clamp-1">{product.name}</h3>
+                    </Link>
+                    <p className="text-xs text-slate-500 mb-4 line-clamp-2 min-h-[32px]">{product.description || "Tidak ada deskripsi tersedia untuk produk ini."}</p>
+                    
+                    <div className="mt-auto flex items-center justify-between pt-3 border-t border-slate-100">
+                      <span className="text-base sm:text-lg font-extrabold text-blue-950">{priceDisplay}</span>
+                      {isLoggedIn ? (
+                        <button
+                          id={`add-to-cart-${product.id}`}
+                          className="w-8 h-8 rounded-full bg-blue-950 text-white flex items-center justify-center hover:bg-red-600 transition-colors shrink-0"
+                          title="Tambah ke Keranjang"
+                        >
+                          <ShoppingBag className="w-4 h-4" />
+                        </button>
+                      ) : (
+                        <Link
+                          href={`/login?callbackUrl=/katalog/${product.slug}`}
+                          id={`product-login-${product.id}`}
+                          className="w-8 h-8 rounded-full bg-blue-50 text-blue-950 flex items-center justify-center hover:bg-blue-950 hover:text-white transition-colors shrink-0"
+                          title="Masuk untuk membeli"
+                        >
+                          <ShoppingBag className="w-4 h-4" />
+                        </Link>
+                      )}
+                    </div>
                   </div>
                 </div>
+              )
+            })}
+            
+            {featuredProducts.length === 0 && (
+              <div className="col-span-full py-16 text-center bg-slate-50 rounded-2xl border border-slate-200 border-dashed">
+                <Factory className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                <p className="text-slate-500 font-medium">Belum ada produk unggulan saat ini.</p>
               </div>
-            ))}
+            )}
           </div>
         </section>
       </main>
