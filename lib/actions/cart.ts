@@ -62,11 +62,58 @@ export async function addToCart(productId: string, qty: number = 1) {
       })
     }
 
-    revalidatePath("/katalog")
+    revalidatePath("/", "layout")
     
     return { success: true }
   } catch (error) {
     console.error("Add to cart error:", error)
     return { success: false, error: "Terjadi kesalahan saat menambahkan ke keranjang." }
+  }
+}
+
+export async function updateCartItemQty(cartItemId: string, qty: number) {
+  try {
+    const session = await auth()
+    if (!session?.user?.id) {
+      return { success: false, error: "Unauthorized" }
+    }
+
+    if (qty < 1) return { success: false, error: "Kuantitas tidak valid" }
+
+    await prisma.cartItem.update({
+      where: {
+        id: cartItemId,
+        cart: { userId: session.user.id }
+      },
+      data: { qty }
+    })
+
+    revalidatePath("/", "layout")
+    return { success: true }
+  } catch (error) {
+    console.error("Update cart error:", error)
+    return { success: false, error: "Terjadi kesalahan sistem." }
+  }
+}
+
+export async function removeCartItem(cartItemId: string) {
+  try {
+    const session = await auth()
+    if (!session?.user?.id) {
+      return { success: false, error: "Unauthorized" }
+    }
+
+    await prisma.cartItem.delete({
+      where: {
+        id: cartItemId,
+        cart: { userId: session.user.id }
+      }
+    })
+
+    revalidatePath("/", "layout")
+    return { success: true }
+  } catch (error) {
+    console.error("Remove cart item error:", error)
+    return { success: false, error: "Terjadi kesalahan sistem." }
   }
 }

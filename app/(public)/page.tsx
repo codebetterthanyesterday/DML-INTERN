@@ -1,7 +1,6 @@
 import Link from "next/link"
 import { ArrowRight, Factory, ShieldCheck, ShoppingBag, Star } from "lucide-react"
-import { AuthAwareHeader } from "@/components/shared/AuthAwareHeader"
-import { Footer } from "@/components/shared/Footer"
+
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
@@ -34,9 +33,6 @@ export default async function LandingPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
-      {/* NAVBAR */}
-      <AuthAwareHeader />
-
       <main className="flex-1 flex flex-col">
         {/* HERO SECTION */}
         <section className="relative min-h-[90vh] md:min-h-[85vh] flex items-center justify-center overflow-hidden">
@@ -209,9 +205,6 @@ export default async function LandingPage() {
           </div>
         </section>
       </main>
-
-      {/* FOOTER */}
-      <Footer />
     </div>
   )
 }

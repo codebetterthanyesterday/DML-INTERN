@@ -1,5 +1,4 @@
-import { AuthAwareHeader } from "@/components/shared/AuthAwareHeader"
-import { Footer } from "@/components/shared/Footer"
+
 import { 
   Building2, 
   Target, 
@@ -13,8 +12,6 @@ import {
 export default async function TentangPage() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
-      <AuthAwareHeader />
-
       <main className="flex-1 w-full">
         {/* HERO SECTION - Foto Pabrik */}
         <section className="relative h-[400px] md:h-[500px] bg-blue-950 flex items-center justify-center overflow-hidden">
@@ -173,8 +170,6 @@ export default async function TentangPage() {
         </section>
 
       </main>
-
-      <Footer />
     </div>
   )
 }

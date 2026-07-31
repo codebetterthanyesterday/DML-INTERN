@@ -3,8 +3,6 @@
 import { useState, useTransition, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
-import { Header } from "@/components/shared/Header"
-import { Footer } from "@/components/shared/Footer"
 import {
   Search,
   Filter,
@@ -188,8 +186,6 @@ export function KatalogPageClient({ session, products, categories, totalCount, c
 
   return (
     <div className={`min-h-screen bg-slate-50 flex flex-col font-sans ${isPending ? 'opacity-80' : ''} transition-opacity`}>
-      {/* NAVBAR */}
-      <Header session={session} />
 
       {/* HEADER BANNER */}
       <div className="bg-blue-950 text-white py-10 px-4 sm:px-6 lg:px-8">
@@ -664,9 +660,6 @@ export function KatalogPageClient({ session, products, categories, totalCount, c
           </div>
         </div>
       )}
-
-      {/* FOOTER */}
-      <Footer />
     </div>
   )
 }

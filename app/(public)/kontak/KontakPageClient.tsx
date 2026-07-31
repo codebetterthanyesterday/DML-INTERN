@@ -2,8 +2,6 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Header } from "@/components/shared/Header"
-import { Footer } from "@/components/shared/Footer"
 import {
   MapPin,
   Phone,
@@ -38,9 +36,7 @@ export function KontakPageClient({ userName, userEmail, session }: KontakPageCli
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
-      {/* NAVBAR */}
-      <Header session={session ?? null} />
+    <div className="min-h-screen flex flex-col font-sans">
 
       {/* HERO BANNER */}
       <div className="relative bg-blue-950 text-white overflow-hidden">
@@ -283,9 +279,6 @@ export function KontakPageClient({ userName, userEmail, session }: KontakPageCli
           </div>
         </div>
       </main>
-
-      {/* FOOTER */}
-      <Footer />
     </div>
   )
 }

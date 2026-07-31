@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { signOut } from "next-auth/react"
 import { useState } from "react"
-import { Menu, ShieldAlert, LayoutDashboard, LogOut, User, Building2, Settings } from "lucide-react"
+import { Menu, ShieldAlert, LayoutDashboard, LogOut, User, Building2, Settings, ShoppingBag } from "lucide-react"
 import Image from "next/image"
 import logoImg from "../../public/logo.png"
 import type { Session } from "next-auth"
@@ -27,6 +27,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
 interface HeaderProps {
   session?: Session | null
+  cartItemCount?: number
 }
 
 const navLinks = [
@@ -164,7 +165,7 @@ function UserMenu({ session }: { session: Session }) {
   )
 }
 
-export function Header({ session }: HeaderProps) {
+export function Header({ session, cartItemCount = 0 }: HeaderProps) {
   const pathname = usePathname()
   const isLoggedIn = !!session?.user
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -199,7 +200,23 @@ export function Header({ session }: HeaderProps) {
         {/* Auth Section */}
         <div className="hidden md:flex items-center gap-3" id="header-auth">
           {isLoggedIn ? (
-            <UserMenu session={session} />
+            <>
+              {session.user.role !== "ADMIN" && (
+                <Link
+                  href="/customer/cart"
+                  className="relative p-2 mr-1 text-slate-500 hover:text-blue-950 transition-colors"
+                  title="Keranjang Belanja"
+                >
+                  <ShoppingBag className="w-5 h-5" />
+                  {cartItemCount > 0 && (
+                    <span className="absolute top-0 right-0 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 text-[10px] font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-600 rounded-full border-2 border-white">
+                      {cartItemCount > 99 ? '99+' : cartItemCount}
+                    </span>
+                  )}
+                </Link>
+              )}
+              <UserMenu session={session} />
+            </>
           ) : (
             <>
               <Link
@@ -222,7 +239,24 @@ export function Header({ session }: HeaderProps) {
 
         {/* Mobile: Hamburger + optional avatar */}
         <div className="flex items-center gap-3 md:hidden">
-          {isLoggedIn && <UserMenu session={session} />}
+          {isLoggedIn && (
+            <>
+              {session.user.role !== "ADMIN" && (
+                <Link
+                  href="/customer/cart"
+                  className="relative p-2 mr-1 text-slate-500 hover:text-blue-950 transition-colors"
+                >
+                  <ShoppingBag className="w-5 h-5" />
+                  {cartItemCount > 0 && (
+                    <span className="absolute top-0 right-0 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 text-[10px] font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-600 rounded-full border-2 border-white">
+                      {cartItemCount > 99 ? '99+' : cartItemCount}
+                    </span>
+                  )}
+                </Link>
+              )}
+              <UserMenu session={session} />
+            </>
+          )}
           
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>

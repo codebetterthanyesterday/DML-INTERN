@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth"
+import prisma from "@/lib/prisma"
 import { Header } from "./Header"
 
 /**
@@ -8,5 +9,16 @@ import { Header } from "./Header"
  */
 export async function AuthAwareHeader() {
   const session = await auth()
-  return <Header session={session} />
+  
+  let cartItemCount = 0
+  
+  if (session?.user?.id) {
+    const cart = await prisma.cart.findUnique({
+      where: { userId: session.user.id },
+      include: { _count: { select: { items: true } } }
+    })
+    cartItemCount = cart?._count?.items || 0
+  }
+  
+  return <Header session={session} cartItemCount={cartItemCount} />
 }
