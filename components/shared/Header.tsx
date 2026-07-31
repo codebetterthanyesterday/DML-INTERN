@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation"
 import { signOut } from "next-auth/react"
 import { useState } from "react"
 import { Menu, ShieldAlert, LayoutDashboard, LogOut, User, Building2, Settings } from "lucide-react"
+import Image from "next/image"
+import logoImg from "../../public/logo.png"
 import type { Session } from "next-auth"
 import {
   DropdownMenu,
@@ -171,12 +173,8 @@ export function Header({ session }: HeaderProps) {
     <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2" id="header-logo">
-          <div className="w-8 h-8 rounded-lg bg-blue-950 flex items-center justify-center shadow-md">
-            <svg viewBox="0 0 32 32" fill="none" className="w-5 h-5">
-              <rect x="2" y="8" width="28" height="4" rx="2" fill="white" />
-              <rect x="2" y="16" width="20" height="4" rx="2" fill="white" fillOpacity="0.7" />
-              <rect x="2" y="24" width="24" height="4" rx="2" fill="white" fillOpacity="0.5" />
-            </svg>
+          <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm overflow-hidden border border-slate-100 p-0.5">
+            <Image src={logoImg} alt="DML Platform Logo" width={40} height={40} className="object-contain w-full h-full rounded-full" />
           </div>
           <span className="text-lg font-extrabold text-blue-950 tracking-tight">DML Platform</span>
         </Link>
@@ -243,12 +241,8 @@ export function Header({ session }: HeaderProps) {
               <SheetHeader className="p-6 border-b border-slate-100 text-left">
                 <SheetTitle asChild>
                   <Link href="/" className="flex items-center gap-2 w-fit" onClick={() => setIsMobileMenuOpen(false)}>
-                    <div className="w-8 h-8 rounded-lg bg-blue-950 flex items-center justify-center shadow-md">
-                      <svg viewBox="0 0 32 32" fill="none" className="w-5 h-5">
-                        <rect x="2" y="8" width="28" height="4" rx="2" fill="white" />
-                        <rect x="2" y="16" width="20" height="4" rx="2" fill="white" fillOpacity="0.7" />
-                        <rect x="2" y="24" width="24" height="4" rx="2" fill="white" fillOpacity="0.5" />
-                      </svg>
+                    <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm overflow-hidden border border-slate-100 p-0.5">
+                      <Image src={logoImg} alt="DML Platform Logo" width={40} height={40} className="object-contain w-full h-full rounded-full" />
                     </div>
                     <span className="text-lg font-extrabold text-blue-950 tracking-tight">DML Platform</span>
                   </Link>

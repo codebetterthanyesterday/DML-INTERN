@@ -1,4 +1,6 @@
 import Link from "next/link"
+import Image from "next/image"
+import logoImg from "../../public/logo.png"
 import { TwitterLogoIcon, InstagramLogoIcon, LinkedInLogoIcon, PaperPlaneIcon } from "@radix-ui/react-icons"
 
 export function Footer() {
@@ -9,12 +11,8 @@ export function Footer() {
           {/* Brand & Socials */}
           <div className="col-span-1 sm:col-span-2 lg:col-span-4">
             <div className="flex items-center gap-2 mb-6">
-              <div className="w-8 h-8 rounded-lg bg-red-600 flex items-center justify-center">
-                <svg viewBox="0 0 32 32" fill="none" className="w-5 h-5">
-                  <rect x="2" y="8" width="28" height="4" rx="2" fill="white" />
-                  <rect x="2" y="16" width="20" height="4" rx="2" fill="white" fillOpacity="0.7" />
-                  <rect x="2" y="24" width="24" height="4" rx="2" fill="white" fillOpacity="0.5" />
-                </svg>
+              <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm overflow-hidden border border-slate-700/50 p-0.5">
+                <Image src={logoImg} alt="DML Platform Logo" width={40} height={40} className="object-contain w-full h-full rounded-full" />
               </div>
               <span className="text-xl font-extrabold text-white tracking-tight">DML Platform</span>
             </div>
