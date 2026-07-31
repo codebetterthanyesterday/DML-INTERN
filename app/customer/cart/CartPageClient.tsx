@@ -41,7 +41,7 @@ export function CartPageClient({ initialItems }: CartPageClientProps) {
     startTransition(async () => {
       const res = await updateCartItemQty(id, newQty)
       if (!res.success) {
-        toast.error(res.error)
+        toast.error(res.error || "Terjadi kesalahan")
         // Revert on failure
         setItems(initialItems)
       }
@@ -57,7 +57,7 @@ export function CartPageClient({ initialItems }: CartPageClientProps) {
       if (res.success) {
         toast.success("Produk dihapus dari keranjang")
       } else {
-        toast.error(res.error)
+        toast.error(res.error || "Terjadi kesalahan")
         // Revert on failure
         setItems(initialItems)
       }
