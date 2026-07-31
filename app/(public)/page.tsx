@@ -12,8 +12,8 @@ export default async function LandingPage() {
     userRole === "ADMIN"
       ? "/admin/dashboard"
       : userRole === "BUSINESS"
-      ? "/business"
-      : "/customer"
+        ? "/business"
+        : "/customer"
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
@@ -22,75 +22,63 @@ export default async function LandingPage() {
 
       <main className="flex-1 flex flex-col">
         {/* HERO SECTION */}
-        <section className="relative bg-blue-950 overflow-hidden">
-          {/* Background decoration */}
-          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
-          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full bg-blue-900 blur-3xl opacity-50 pointer-events-none"></div>
-          
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 flex flex-col md:flex-row items-center">
-            <div className="md:w-1/2 text-center md:text-left z-10">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-900/50 border border-blue-800 text-blue-200 text-xs font-semibold uppercase tracking-wider mb-6">
-                <ShieldCheck className="w-4 h-4" /> Solusi Karet Terbaik
-              </div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight mb-6">
-                Material Karet Berkualitas untuk Segala <span className="text-red-500">Kebutuhan</span>.
-              </h1>
-              <p className="text-lg text-blue-200 mb-8 max-w-xl mx-auto md:mx-0">
-                Dari produk retail harian hingga suplai industri berat (B2B). Kami menyediakan rubber sheet, seal, gasket, dan conveyor belt terbaik di kelasnya.
-              </p>
-              <div className="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
-                <Link
-                  href="/katalog"
-                  id="hero-catalog-btn"
-                  className="w-full sm:w-auto px-8 py-3.5 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-lg shadow-red-600/30 transition-all flex items-center justify-center gap-2"
-                >
-                  Lihat Katalog <ArrowRight className="w-4 h-4" />
-                </Link>
+        <section className="relative min-h-[90vh] md:min-h-[85vh] flex items-center justify-center overflow-hidden">
+          {/* Background Image */}
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: "url('/images/hero-bg.png')" }}
+          ></div>
 
-                {/* Dynamic secondary CTA */}
-                {isLoggedIn ? (
-                  <Link
-                    href={dashboardHref}
-                    id="hero-dashboard-btn"
-                    className="w-full sm:w-auto px-8 py-3.5 text-sm font-bold text-blue-100 bg-blue-900/40 hover:bg-blue-900/60 border border-blue-800 rounded-xl transition-all flex items-center justify-center gap-2"
-                  >
-                    Dashboard Saya <ArrowRight className="w-4 h-4" />
-                  </Link>
-                ) : (
-                  <Link
-                    href="/register/business"
-                    id="hero-b2b-btn"
-                    className="w-full sm:w-auto px-8 py-3.5 text-sm font-bold text-blue-100 bg-blue-900/40 hover:bg-blue-900/60 border border-blue-800 rounded-xl transition-all flex items-center justify-center"
-                  >
-                    Ajukan Penawaran B2B
-                  </Link>
-                )}
-              </div>
+          {/* Overlay gradient for modern look */}
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-900/90 via-slate-900/60 to-slate-900/40 mix-blend-multiply"></div>
+          {/* Additional subtle gradient */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-blue-950/50 to-transparent"></div>
+
+          <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 flex flex-col items-center text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-slate-100 text-xs sm:text-sm font-semibold uppercase tracking-widest mb-8 backdrop-blur-md shadow-lg">
+              <ShieldCheck className="w-4 h-4 text-red-400" /> Solusi Karet Terbaik
             </div>
-            
-            <div className="md:w-1/2 mt-12 md:mt-0 z-10 flex justify-center md:justify-end">
-              {/* Abstract 3D shape or placeholder for product visual */}
-              <div className="relative w-72 h-72 sm:w-96 sm:h-96">
-                <div className="absolute inset-0 bg-gradient-to-tr from-red-600 to-blue-600 rounded-3xl rotate-6 opacity-80 shadow-2xl blur-[2px]"></div>
-                <div className="absolute inset-0 bg-white rounded-3xl -rotate-3 shadow-xl overflow-hidden border border-slate-200 flex flex-col">
-                  <div className="bg-slate-100 h-48 border-b border-slate-200 flex items-center justify-center">
-                    <Factory className="w-20 h-20 text-slate-300" />
-                  </div>
-                  <div className="p-6 flex-1 flex flex-col justify-between">
-                    <div>
-                      <div className="w-16 h-4 bg-red-100 rounded mb-3"></div>
-                      <div className="w-3/4 h-6 bg-slate-200 rounded mb-2"></div>
-                      <div className="w-1/2 h-4 bg-slate-200 rounded"></div>
-                    </div>
-                    <div className="flex justify-between items-end">
-                      <div className="w-24 h-6 bg-slate-800 rounded"></div>
-                      <div className="w-10 h-10 bg-slate-200 rounded-full"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white tracking-tight leading-[1.15] mb-6 max-w-5xl drop-shadow-lg">
+              Material Karet Berkualitas untuk Segala <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-rose-400">Kebutuhan</span>
+            </h1>
+
+            <p className="text-base sm:text-lg md:text-xl text-slate-300 mb-10 max-w-2xl mx-auto font-medium leading-relaxed drop-shadow-md">
+              Dari produk retail harian hingga suplai industri berat (B2B). Kami menyediakan rubber sheet, seal, gasket, dan conveyor belt terbaik di kelasnya.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto justify-center">
+              <Link
+                href="/katalog"
+                id="hero-catalog-btn"
+                className="w-full sm:w-auto px-8 py-4 text-sm sm:text-base font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-[0_0_40px_-10px_rgba(220,38,38,0.6)] hover:shadow-[0_0_60px_-15px_rgba(220,38,38,0.8)] transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-1"
+              >
+                Lihat Katalog <ArrowRight className="w-5 h-5" />
+              </Link>
+
+              {/* Dynamic secondary CTA */}
+              {isLoggedIn ? (
+                <Link
+                  href={dashboardHref}
+                  id="hero-dashboard-btn"
+                  className="w-full sm:w-auto px-8 py-4 text-sm sm:text-base font-bold text-white bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md rounded-xl transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-1"
+                >
+                  Dashboard Saya <ArrowRight className="w-5 h-5" />
+                </Link>
+              ) : (
+                <Link
+                  href="/register/business"
+                  id="hero-b2b-btn"
+                  className="w-full sm:w-auto px-8 py-4 text-sm sm:text-base font-bold text-white bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md rounded-xl transition-all duration-300 flex items-center justify-center transform hover:-translate-y-1"
+                >
+                  Ajukan Penawaran B2B
+                </Link>
+              )}
             </div>
           </div>
+
+          {/* Bottom decorative edge matching the next section */}
+          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-slate-50 to-transparent z-10 pointer-events-none"></div>
         </section>
 
         {/* VALUE PROPOSITIONS */}
@@ -103,7 +91,7 @@ export default async function LandingPage() {
               <h3 className="text-lg font-bold text-slate-900 mb-2">Rumah Tangga & Retail</h3>
               <p className="text-sm text-slate-500">Pesan satuan dengan harga terbaik. Pengiriman cepat langsung ke alamat Anda.</p>
             </div>
-            
+
             <div className="p-8 text-center flex flex-col items-center group">
               <div className="w-14 h-14 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
                 <Factory className="w-7 h-7" />
@@ -111,7 +99,7 @@ export default async function LandingPage() {
               <h3 className="text-lg font-bold text-slate-900 mb-2">Industri & Bisnis (B2B)</h3>
               <p className="text-sm text-slate-500">Kapasitas besar, negosiasi harga (RFQ), dan metode pembayaran fleksibel/berjangka.</p>
             </div>
-            
+
             <div className="p-8 text-center flex flex-col items-center group">
               <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-950 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
                 <ShieldCheck className="w-7 h-7" />
@@ -141,7 +129,7 @@ export default async function LandingPage() {
                   <div className="absolute inset-0 bg-blue-950/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <Factory className="w-16 h-16 text-slate-300 group-hover:scale-110 transition-transform duration-500" />
                   <div className="absolute top-3 right-3 bg-white px-2 py-1 rounded text-[10px] font-bold text-slate-600 shadow-sm">
-                    SKU-{1000+i}
+                    SKU-{1000 + i}
                   </div>
                 </div>
                 <div className="p-5">
