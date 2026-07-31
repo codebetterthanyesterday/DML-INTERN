@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Eye, EyeOff, ShieldCheck } from "lucide-react"
 import { loginAction } from "@/lib/actions/auth"
+import { Checkbox } from "@/components/ui/checkbox"
 
 function LoginContent() {
   const router = useRouter()
@@ -13,6 +14,7 @@ function LoginContent() {
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [rememberMe, setRememberMe] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const justRegistered = searchParams.get("registered")
   const justReset = searchParams.get("reset")
@@ -23,6 +25,7 @@ function LoginContent() {
     const formData = new FormData()
     formData.append("email", email)
     formData.append("password", password)
+    formData.append("rememberMe", rememberMe.toString())
     startTransition(async () => {
       try {
         const res = await loginAction(formData)
@@ -107,8 +110,23 @@ function LoginContent() {
             </div>
           </div>
 
-          {/* Lupa kata sandi */}
-          <div className="text-right">
+          {/* Remember Me & Lupa kata sandi */}
+          <div className="flex items-center justify-between">
+            <label 
+              htmlFor="rememberMe" 
+              className="flex items-center gap-2 cursor-pointer group px-1 py-0.5 -ml-1 rounded-md hover:bg-slate-100 transition-colors"
+            >
+              <Checkbox
+                id="rememberMe"
+                checked={rememberMe}
+                onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                className="w-4 h-4 rounded-[4px] border-slate-300 data-[state=checked]:bg-blue-900 data-[state=checked]:text-white transition-all duration-200 shadow-sm"
+              />
+              <span className="text-xs font-medium text-slate-600 group-hover:text-slate-900 transition-colors select-none">
+                Ingat saya
+              </span>
+            </label>
+
             <Link href="/forgot" className="text-xs text-red-600 hover:text-red-700 font-medium transition-colors">
               Lupa kata sandi?
             </Link>

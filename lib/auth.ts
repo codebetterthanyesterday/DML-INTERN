@@ -11,6 +11,7 @@ declare module "next-auth" {
     id: string
     role: "CUSTOMER" | "BUSINESS" | "ADMIN"
     companyName?: string | null
+    rememberMe?: boolean
   }
   interface Session {
     user: User & {
@@ -38,11 +39,15 @@ export const authConfig: NextAuthConfig = {
       },
       async authorize(credentials) {
         const parsedCredentials = z
-          .object({ email: z.string().email(), password: z.string().min(6) })
+          .object({ 
+            email: z.string().email(), 
+            password: z.string().min(6),
+            rememberMe: z.string().optional()
+          })
           .safeParse(credentials)
 
         if (parsedCredentials.success) {
-          const { email, password } = parsedCredentials.data
+          const { email, password, rememberMe } = parsedCredentials.data
 
           const user = await prisma.user.findUnique({
             where: { email }
@@ -64,6 +69,7 @@ export const authConfig: NextAuthConfig = {
               email: user.email,
               role: user.role,
               companyName: user.companyName,
+              rememberMe: rememberMe === "true",
             }
           }
         }
@@ -78,6 +84,12 @@ export const authConfig: NextAuthConfig = {
         token.id = user.id
         token.role = user.role
         token.companyName = user.companyName
+        
+        // If "Remember Me" was not checked, set token to expire in 24 hours.
+        // Otherwise, it defaults to the session maxAge (30 days).
+        if (user.rememberMe === false) {
+          token.exp = Math.floor(Date.now() / 1000) + 60 * 60 * 24
+        }
       }
       return token
     },
