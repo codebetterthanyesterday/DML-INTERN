@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useState, useTransition, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { Header } from "@/components/shared/Header"
@@ -90,6 +90,34 @@ export function KatalogPageClient({ session, products, categories, totalCount, c
 
   const rfqConfig = getRfqConfig(session)
   const cartConfig = getAddToCartConfig(session)
+  const isMounted = useRef(false)
+  const isPriceMounted = useRef(false)
+
+  useEffect(() => {
+    if (!isMounted.current) {
+      isMounted.current = true
+      return
+    }
+
+    const timeoutId = setTimeout(() => {
+      updateFilters("q", searchQuery)
+    }, 500)
+
+    return () => clearTimeout(timeoutId)
+  }, [searchQuery])
+
+  useEffect(() => {
+    if (!isPriceMounted.current) {
+      isPriceMounted.current = true
+      return
+    }
+
+    const timeoutId = setTimeout(() => {
+      handlePriceSubmit()
+    }, 700) // slightly longer debounce for numbers
+
+    return () => clearTimeout(timeoutId)
+  }, [localMinPrice, localMaxPrice])
 
   const updateFilters = (key: string, value: string | null) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -100,7 +128,7 @@ export function KatalogPageClient({ session, products, categories, totalCount, c
     }
     // Reset to page 1 on filter change
     params.delete("page")
-    
+
     startTransition(() => {
       router.push(`${pathname}?${params.toString()}`, { scroll: false })
     })
@@ -115,12 +143,12 @@ export function KatalogPageClient({ session, products, categories, totalCount, c
     const params = new URLSearchParams(searchParams.toString())
     if (localMinPrice) params.set("minPrice", localMinPrice)
     else params.delete("minPrice")
-    
+
     if (localMaxPrice) params.set("maxPrice", localMaxPrice)
     else params.delete("maxPrice")
 
     params.delete("page")
-    
+
     startTransition(() => {
       router.push(`${pathname}?${params.toString()}`, { scroll: false })
     })
@@ -224,13 +252,12 @@ export function KatalogPageClient({ session, products, categories, totalCount, c
                   <button
                     key={type}
                     onClick={() => updateFilters("type", type)}
-                    className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-between ${
-                      selectedType === type
-                        ? type === "INDUSTRIAL"
-                          ? "bg-red-600 text-white shadow-sm"
-                          : "bg-blue-950 text-white shadow-sm"
-                        : "bg-slate-50 text-slate-700 hover:bg-slate-100"
-                    }`}
+                    className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-between ${selectedType === type
+                      ? type === "INDUSTRIAL"
+                        ? "bg-red-600 text-white shadow-sm"
+                        : "bg-blue-950 text-white shadow-sm"
+                      : "bg-slate-50 text-slate-700 hover:bg-slate-100"
+                      }`}
                   >
                     <span className="flex items-center gap-1.5">
                       {type !== "ALL" && (
@@ -256,11 +283,10 @@ export function KatalogPageClient({ session, products, categories, totalCount, c
                   <button
                     key={cat}
                     onClick={() => updateFilters("category", cat)}
-                    className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center justify-between ${
-                      selectedCategory === cat
-                        ? "text-blue-950 font-bold bg-blue-50"
-                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                    }`}
+                    className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center justify-between ${selectedCategory === cat
+                      ? "text-blue-950 font-bold bg-blue-50"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                      }`}
                   >
                     <span>{cat}</span>
                     {selectedCategory === cat && <span className="w-1.5 h-1.5 rounded-full bg-blue-950"></span>}
@@ -294,7 +320,7 @@ export function KatalogPageClient({ session, products, categories, totalCount, c
                   className="w-full px-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-900"
                 />
               </div>
-              <button 
+              <button
                 onClick={handlePriceSubmit}
                 className="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition-colors"
               >
@@ -425,7 +451,7 @@ export function KatalogPageClient({ session, products, categories, totalCount, c
                         </span>
 
                         {product.imageUrl ? (
-                           <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 relative z-0" />
+                          <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 relative z-0" />
                         ) : (
                           <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center group-hover:scale-105 transition-transform duration-500 relative z-0">
                             <div className="w-16 h-16 rounded-2xl bg-slate-200/80 flex items-center justify-center mb-2 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-950 transition-colors">
@@ -507,14 +533,14 @@ export function KatalogPageClient({ session, products, categories, totalCount, c
                   Menampilkan {(currentPage - 1) * 12 + 1}–{Math.min(currentPage * 12, totalCount)} dari {totalCount} produk
                 </span>
                 <div className="flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 sm:pb-0">
-                  <button 
+                  <button
                     disabled={currentPage === 1 || isPending}
                     onClick={() => handlePageChange(currentPage - 1)}
                     className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     ◂ Prev
                   </button>
-                  
+
                   {Array.from({ length: totalPages }, (_, i) => i + 1)
                     .filter(page => {
                       if (totalPages <= 5) return true
@@ -529,24 +555,23 @@ export function KatalogPageClient({ session, products, categories, totalCount, c
                           <span key={`ellipsis-${page}`} className="px-1 text-slate-400">...</span>
                         )
                       }
-                      
+
                       return (
                         <button
                           key={page}
                           onClick={() => handlePageChange(page)}
                           disabled={isPending}
-                          className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors disabled:opacity-50 ${
-                            currentPage === page 
-                              ? "bg-blue-950 text-white shadow-sm" 
-                              : "text-slate-600 hover:bg-slate-100 bg-white border border-slate-200"
-                          }`}
+                          className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors disabled:opacity-50 ${currentPage === page
+                            ? "bg-blue-950 text-white shadow-sm"
+                            : "text-slate-600 hover:bg-slate-100 bg-white border border-slate-200"
+                            }`}
                         >
                           {page}
                         </button>
                       )
-                  })}
-                  
-                  <button 
+                    })}
+
+                  <button
                     disabled={currentPage === totalPages || isPending}
                     onClick={() => handlePageChange(currentPage + 1)}
                     className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -556,7 +581,7 @@ export function KatalogPageClient({ session, products, categories, totalCount, c
                 </div>
               </div>
             )}
-            
+
             {totalPages <= 1 && totalCount > 0 && (
               <div className="mt-8 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
                 <span className="text-xs text-slate-500 font-medium">
@@ -589,11 +614,10 @@ export function KatalogPageClient({ session, products, categories, totalCount, c
                   <button
                     key={type}
                     onClick={() => { updateFilters("type", type); setIsMobileFilterOpen(false) }}
-                    className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold ${
-                      selectedType === type
-                        ? type === "INDUSTRIAL" ? "bg-red-600 text-white" : "bg-blue-950 text-white"
-                        : "bg-slate-50"
-                    }`}
+                    className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold ${selectedType === type
+                      ? type === "INDUSTRIAL" ? "bg-red-600 text-white" : "bg-blue-950 text-white"
+                      : "bg-slate-50"
+                      }`}
                   >
                     {type === "ALL" ? "Semua Tipe" : type === "RETAIL" ? "Eceran (Retail)" : "Industri (B2B / RFQ)"}
                   </button>
@@ -608,9 +632,8 @@ export function KatalogPageClient({ session, products, categories, totalCount, c
                   <button
                     key={cat}
                     onClick={() => { updateFilters("category", cat); setIsMobileFilterOpen(false) }}
-                    className={`w-full text-left px-3 py-2 rounded-lg text-xs font-medium ${
-                      selectedCategory === cat ? "bg-blue-50 text-blue-950 font-bold" : "text-slate-600"
-                    }`}
+                    className={`w-full text-left px-3 py-2 rounded-lg text-xs font-medium ${selectedCategory === cat ? "bg-blue-50 text-blue-950 font-bold" : "text-slate-600"
+                      }`}
                   >
                     {cat}
                   </button>
@@ -624,7 +647,7 @@ export function KatalogPageClient({ session, products, categories, totalCount, c
                 <input type="number" placeholder="Min" value={localMinPrice} onChange={e => setLocalMinPrice(e.target.value)} className="w-1/2 p-2 text-xs border rounded-lg" />
                 <input type="number" placeholder="Max" value={localMaxPrice} onChange={e => setLocalMaxPrice(e.target.value)} className="w-1/2 p-2 text-xs border rounded-lg" />
               </div>
-              <button 
+              <button
                 onClick={() => { handlePriceSubmit(); setIsMobileFilterOpen(false) }}
                 className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-lg"
               >
