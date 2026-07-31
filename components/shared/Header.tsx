@@ -174,10 +174,10 @@ export function Header({ session, cartItemCount = 0 }: HeaderProps) {
     <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2" id="header-logo">
-          <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm overflow-hidden border border-slate-100 p-0.5">
-            <Image src={logoImg} alt="DML Platform Logo" width={40} height={40} className="object-contain w-full h-full rounded-full" />
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white flex items-center justify-center shadow-sm overflow-hidden border border-slate-100 p-0.5 shrink-0">
+            <Image src={logoImg} alt="Duta Rubber Shop Logo" width={40} height={40} className="object-contain w-full h-full rounded-full" />
           </div>
-          <span className="text-lg font-extrabold text-blue-950 tracking-tight">DML Platform</span>
+          <span className="text-sm sm:text-lg font-extrabold text-blue-950 tracking-tight truncate max-w-[140px] sm:max-w-none">Duta Rubber Shop</span>
         </Link>
 
         {/* Desktop Nav */}
@@ -275,10 +275,10 @@ export function Header({ session, cartItemCount = 0 }: HeaderProps) {
               <SheetHeader className="p-6 border-b border-slate-100 text-left">
                 <SheetTitle asChild>
                   <Link href="/" className="flex items-center gap-2 w-fit" onClick={() => setIsMobileMenuOpen(false)}>
-                    <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm overflow-hidden border border-slate-100 p-0.5">
-                      <Image src={logoImg} alt="DML Platform Logo" width={40} height={40} className="object-contain w-full h-full rounded-full" />
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white flex items-center justify-center shadow-sm overflow-hidden border border-slate-100 p-0.5 shrink-0">
+                      <Image src={logoImg} alt="Duta Rubber Shop Logo" width={40} height={40} className="object-contain w-full h-full rounded-full" />
                     </div>
-                    <span className="text-lg font-extrabold text-blue-950 tracking-tight">DML Platform</span>
+                    <span className="text-sm sm:text-lg font-extrabold text-blue-950 tracking-tight truncate">Duta Rubber Shop</span>
                   </Link>
                 </SheetTitle>
               </SheetHeader>

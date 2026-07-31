@@ -40,10 +40,18 @@ export function KontakPageClient({ userName, userEmail, session }: KontakPageCli
 
       {/* HERO BANNER */}
       <div className="relative bg-blue-950 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
-        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full bg-blue-900 blur-3xl opacity-50 pointer-events-none"></div>
+        {/* Background Image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/images/kontak-bg.png')" }}
+        ></div>
         
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 flex flex-col items-center text-center">
+        {/* Overlay gradient for modern look */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/90 via-slate-900/60 to-slate-900/40 mix-blend-multiply z-0"></div>
+        {/* Additional subtle gradient */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-blue-950/50 to-transparent z-0"></div>
+        
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 flex flex-col items-center text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-900/60 border border-blue-800 text-blue-200 text-xs font-semibold uppercase tracking-wider mb-6">
             <Building2 className="w-4 h-4" /> Mari Berdiskusi
           </div>

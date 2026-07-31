@@ -4,7 +4,7 @@ import { redirect } from "next/navigation"
 import { CartPageClient } from "./CartPageClient"
 
 export const metadata = {
-  title: "Keranjang Belanja | DML Platform",
+  title: "Keranjang Belanja | Duta Rubber Shop",
   description: "Review keranjang belanja Anda",
 }
 

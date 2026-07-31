@@ -15,10 +15,16 @@ export default async function TentangPage() {
       <main className="flex-1 w-full">
         {/* HERO SECTION - Foto Pabrik */}
         <section className="relative h-[400px] md:h-[500px] bg-blue-950 flex items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/black-scales.png')] opacity-20 z-0"></div>
-          {/* Simulated factory background image */}
-          <div className="absolute inset-0 bg-blue-900 mix-blend-multiply opacity-50 z-10"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-blue-950 via-transparent to-transparent z-10"></div>
+          {/* Background Image */}
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: "url('/images/tentang-bg.png')" }}
+          ></div>
+          
+          {/* Overlay gradient for modern look */}
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-900/90 via-slate-900/60 to-slate-900/40 mix-blend-multiply z-10"></div>
+          {/* Additional subtle gradient */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-blue-950/50 to-transparent z-10"></div>
           
           <div className="relative z-20 text-center px-4 max-w-4xl mx-auto mt-10">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-600/20 border border-red-500/50 text-red-200 text-xs font-bold uppercase tracking-widest mb-6">

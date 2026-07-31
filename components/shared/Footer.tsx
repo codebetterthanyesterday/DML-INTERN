@@ -12,9 +12,9 @@ export function Footer() {
           <div className="col-span-1 sm:col-span-2 lg:col-span-4">
             <div className="flex items-center gap-2 mb-6">
               <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm overflow-hidden border border-slate-700/50 p-0.5">
-                <Image src={logoImg} alt="DML Platform Logo" width={40} height={40} className="object-contain w-full h-full rounded-full" />
+                <Image src={logoImg} alt="Duta Rubber Shop Logo" width={40} height={40} className="object-contain w-full h-full rounded-full" />
               </div>
-              <span className="text-xl font-extrabold text-white tracking-tight">DML Platform</span>
+              <span className="text-xl font-extrabold text-white tracking-tight">Duta Rubber Shop</span>
             </div>
             <p className="text-sm text-slate-400 leading-relaxed max-w-sm mb-6">
               Platform B2B dan Retail terpercaya untuk produk material karet, gasket, seal, dan perlengkapan industri lainnya.
@@ -81,7 +81,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-slate-500">
-            © {new Date().getFullYear()} DML Platform. Hak Cipta Dilindungi.
+            © {new Date().getFullYear()} Duta Rubber Shop. Hak Cipta Dilindungi.
           </p>
           <div className="flex flex-wrap gap-4">
             <Link href="#" className="text-xs text-slate-500 hover:text-white transition-colors">Syarat & Ketentuan</Link>

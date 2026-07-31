@@ -188,8 +188,19 @@ export function KatalogPageClient({ session, products, categories, totalCount, c
     <div className={`min-h-screen bg-slate-50 flex flex-col font-sans ${isPending ? 'opacity-80' : ''} transition-opacity`}>
 
       {/* HEADER BANNER */}
-      <div className="bg-blue-950 text-white py-10 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="relative bg-blue-950 text-white overflow-hidden py-10 px-4 sm:px-6 lg:px-8">
+        {/* Background Image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/images/katalog-bg.png')" }}
+        ></div>
+        
+        {/* Overlay gradient for modern look */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/90 via-slate-900/60 to-slate-900/40 mix-blend-multiply z-0"></div>
+        {/* Additional subtle gradient */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-blue-950/50 to-transparent z-0"></div>
+        
+        <div className="relative z-10 max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-900/60 text-blue-200 text-xs font-semibold uppercase tracking-wider mb-2">
               Katalog Produk Lengkap

@@ -1,5 +1,7 @@
 "use client"
 
+import Image from "next/image"
+import logoImg from "@/public/logo.png"
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -55,14 +57,10 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-4 py-12">
       {/* Logo */}
       <div className="mb-8 flex flex-col items-center gap-3">
-        <div className="w-12 h-12 rounded-2xl bg-red-600 flex items-center justify-center shadow-lg shadow-red-600/20">
-          <svg viewBox="0 0 32 32" fill="none" className="w-7 h-7">
-            <rect x="2" y="8" width="28" height="4" rx="2" fill="white" />
-            <rect x="2" y="16" width="20" height="4" rx="2" fill="white" fillOpacity="0.7" />
-            <rect x="2" y="24" width="24" height="4" rx="2" fill="white" fillOpacity="0.5" />
-          </svg>
+        <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shadow-lg shadow-slate-200/50 overflow-hidden border border-slate-100 p-0.5 shrink-0">
+          <Image src={logoImg} alt="Duta Rubber Shop Logo" width={48} height={48} className="object-contain w-full h-full rounded-xl" />
         </div>
-        <span className="text-xl font-extrabold text-slate-800 tracking-tight">DML Platform</span>
+        <span className="text-xl font-extrabold text-slate-800 tracking-tight">Duta Rubber Shop</span>
       </div>
 
       {/* Card */}

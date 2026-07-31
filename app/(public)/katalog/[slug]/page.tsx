@@ -1,8 +1,6 @@
 import { notFound } from "next/navigation"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
-import { Footer } from "@/components/shared/Footer"
-import { AuthAwareHeader } from "@/components/shared/AuthAwareHeader"
 import { ProductDetailClient, type ProductDetailProps } from "./ProductDetailClient"
 
 export default async function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -66,9 +64,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
-      <AuthAwareHeader />
       <ProductDetailClient product={productProps} session={session} />
-      <Footer />
     </div>
   )
 }

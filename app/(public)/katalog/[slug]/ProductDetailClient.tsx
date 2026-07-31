@@ -1,7 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useTransition } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import toast from "react-hot-toast"
+import { addToCart } from "@/lib/actions/cart"
 import {
   ChevronRight,
   Minus,
@@ -48,10 +51,29 @@ interface ProductDetailClientProps {
 export function ProductDetailClient({ product, session }: ProductDetailClientProps) {
   const [mainImageIdx, setMainImageIdx] = useState(0)
   const [qty, setQty] = useState(product.minOrderQty)
+  const [isPending, startTransition] = useTransition()
+  const router = useRouter()
 
   const handleQtyChange = (type: "inc" | "dec") => {
     if (type === "inc") setQty(q => q + 1)
     if (type === "dec" && qty > product.minOrderQty) setQty(q => q - 1)
+  }
+
+  const handleAddToCart = () => {
+    if (!session) {
+      toast.error("Silakan login terlebih dahulu")
+      router.push("/login")
+      return
+    }
+    
+    startTransition(async () => {
+      const res = await addToCart(product.id, qty)
+      if (res.success) {
+        toast.success("Produk berhasil ditambahkan ke keranjang")
+      } else {
+        toast.error(res.error || "Gagal menambahkan ke keranjang")
+      }
+    })
   }
 
   // Treat BOTH as RETAIL for UI purposes (displaying price and cart button)
@@ -181,8 +203,12 @@ export function ProductDetailClient({ product, session }: ProductDetailClientPro
                       </button>
                     </div>
                     
-                    <button className="flex-1 sm:flex-none h-12 px-6 rounded-xl bg-blue-950 hover:bg-blue-900 text-white text-sm font-bold shadow-md shadow-blue-950/20 transition-all flex items-center justify-center gap-2">
-                      <ShoppingBag className="w-4 h-4" /> Masuk Keranjang
+                    <button 
+                      onClick={handleAddToCart}
+                      disabled={isPending}
+                      className="flex-1 sm:flex-none h-12 px-6 rounded-xl bg-blue-950 hover:bg-blue-900 text-white text-sm font-bold shadow-md shadow-blue-950/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <ShoppingBag className="w-4 h-4" /> {isPending ? "Memproses..." : "Masuk Keranjang"}
                     </button>
                   </div>
                 </div>
@@ -209,7 +235,7 @@ export function ProductDetailClient({ product, session }: ProductDetailClientPro
                     </div>
                     
                     {session?.user?.role === "BUSINESS" ? (
-                      <Link href="/business/quotes/new" className="flex-1 sm:flex-none h-12 px-6 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-bold shadow-md shadow-red-600/20 transition-all flex items-center justify-center gap-2">
+                      <Link href={`/business/quotes/new?productId=${product.id}`} className="flex-1 sm:flex-none h-12 px-6 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-bold shadow-md shadow-red-600/20 transition-all flex items-center justify-center gap-2">
                         Minta Penawaran
                       </Link>
                     ) : session?.user?.role === "ADMIN" ? (
@@ -316,9 +342,14 @@ export function ProductDetailClient({ product, session }: ProductDetailClientPro
               <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500 blur-3xl opacity-20 rounded-full"></div>
               <h3 className="text-lg font-bold text-white mb-2 relative z-10">Butuh Bantuan?</h3>
               <p className="text-sm text-blue-200 mb-6 relative z-10">Tim sales kami siap membantu Anda mencarikan produk yang tepat.</p>
-              <button className="w-full py-3 rounded-xl bg-white text-blue-950 text-sm font-bold shadow-lg hover:bg-slate-50 transition-colors relative z-10">
+              <a 
+                href={`https://wa.me/6281234567890?text=Halo,%20saya%20ingin%20bertanya%20tentang%20produk%20${encodeURIComponent(product.name)}`} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="block text-center w-full py-3 rounded-xl bg-white text-blue-950 text-sm font-bold shadow-lg hover:bg-slate-50 transition-colors relative z-10"
+              >
                 Hubungi via WhatsApp
-              </button>
+              </a>
            </div>
         </div>
       </div>

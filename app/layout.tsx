@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DML Platform – Material Karet Berkualitas",
+  title: "Duta Rubber Shop – Material Karet Berkualitas",
   description: "Platform B2B dan Retail terpercaya untuk produk material karet, gasket, seal, dan perlengkapan industri lainnya.",
 };
 
