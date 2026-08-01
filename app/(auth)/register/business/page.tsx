@@ -7,49 +7,53 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Eye, EyeOff, ArrowLeft, UploadCloud, FileText } from "lucide-react"
 import { registerBusinessAction } from "@/lib/actions/auth"
+import { useForm, Controller } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { businessSchema, type BusinessFormValues } from "@/lib/validators/auth"
 
-function InputField({ id, label, type = "text", placeholder, value, onChange, error, suffix }: {
+function InputField({ id, label, type = "text", placeholder, errorMsg, suffix, registration }: {
   id: string; label: string; type?: string; placeholder: string
-  value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-  error?: string; suffix?: React.ReactNode
+  errorMsg?: string; suffix?: React.ReactNode; registration: any
 }) {
   return (
     <div>
       <label htmlFor={id} className="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">{label}</label>
       <div className="relative">
-        <input id={id} type={type} value={value} onChange={onChange} placeholder={placeholder} autoComplete={id}
+        <input id={id} type={type} placeholder={placeholder} autoComplete={id} {...registration}
           className={`w-full px-3.5 py-2.5 ${suffix ? "pr-10" : ""} rounded-lg border bg-slate-50 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:bg-white transition-all ${
-            error ? "border-red-300 focus:ring-red-400" : "border-slate-200 focus:ring-red-500"
+            errorMsg ? "border-red-300 focus:ring-red-400" : "border-slate-200 focus:ring-red-500"
           }`} />
         {suffix && <div className="absolute right-3 top-1/2 -translate-y-1/2">{suffix}</div>}
       </div>
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+      {errorMsg && <p className="text-red-500 text-xs mt-1">{errorMsg}</p>}
     </div>
   )
 }
 
-function UploadZone({ label, fieldName, onFileChange, fileName }: {
-  label: string; fieldName: string
-  onFileChange: (name: string, file: File | null) => void; fileName?: string
+function UploadZone({ label, fieldName, errorMsg, file, onChange }: {
+  label: string; fieldName: string; errorMsg?: string; file?: File | null; onChange: (file: File | null) => void
 }) {
   return (
-    <label className="relative flex flex-col items-center justify-center gap-1.5 p-5 rounded-xl border-2 border-dashed border-slate-200 hover:border-red-400 bg-slate-50 hover:bg-red-50 transition-all cursor-pointer group min-h-[80px]">
-      <input type="file" className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-        accept="image/*,.pdf" onChange={(e) => onFileChange(fieldName, e.target.files?.[0] ?? null)} />
-      {fileName ? (
-        <>
-          <FileText className="w-6 h-6 text-red-500" />
-          <span className="text-xs font-semibold text-red-600 text-center">{fileName}</span>
-          <span className="text-xs text-slate-400">Klik untuk ganti</span>
-        </>
-      ) : (
-        <>
-          <UploadCloud className="w-6 h-6 text-slate-400 group-hover:text-red-500 transition-colors" />
-          <span className="text-xs font-semibold text-slate-600 group-hover:text-red-600 text-center transition-colors">{label}</span>
-          <span className="text-xs text-slate-400">JPG, PNG, atau PDF · Maks. 5MB</span>
-        </>
-      )}
-    </label>
+    <div>
+      <label className={`relative flex flex-col items-center justify-center gap-1.5 p-5 rounded-xl border-2 border-dashed transition-all cursor-pointer group min-h-[80px] ${errorMsg ? 'border-red-300 bg-red-50 hover:border-red-400' : 'border-slate-200 hover:border-red-400 bg-slate-50 hover:bg-red-50'}`}>
+        <input type="file" className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+          accept="image/jpeg,image/png,application/pdf" onChange={(e) => onChange(e.target.files?.[0] ?? null)} />
+        {file ? (
+          <>
+            <FileText className="w-6 h-6 text-red-500" />
+            <span className="text-xs font-semibold text-red-600 text-center">{file.name}</span>
+            <span className="text-xs text-slate-400">Klik untuk ganti</span>
+          </>
+        ) : (
+          <>
+            <UploadCloud className={`w-6 h-6 transition-colors ${errorMsg ? 'text-red-400 group-hover:text-red-500' : 'text-slate-400 group-hover:text-red-500'}`} />
+            <span className={`text-xs font-semibold text-center transition-colors ${errorMsg ? 'text-red-500 group-hover:text-red-600' : 'text-slate-600 group-hover:text-red-600'}`}>{label}</span>
+            <span className="text-xs text-slate-400">JPG, PNG, atau PDF · Maks. 5MB</span>
+          </>
+        )}
+      </label>
+      {errorMsg && <p className="text-red-500 text-xs mt-1">{errorMsg}</p>}
+    </div>
   )
 }
 
@@ -58,36 +62,24 @@ export default function RegisterBusinessPage() {
   const [isPending, startTransition] = useTransition()
   const [showPw, setShowPw] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [fileNames, setFileNames] = useState<Record<string, string>>({})
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
-  const [form, setForm] = useState({
-    companyName: "", npwp: "", address: "", picName: "", picPhone: "", email: "", password: "",
+
+  const { register, handleSubmit, formState: { errors }, control } = useForm<BusinessFormValues>({
+    resolver: zodResolver(businessSchema),
+    defaultValues: {
+      companyName: "", npwp: "", address: "", city: "", province: "", postalCode: "", picName: "", picPhone: "", email: "", password: ""
+    }
   })
 
-  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm(f => ({ ...f, [k]: e.target.value }))
-    setFieldErrors(fe => { const n = { ...fe }; delete n[k]; return n })
-  }
-
-  const handleFileChange = (name: string, file: File | null) => {
-    setFileNames(prev => ({ ...prev, [name]: file?.name ?? "" }))
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const errs: Record<string, string> = {}
-    if (form.companyName.length < 2) errs.companyName = "Wajib diisi"
-    if (form.npwp.length < 15) errs.npwp = "NPWP tidak valid"
-    if (form.address.length < 5) errs.address = "Wajib diisi"
-    if (form.picName.length < 2) errs.picName = "Wajib diisi"
-    if (form.picPhone.length < 8) errs.picPhone = "No. HP tidak valid"
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = "Email tidak valid"
-    if (form.password.length < 6) errs.password = "Minimal 6 karakter"
-    if (Object.keys(errs).length) { setFieldErrors(errs); return }
-
+  const onSubmit = async (data: BusinessFormValues) => {
     setError(null)
     const formData = new FormData()
-    Object.entries(form).forEach(([k, v]) => formData.append(k, v))
+    
+    // Append primitive fields
+    Object.entries(data).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        formData.append(key, value as string | Blob)
+      }
+    })
 
     startTransition(async () => {
       try {
@@ -110,7 +102,7 @@ export default function RegisterBusinessPage() {
       </div>
 
       {/* Two-column form — sesuai wireframe p09 */}
-      <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
+      <form onSubmit={handleSubmit(onSubmit)} className="max-w-4xl mx-auto">
         <div className="flex items-center gap-3 mb-6">
           <Link href="/register" className="text-slate-400 hover:text-slate-600 transition-colors">
             <ArrowLeft className="w-4 h-4" />
@@ -132,28 +124,38 @@ export default function RegisterBusinessPage() {
             </div>
 
             <InputField id="companyName" label="Nama Perusahaan (PT/CV)"
-              placeholder="PT Contoh Sukses" value={form.companyName} onChange={set("companyName")} error={fieldErrors.companyName} />
+              placeholder="PT Contoh Sukses" registration={register("companyName")} errorMsg={errors.companyName?.message} />
 
             <InputField id="npwp" label="NPWP"
-              placeholder="00.000.000.0-000.000" value={form.npwp} onChange={set("npwp")} error={fieldErrors.npwp} />
+              placeholder="00.000.000.0-000.000" registration={register("npwp")} errorMsg={errors.npwp?.message} />
 
             <InputField id="address" label="Alamat Perusahaan"
-              placeholder="Jl. Industri Raya No. 123" value={form.address} onChange={set("address")} error={fieldErrors.address} />
+              placeholder="Jl. Industri Raya No. 123" registration={register("address")} errorMsg={errors.address?.message} />
+
+            <div className="grid grid-cols-2 gap-3">
+              <InputField id="city" label="Kota / Kab"
+                placeholder="Jakarta Pusat" registration={register("city")} errorMsg={errors.city?.message} />
+              <InputField id="province" label="Provinsi"
+                placeholder="DKI Jakarta" registration={register("province")} errorMsg={errors.province?.message} />
+            </div>
+
+            <InputField id="postalCode" label="Kode Pos"
+              placeholder="10000" registration={register("postalCode")} errorMsg={errors.postalCode?.message} />
 
             {/* Nama & No. HP PIC — sesuai wireframe dalam satu baris */}
             <div className="grid grid-cols-2 gap-3">
               <InputField id="picName" label="Nama PIC"
-                placeholder="Nama PIC" value={form.picName} onChange={set("picName")} error={fieldErrors.picName} />
+                placeholder="Nama PIC" registration={register("picName")} errorMsg={errors.picName?.message} />
               <InputField id="picPhone" label="No. HP PIC"
-                type="tel" placeholder="081234567890" value={form.picPhone} onChange={set("picPhone")} error={fieldErrors.picPhone} />
+                type="tel" placeholder="081234567890" registration={register("picPhone")} errorMsg={errors.picPhone?.message} />
             </div>
 
             <InputField id="email" label="Email Perusahaan"
-              type="email" placeholder="email@perusahaan.com" value={form.email} onChange={set("email")} error={fieldErrors.email} />
+              type="email" placeholder="email@perusahaan.com" registration={register("email")} errorMsg={errors.email?.message} />
 
             <InputField id="password" label="Kata Sandi Akun"
               type={showPw ? "text" : "password"} placeholder="Minimal 6 karakter"
-              value={form.password} onChange={set("password")} error={fieldErrors.password}
+              registration={register("password")} errorMsg={errors.password?.message}
               suffix={
                 <button type="button" onClick={() => setShowPw(v => !v)} className="text-slate-400 hover:text-slate-600">
                   {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -168,11 +170,33 @@ export default function RegisterBusinessPage() {
               <h2 className="text-xs font-bold text-slate-700 uppercase tracking-widest">Upload Dokumen Legalitas</h2>
             </div>
 
-            <UploadZone label="Upload NPWP" fieldName="npwpFile"
-              onFileChange={handleFileChange} fileName={fileNames.npwpFile} />
+            <Controller
+              name="npwpFile"
+              control={control}
+              render={({ field }) => (
+                <UploadZone 
+                  label="Upload NPWP" 
+                  fieldName="npwpFile"
+                  file={field.value}
+                  onChange={field.onChange}
+                  errorMsg={errors.npwpFile?.message as string}
+                />
+              )}
+            />
 
-            <UploadZone label="Upload SIUP / NIB" fieldName="siupFile"
-              onFileChange={handleFileChange} fileName={fileNames.siupFile} />
+            <Controller
+              name="siupFile"
+              control={control}
+              render={({ field }) => (
+                <UploadZone 
+                  label="Upload SIUP / NIB" 
+                  fieldName="siupFile"
+                  file={field.value}
+                  onChange={field.onChange}
+                  errorMsg={errors.siupFile?.message as string}
+                />
+              )}
+            />
 
             <p className="text-xs text-slate-400 italic">
               Dokumen akan diverifikasi Admin (1–2 hari kerja). Akun aktif setelah verifikasi selesai.

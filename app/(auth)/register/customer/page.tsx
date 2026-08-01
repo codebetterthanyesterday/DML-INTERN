@@ -7,41 +7,38 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Eye, EyeOff, ArrowLeft, Check } from "lucide-react"
 import { registerCustomerAction } from "@/lib/actions/auth"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { customerSchema, type CustomerFormValues } from "@/lib/validators/auth"
 
 export default function RegisterCustomerPage() {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [showPw, setShowPw] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
-  const [agreed, setAgreed] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
-  const [form, setForm] = useState({
-    name: "", email: "", phone: "", password: "", confirmPassword: "",
+
+  const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm<CustomerFormValues>({
+    resolver: zodResolver(customerSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      password: "",
+      confirmPassword: "",
+      terms: false as any // We handle this explicitly
+    }
   })
 
-  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm(f => ({ ...f, [k]: e.target.value }))
-    setFieldErrors(fe => { const n = { ...fe }; delete n[k]; return n })
-  }
+  const agreed = watch("terms")
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const errs: Record<string, string> = {}
-    if (form.name.length < 2) errs.name = "Nama minimal 2 karakter"
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = "Email tidak valid"
-    if (form.phone.length < 8) errs.phone = "No. HP tidak valid"
-    if (form.password.length < 6) errs.password = "Minimal 6 karakter"
-    if (form.password !== form.confirmPassword) errs.confirmPassword = "Kata sandi tidak cocok"
-    if (!agreed) errs.terms = "Anda harus menyetujui Syarat & Ketentuan"
-    if (Object.keys(errs).length) { setFieldErrors(errs); return }
-
+  const onSubmit = async (data: CustomerFormValues) => {
     setError(null)
     const formData = new FormData()
-    formData.append("name", form.name)
-    formData.append("email", form.email)
-    formData.append("phone", form.phone)
-    formData.append("password", form.password)
+    formData.append("name", data.name)
+    formData.append("email", data.email)
+    formData.append("phone", data.phone)
+    formData.append("password", data.password)
     formData.append("terms", "on")
 
     startTransition(async () => {
@@ -54,21 +51,20 @@ export default function RegisterCustomerPage() {
     })
   }
 
-  const Field = ({ id, label, type = "text", placeholder, value, onChange, err, suffix }: {
+  const Field = ({ id, label, type = "text", placeholder, errorMsg, suffix, registration }: {
     id: string; label: string; type?: string; placeholder: string
-    value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-    err?: string; suffix?: React.ReactNode
+    errorMsg?: string; suffix?: React.ReactNode; registration: any
   }) => (
     <div>
       <label htmlFor={id} className="block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">{label}</label>
       <div className="relative">
-        <input id={id} type={type} value={value} onChange={onChange} placeholder={placeholder} autoComplete={id}
+        <input id={id} type={type} placeholder={placeholder} autoComplete={id} {...registration}
           className={`w-full px-3.5 py-2.5 ${suffix ? "pr-10" : ""} rounded-lg border bg-slate-50 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:bg-white transition-all ${
-            err ? "border-red-300 focus:ring-red-400" : "border-slate-200 focus:ring-blue-900"
+            errorMsg ? "border-red-300 focus:ring-red-400" : "border-slate-200 focus:ring-blue-900"
           }`} />
         {suffix && <div className="absolute right-3 top-1/2 -translate-y-1/2">{suffix}</div>}
       </div>
-      {err && <p className="text-red-500 text-xs mt-1">{err}</p>}
+      {errorMsg && <p className="text-red-500 text-xs mt-1">{errorMsg}</p>}
     </div>
   )
 
@@ -82,7 +78,7 @@ export default function RegisterCustomerPage() {
         <span className="text-xl font-extrabold text-slate-800 tracking-tight">Duta Rubber Shop</span>
       </div>
 
-      {/* Card — sesuai wireframe p08, single centered card */}
+      {/* Card */}
       <div className="w-full max-w-sm bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-100/80 p-8">
         <div className="flex items-center gap-3 mb-6">
           <Link href="/register" className="text-slate-400 hover:text-slate-600 transition-colors">
@@ -95,18 +91,18 @@ export default function RegisterCustomerPage() {
           <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-xs mb-5">{error}</div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <Field id="name" label="Nama Lengkap" placeholder="Nama lengkap Anda"
-            value={form.name} onChange={set("name")} err={fieldErrors.name} />
+            registration={register("name")} errorMsg={errors.name?.message} />
 
           <Field id="email" label="Email" type="email" placeholder="nama@email.com"
-            value={form.email} onChange={set("email")} err={fieldErrors.email} />
+            registration={register("email")} errorMsg={errors.email?.message} />
 
           <Field id="phone" label="No. HP" type="tel" placeholder="081234567890"
-            value={form.phone} onChange={set("phone")} err={fieldErrors.phone} />
+            registration={register("phone")} errorMsg={errors.phone?.message} />
 
           <Field id="password" label="Kata Sandi" type={showPw ? "text" : "password"}
-            placeholder="Minimal 6 karakter" value={form.password} onChange={set("password")} err={fieldErrors.password}
+            placeholder="Minimal 6 karakter" registration={register("password")} errorMsg={errors.password?.message}
             suffix={
               <button type="button" onClick={() => setShowPw(v => !v)} className="text-slate-400 hover:text-slate-600">
                 {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -115,7 +111,7 @@ export default function RegisterCustomerPage() {
 
           <Field id="confirmPassword" label="Konfirmasi Kata Sandi"
             type={showConfirm ? "text" : "password"} placeholder="Ulangi kata sandi"
-            value={form.confirmPassword} onChange={set("confirmPassword")} err={fieldErrors.confirmPassword}
+            registration={register("confirmPassword")} errorMsg={errors.confirmPassword?.message}
             suffix={
               <button type="button" onClick={() => setShowConfirm(v => !v)} className="text-slate-400 hover:text-slate-600">
                 {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -125,7 +121,7 @@ export default function RegisterCustomerPage() {
           {/* Checkbox S&K */}
           <div>
             <label className="flex items-start gap-2.5 cursor-pointer group">
-              <button type="button" onClick={() => { setAgreed(v => !v); setFieldErrors(fe => { const n = {...fe}; delete n.terms; return n }) }}
+              <button type="button" onClick={() => setValue("terms", !agreed as any, { shouldValidate: true })}
                 className={`mt-0.5 w-4 h-4 rounded flex-shrink-0 flex items-center justify-center border-2 transition-all ${
                   agreed ? "bg-blue-950 border-blue-950" : "bg-white border-slate-300 group-hover:border-blue-900"
                 }`}>
@@ -136,7 +132,7 @@ export default function RegisterCustomerPage() {
                 <span className="text-blue-950 font-semibold">Syarat &amp; Ketentuan</span>
               </span>
             </label>
-            {fieldErrors.terms && <p className="text-red-500 text-xs mt-1">{fieldErrors.terms}</p>}
+            {errors.terms && <p className="text-red-500 text-xs mt-1">{errors.terms.message}</p>}
           </div>
 
           <button type="submit" disabled={isPending}

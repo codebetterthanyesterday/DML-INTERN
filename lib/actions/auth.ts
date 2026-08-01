@@ -43,18 +43,21 @@ export async function loginAction(formData: FormData) {
   }
 }
 
-const customerSchema = z.object({
-  name: z.string().min(2, "Nama terlalu pendek"),
-  email: z.string().email("Email tidak valid"),
-  phone: z.string().min(8, "No. HP tidak valid"),
-  password: z.string().min(6, "Minimal 6 karakter"),
-  terms: z.literal("on", {
-    message: "Anda harus menyetujui S&K",
-  }),
-})
+import { customerSchema } from "@/lib/validators/auth"
 
 export async function registerCustomerAction(prevState: any, formData: FormData) {
   const payload = Object.fromEntries(formData.entries())
+  
+  // Convert terms to boolean for validation
+  if (payload.terms === "on") {
+    payload.terms = true as any
+  }
+  
+  // Add confirmPassword since we validate it on the server too just in case
+  if (payload.password && !payload.confirmPassword) {
+    payload.confirmPassword = payload.password
+  }
+
   const parsed = customerSchema.safeParse(payload)
 
   if (!parsed.success) {
@@ -88,15 +91,9 @@ export async function registerCustomerAction(prevState: any, formData: FormData)
   }
 }
 
-const businessSchema = z.object({
-  companyName: z.string().min(2, "Nama perusahaan wajib diisi"),
-  npwp: z.string().min(15, "NPWP tidak valid"),
-  address: z.string().min(5, "Alamat wajib diisi"),
-  picName: z.string().min(2, "Nama PIC wajib diisi"),
-  picPhone: z.string().min(8, "No. HP PIC tidak valid"),
-  email: z.string().email("Email tidak valid"),
-  password: z.string().min(6, "Minimal 6 karakter"),
-})
+import { businessSchema } from "@/lib/validators/auth"
+import fs from "fs/promises"
+import path from "path"
 
 export async function registerBusinessAction(prevState: any, formData: FormData) {
   const payload = Object.fromEntries(formData.entries())
@@ -106,7 +103,7 @@ export async function registerBusinessAction(prevState: any, formData: FormData)
     return { errors: parsed.error.flatten().fieldErrors }
   }
 
-  const { companyName, npwp, address, picName, picPhone, email, password } = parsed.data
+  const { companyName, npwp, address, city, province, postalCode, picName, picPhone, email, password, npwpFile, siupFile } = parsed.data
 
   try {
     const existing = await prisma.user.findUnique({ where: { email } })
@@ -116,9 +113,21 @@ export async function registerBusinessAction(prevState: any, formData: FormData)
 
     const passwordHash = await bcrypt.hash(password, 10)
 
-    // Simulasi File Upload URL
-    const mockNpwpUrl = "https://dummyimage.com/600x400/ccc/000.png&text=Mock+NPWP"
-    const mockSiupUrl = "https://dummyimage.com/600x400/ccc/000.png&text=Mock+SIUP"
+    // Save files locally to public/uploads/business-docs
+    const uploadDir = path.join(process.cwd(), "public/uploads/business-docs")
+    await fs.mkdir(uploadDir, { recursive: true })
+
+    const npwpFilename = `${Date.now()}-npwp-${(npwpFile as File).name.replace(/\\s+/g, '-')}`
+    const siupFilename = `${Date.now()}-siup-${(siupFile as File).name.replace(/\\s+/g, '-')}`
+
+    const npwpBuffer = Buffer.from(await (npwpFile as File).arrayBuffer())
+    const siupBuffer = Buffer.from(await (siupFile as File).arrayBuffer())
+
+    await fs.writeFile(path.join(uploadDir, npwpFilename), npwpBuffer)
+    await fs.writeFile(path.join(uploadDir, siupFilename), siupBuffer)
+
+    const npwpUrl = `/uploads/business-docs/${npwpFilename}`
+    const siupUrl = `/uploads/business-docs/${siupFilename}`
 
     await prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
@@ -141,17 +150,17 @@ export async function registerBusinessAction(prevState: any, formData: FormData)
           recipientName: picName,
           phone: picPhone,
           fullAddress: address,
-          city: "Jakarta", // Mock data, di dunia nyata mungkin input terpisah
-          province: "DKI Jakarta",
-          postalCode: "10000",
+          city,
+          province,
+          postalCode,
           isDefault: true,
         },
       })
 
       await tx.businessDocument.createMany({
         data: [
-          { userId: user.id, docType: "NPWP", fileUrl: mockNpwpUrl },
-          { userId: user.id, docType: "SIUP", fileUrl: mockSiupUrl }, // Atau NIB
+          { userId: user.id, docType: "NPWP", fileUrl: npwpUrl },
+          { userId: user.id, docType: "SIUP", fileUrl: siupUrl }, // Atau NIB
         ],
       })
     })
