@@ -12,11 +12,14 @@ declare module "next-auth" {
     role: "CUSTOMER" | "BUSINESS" | "ADMIN"
     companyName?: string | null
     rememberMe?: boolean
+    isSuspended?: boolean
   }
   interface Session {
     user: User & {
       role: "CUSTOMER" | "BUSINESS" | "ADMIN"
       companyName?: string | null
+      rememberMe?: boolean
+      isSuspended?: boolean
     }
   }
 }
@@ -26,6 +29,7 @@ declare module "next-auth/jwt" {
     id: string
     role: "CUSTOMER" | "BUSINESS" | "ADMIN"
     companyName?: string | null
+    isSuspended?: boolean
   }
 }
 
@@ -58,6 +62,9 @@ export const authConfig: NextAuthConfig = {
           const passwordsMatch = await bcrypt.compare(password, user.passwordHash)
 
           if (passwordsMatch) {
+            if (user.isSuspended) {
+              return null
+            }
             // Block business accounts that are not yet verified
             if (user.role === "BUSINESS" && user.businessStatus !== "APPROVED") {
               return null
@@ -69,6 +76,7 @@ export const authConfig: NextAuthConfig = {
               email: user.email,
               role: user.role,
               companyName: user.companyName,
+              isSuspended: user.isSuspended,
               rememberMe: rememberMe === "true",
             }
           }
@@ -84,6 +92,7 @@ export const authConfig: NextAuthConfig = {
         token.id = user.id
         token.role = user.role
         token.companyName = user.companyName
+        token.isSuspended = user.isSuspended
         
         // If "Remember Me" was not checked, set token to expire in 24 hours.
         // Otherwise, it defaults to the session maxAge (30 days).
@@ -95,9 +104,26 @@ export const authConfig: NextAuthConfig = {
     },
     async session({ session, token }) {
       if (token && session.user) {
+        // Real-time suspension check
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: token.id as string },
+            select: { isSuspended: true, role: true }
+          })
+          if (dbUser?.isSuspended) {
+            return {} as any // Return empty session to force logout
+          }
+          if (dbUser) {
+            token.role = dbUser.role // Sync role changes instantly
+          }
+        } catch (e) {
+          console.error("Session DB Check Error:", e)
+        }
+
         session.user.id = token.id as string
         session.user.role = token.role as "CUSTOMER" | "BUSINESS" | "ADMIN"
         session.user.companyName = token.companyName as string | null
+        session.user.isSuspended = token.isSuspended as boolean | undefined
       }
       return session
     }

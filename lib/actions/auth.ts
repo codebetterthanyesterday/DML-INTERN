@@ -10,11 +10,15 @@ export async function loginAction(formData: FormData) {
   try {
     const email = formData.get("email") as string
 
-    // Pre-flight: check if this is a business account awaiting/denied verification
+    // Pre-flight: check if this is a business account awaiting/denied verification, or suspended
     const user = await prisma.user.findUnique({
       where: { email },
-      select: { role: true, businessStatus: true },
+      select: { role: true, businessStatus: true, isSuspended: true },
     })
+    
+    if (user?.isSuspended) {
+      return { error: "Akun Anda telah ditangguhkan. Silakan hubungi admin untuk informasi lebih lanjut." }
+    }
     if (user?.role === "BUSINESS") {
       if (user.businessStatus === "PENDING") {
         return { error: "Akun bisnis Anda sedang menunggu verifikasi Admin (1–2 hari kerja)." }

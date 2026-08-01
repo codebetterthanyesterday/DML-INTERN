@@ -100,6 +100,17 @@ enum NotificationType {
   BUSINESS_VERIFICATION
 }
 
+enum AuditAction {
+  USER_APPROVED
+  USER_REJECTED
+  USER_SUSPENDED
+  USER_UNSUSPENDED
+  USER_DELETED
+  ROLE_CHANGED
+  DOCUMENT_VERIFIED
+  DOCUMENT_REJECTED
+}
+
 // ============================================
 // USER & AKUN BISNIS
 // ============================================
@@ -114,6 +125,7 @@ model User {
   companyName    String?
   npwp           String?
   businessStatus BusinessStatus?
+  isSuspended    Boolean         @default(false)
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 
@@ -124,6 +136,7 @@ model User {
   quotes            Quote[]
   reviews           Review[]
   notifications     Notification[]
+  auditLogs         AuditLog[]
 
   @@map("users")
 }
@@ -402,4 +415,23 @@ model Notification {
   @@index([userId])
   @@index([isRead])
   @@map("notifications")
+}
+
+// ============================================
+// AUDIT LOG
+// ============================================
+
+model AuditLog {
+  id          String      @id @default(cuid())
+  adminId     String
+  targetId    String      // ID of the user or document being modified
+  action      AuditAction
+  details     String?     // Optional JSON or string for old/new values, reasons, etc.
+  createdAt   DateTime    @default(now())
+
+  admin       User        @relation(fields: [adminId], references: [id])
+
+  @@index([adminId])
+  @@index([targetId])
+  @@map("audit_logs")
 }

@@ -11,6 +11,8 @@ import {
   ShoppingCart,
   FileText,
   Users,
+  UserCog,
+  ShieldCheck,
   BarChart3,
   Settings,
 } from "lucide-react";
@@ -20,7 +22,8 @@ const navigation = [
   { name: "Produk", href: "/admin/products", icon: Package },
   { name: "Pesanan", href: "/admin/orders", icon: ShoppingCart },
   { name: "RFQ", href: "/admin/quotes", icon: FileText },
-  { name: "Verifikasi Akun", href: "/admin/verifications", icon: Users },
+  { name: "Akun & Pengguna", href: "/admin/accounts", icon: Users },
+  { name: "Verifikasi Akun", href: "/admin/verifications", icon: ShieldCheck },
   { name: "Laporan", href: "/admin/reports", icon: BarChart3 },
 ];
 
