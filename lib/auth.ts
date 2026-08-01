@@ -9,16 +9,16 @@ import { JWT } from "next-auth/jwt";
 declare module "next-auth" {
   interface User {
     id: string
+    rememberMe?: boolean
     role: "CUSTOMER" | "BUSINESS" | "ADMIN"
     companyName?: string | null
-    rememberMe?: boolean
     isSuspended?: boolean
   }
   interface Session {
     user: User & {
+      rememberMe?: boolean
       role: "CUSTOMER" | "BUSINESS" | "ADMIN"
       companyName?: string | null
-      rememberMe?: boolean
       isSuspended?: boolean
     }
   }
@@ -27,6 +27,7 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT {
     id: string
+    rememberMe?: boolean
     role: "CUSTOMER" | "BUSINESS" | "ADMIN"
     companyName?: string | null
     isSuspended?: boolean
@@ -43,8 +44,8 @@ export const authConfig: NextAuthConfig = {
       },
       async authorize(credentials) {
         const parsedCredentials = z
-          .object({ 
-            email: z.string().email(), 
+          .object({
+            email: z.string().email(),
             password: z.string().min(6),
             rememberMe: z.string().optional()
           })
@@ -93,7 +94,7 @@ export const authConfig: NextAuthConfig = {
         token.role = user.role
         token.companyName = user.companyName
         token.isSuspended = user.isSuspended
-        
+
         // If "Remember Me" was not checked, set token to expire in 24 hours.
         // Otherwise, it defaults to the session maxAge (30 days).
         if (user.rememberMe === false) {
