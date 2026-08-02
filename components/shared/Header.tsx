@@ -28,6 +28,9 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 interface HeaderProps {
   session?: Session | null
   cartItemCount?: number
+  cmsData?: {
+    brandName: string
+  }
 }
 
 const navLinks = [
@@ -165,7 +168,7 @@ function UserMenu({ session }: { session: Session }) {
   )
 }
 
-export function Header({ session, cartItemCount = 0 }: HeaderProps) {
+export function Header({ session, cartItemCount = 0, cmsData }: HeaderProps) {
   const pathname = usePathname()
   const isLoggedIn = !!session?.user
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -177,7 +180,7 @@ export function Header({ session, cartItemCount = 0 }: HeaderProps) {
           <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white flex items-center justify-center shadow-sm overflow-hidden border border-slate-100 p-0.5 shrink-0">
             <Image src={logoImg} alt="Duta Rubber Shop Logo" width={40} height={40} className="object-contain w-full h-full rounded-full" />
           </div>
-          <span className="text-sm sm:text-lg font-extrabold text-blue-950 tracking-tight truncate max-w-[140px] sm:max-w-none">Duta Rubber Shop</span>
+          <span className="text-sm sm:text-lg font-extrabold text-blue-950 tracking-tight truncate max-w-[140px] sm:max-w-none">{cmsData?.brandName || "Duta Rubber Shop"}</span>
         </Link>
 
         {/* Desktop Nav */}
@@ -278,7 +281,7 @@ export function Header({ session, cartItemCount = 0 }: HeaderProps) {
                     <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white flex items-center justify-center shadow-sm overflow-hidden border border-slate-100 p-0.5 shrink-0">
                       <Image src={logoImg} alt="Duta Rubber Shop Logo" width={40} height={40} className="object-contain w-full h-full rounded-full" />
                     </div>
-                    <span className="text-sm sm:text-lg font-extrabold text-blue-950 tracking-tight truncate">Duta Rubber Shop</span>
+                    <span className="text-sm sm:text-lg font-extrabold text-blue-950 tracking-tight truncate">{cmsData?.brandName || "Duta Rubber Shop"}</span>
                   </Link>
                 </SheetTitle>
               </SheetHeader>

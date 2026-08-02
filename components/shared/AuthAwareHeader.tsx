@@ -7,7 +7,7 @@ import { Header } from "./Header"
  * Fetches the session on the server side (zero-flash, no loading state)
  * and passes it down as a prop to the client Header component.
  */
-export async function AuthAwareHeader() {
+export async function AuthAwareHeader({ headerCmsData }: { headerCmsData?: { brandName: string } }) {
   const session = await auth()
   
   let cartItemCount = 0
@@ -20,5 +20,5 @@ export async function AuthAwareHeader() {
     cartItemCount = cart?._count?.items || 0
   }
   
-  return <Header session={session} cartItemCount={cartItemCount} />
+  return <Header session={session} cartItemCount={cartItemCount} cmsData={headerCmsData} />
 }

@@ -95,3 +95,23 @@ export const kontakPageSchema = z.object({
 })
 
 export type KontakPageContent = z.infer<typeof kontakPageSchema>
+
+export const sharedComponentsSchema = z.object({
+  header: z.object({
+    brandName: z.string().min(1, "Nama brand tidak boleh kosong"),
+  }),
+  footer: z.object({
+    brandName: z.string().min(1, "Nama brand tidak boleh kosong"),
+    description: z.string().min(1, "Deskripsi tidak boleh kosong"),
+    socialLinks: z.object({
+      twitter: z.string().optional(),
+      instagram: z.string().optional(),
+      linkedin: z.string().optional(),
+    }),
+    newsletterTitle: z.string().min(1, "Judul berlangganan tidak boleh kosong"),
+    newsletterDescription: z.string().min(1, "Deskripsi berlangganan tidak boleh kosong"),
+    copyrightText: z.string().min(1, "Teks hak cipta tidak boleh kosong"),
+  })
+})
+
+export type SharedComponentsContent = z.infer<typeof sharedComponentsSchema>

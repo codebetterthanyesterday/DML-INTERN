@@ -3,7 +3,18 @@ import Image from "next/image"
 import logoImg from "../../public/logo.png"
 import { TwitterLogoIcon, InstagramLogoIcon, LinkedInLogoIcon, PaperPlaneIcon } from "@radix-ui/react-icons"
 
-export function Footer() {
+export function Footer({ cmsData }: { cmsData?: {
+  brandName: string
+  description: string
+  socialLinks: {
+    twitter?: string
+    instagram?: string
+    linkedin?: string
+  }
+  newsletterTitle: string
+  newsletterDescription: string
+  copyrightText: string
+} }) {
   return (
     <footer className="bg-slate-900 pt-16 pb-8 border-t border-slate-800 mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -14,24 +25,30 @@ export function Footer() {
               <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm overflow-hidden border border-slate-700/50 p-0.5">
                 <Image src={logoImg} alt="Duta Rubber Shop Logo" width={40} height={40} className="object-contain w-full h-full rounded-full" />
               </div>
-              <span className="text-xl font-extrabold text-white tracking-tight">Duta Rubber Shop</span>
+              <span className="text-xl font-extrabold text-white tracking-tight">{cmsData?.brandName || "Duta Rubber Shop"}</span>
             </div>
-            <p className="text-sm text-slate-400 leading-relaxed max-w-sm mb-6">
-              Platform B2B dan Retail terpercaya untuk produk material karet, gasket, seal, dan perlengkapan industri lainnya.
+            <p className="text-sm text-slate-400 leading-relaxed max-w-sm mb-6 whitespace-pre-wrap">
+              {cmsData?.description || "Platform B2B dan Retail terpercaya untuk produk material karet, gasket, seal, dan perlengkapan industri lainnya."}
             </p>
             <div className="flex items-center gap-4">
-              <Link href="#" className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-red-600 hover:text-white shadow-sm transition-all">
-                <TwitterLogoIcon className="w-4 h-4" />
-                <span className="sr-only">Twitter</span>
-              </Link>
-              <Link href="#" className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-red-600 hover:text-white shadow-sm transition-all">
-                <InstagramLogoIcon className="w-4 h-4" />
-                <span className="sr-only">Instagram</span>
-              </Link>
-              <Link href="#" className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-red-600 hover:text-white shadow-sm transition-all">
-                <LinkedInLogoIcon className="w-4 h-4" />
-                <span className="sr-only">LinkedIn</span>
-              </Link>
+              {(!cmsData?.socialLinks || cmsData.socialLinks.twitter) && (
+                <Link href={cmsData?.socialLinks?.twitter || "#"} className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-red-600 hover:text-white shadow-sm transition-all">
+                  <TwitterLogoIcon className="w-4 h-4" />
+                  <span className="sr-only">Twitter</span>
+                </Link>
+              )}
+              {(!cmsData?.socialLinks || cmsData.socialLinks.instagram) && (
+                <Link href={cmsData?.socialLinks?.instagram || "#"} className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-red-600 hover:text-white shadow-sm transition-all">
+                  <InstagramLogoIcon className="w-4 h-4" />
+                  <span className="sr-only">Instagram</span>
+                </Link>
+              )}
+              {(!cmsData?.socialLinks || cmsData.socialLinks.linkedin) && (
+                <Link href={cmsData?.socialLinks?.linkedin || "#"} className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-red-600 hover:text-white shadow-sm transition-all">
+                  <LinkedInLogoIcon className="w-4 h-4" />
+                  <span className="sr-only">LinkedIn</span>
+                </Link>
+              )}
             </div>
           </div>
 
@@ -57,9 +74,9 @@ export function Footer() {
 
           {/* Newsletter */}
           <div className="col-span-1 sm:col-span-2 lg:col-span-4">
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-5">Berlangganan</h4>
-            <p className="text-sm text-slate-400 mb-4">
-              Dapatkan info terbaru tentang produk dan penawaran eksklusif.
+            <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-5">{cmsData?.newsletterTitle || "Berlangganan"}</h4>
+            <p className="text-sm text-slate-400 mb-4 whitespace-pre-wrap">
+              {cmsData?.newsletterDescription || "Dapatkan info terbaru tentang produk dan penawaran eksklusif."}
             </p>
             <div className="relative flex items-center">
               <input
@@ -81,7 +98,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-slate-500">
-            © {new Date().getFullYear()} Duta Rubber Shop. Hak Cipta Dilindungi.
+            © {new Date().getFullYear()} {cmsData?.copyrightText || "Duta Rubber Shop. Hak Cipta Dilindungi."}
           </p>
           <div className="flex flex-wrap gap-4">
             <Link href="#" className="text-xs text-slate-500 hover:text-white transition-colors">Syarat & Ketentuan</Link>

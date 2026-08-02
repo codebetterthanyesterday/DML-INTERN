@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
-import { landingPageSchema, type LandingPageContent, katalogPageSchema, type KatalogPageContent, tentangPageSchema, type TentangPageContent, kontakPageSchema, type KontakPageContent } from "@/lib/validators/cms"
+import { landingPageSchema, type LandingPageContent, katalogPageSchema, type KatalogPageContent, tentangPageSchema, type TentangPageContent, kontakPageSchema, type KontakPageContent, sharedComponentsSchema, type SharedComponentsContent } from "@/lib/validators/cms"
 
 const defaultLandingPageContent: LandingPageContent = {
   hero: {
@@ -277,6 +277,66 @@ export async function updateKontakPageContent(data: KontakPageContent) {
     return { success: true }
   } catch (error) {
     console.error("Error updating kontak page content:", error)
+    return { success: false, error: "Failed to update content" }
+  }
+}
+
+const defaultSharedComponentsContent: SharedComponentsContent = {
+  header: {
+    brandName: "Duta Rubber Shop",
+  },
+  footer: {
+    brandName: "Duta Rubber Shop",
+    description: "Platform B2B dan Retail terpercaya untuk produk material karet, gasket, seal, dan perlengkapan industri lainnya.",
+    socialLinks: {
+      twitter: "#",
+      instagram: "#",
+      linkedin: "#",
+    },
+    newsletterTitle: "Berlangganan",
+    newsletterDescription: "Dapatkan info terbaru tentang produk dan penawaran eksklusif.",
+    copyrightText: "Duta Rubber Shop. Hak Cipta Dilindungi.",
+  }
+}
+
+export async function getSharedComponentsContent(): Promise<SharedComponentsContent> {
+  try {
+    const setting = await prisma.siteSetting.findUnique({
+      where: { key: "shared_components" }
+    })
+    
+    if (setting && setting.value) {
+      return setting.value as unknown as SharedComponentsContent
+    }
+    
+    return defaultSharedComponentsContent
+  } catch (error) {
+    console.error("Error fetching shared components content:", error)
+    return defaultSharedComponentsContent
+  }
+}
+
+export async function updateSharedComponentsContent(data: SharedComponentsContent) {
+  try {
+    const session = await auth()
+    if (session?.user?.role !== "ADMIN") {
+      return { success: false, error: "Unauthorized" }
+    }
+
+    const parsedData = sharedComponentsSchema.parse(data)
+
+    await prisma.siteSetting.upsert({
+      where: { key: "shared_components" },
+      update: { value: parsedData as any },
+      create: { key: "shared_components", value: parsedData as any }
+    })
+
+    // Revalidate the entire layout to ensure header and footer update globally
+    revalidatePath("/", "layout")
+    
+    return { success: true }
+  } catch (error) {
+    console.error("Error updating shared components content:", error)
     return { success: false, error: "Failed to update content" }
   }
 }

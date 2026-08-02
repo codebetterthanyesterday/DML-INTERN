@@ -66,7 +66,7 @@ export default async function LandingPage() {
 
             <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto justify-center">
               <Link
-                href="/katalog"
+                href="/register"
                 id="hero-catalog-btn"
                 className="w-full sm:w-auto px-8 py-4 text-sm sm:text-base font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-[0_0_40px_-10px_rgba(220,38,38,0.6)] hover:shadow-[0_0_60px_-15px_rgba(220,38,38,0.8)] transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-1"
               >
@@ -84,7 +84,7 @@ export default async function LandingPage() {
                 </Link>
               ) : (
                 <Link
-                  href="/register/business"
+                  href="/login"
                   id="hero-b2b-btn"
                   className="w-full sm:w-auto px-8 py-4 text-sm sm:text-base font-bold text-white bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md rounded-xl transition-all duration-300 flex items-center justify-center transform hover:-translate-y-1"
                 >
@@ -141,11 +141,11 @@ export default async function LandingPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {featuredProducts.map((product) => {
-              const avgRating = product.reviews.length > 0 
+              const avgRating = product.reviews.length > 0
                 ? (product.reviews.reduce((acc, r) => acc + r.rating, 0) / product.reviews.length).toFixed(1)
                 : '0.0'
-                
-              const priceDisplay = product.price 
+
+              const priceDisplay = product.price
                 ? new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(Number(product.price))
                 : "Hubungi Kami"
 
@@ -173,7 +173,7 @@ export default async function LandingPage() {
                       <h3 className="text-base font-bold text-slate-900 line-clamp-1">{product.name}</h3>
                     </Link>
                     <p className="text-xs text-slate-500 mb-4 line-clamp-2 min-h-[32px]">{product.description || "Tidak ada deskripsi tersedia untuk produk ini."}</p>
-                    
+
                     <div className="mt-auto flex items-center justify-between pt-3 border-t border-slate-100">
                       <span className="text-base sm:text-lg font-extrabold text-blue-950">{priceDisplay}</span>
                       {isLoggedIn ? (
@@ -199,7 +199,7 @@ export default async function LandingPage() {
                 </div>
               )
             })}
-            
+
             {featuredProducts.length === 0 && (
               <div className="col-span-full py-16 text-center bg-slate-50 rounded-2xl border border-slate-200 border-dashed">
                 <Factory className="w-12 h-12 text-slate-300 mx-auto mb-3" />
