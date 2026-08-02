@@ -17,6 +17,7 @@ import {
 import { ShoppingCart, FileText, Building2, Wallet } from "lucide-react";
 import { SalesChart, ChartDataItem } from "@/components/admin/SalesChart";
 import prisma from "@/lib/prisma";
+import Link from "next/link";
 
 export default async function AdminDashboardPage() {
   const startOfThisMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
@@ -269,9 +270,13 @@ export default async function AdminDashboardPage() {
                         </TableCell>
                         <TableCell className="text-right">
                           {(quote.status === 'PENDING' || quote.status === 'REVIEWED') ? (
-                            <Button size="sm" className="bg-blue-950 hover:bg-blue-900 text-white font-bold shadow-md shadow-blue-900/20">Beri Harga</Button>
+                            <Button size="sm" className="bg-blue-950 hover:bg-blue-900 text-white font-bold shadow-md shadow-blue-900/20" asChild>
+                              <Link href={`/admin/quotes?q=${quote.quoteNumber}`}>Beri Harga</Link>
+                            </Button>
                           ) : (
-                            <Button size="sm" variant="outline" className="border-slate-300 text-slate-700 font-bold hover:bg-slate-50">Lihat</Button>
+                            <Button size="sm" variant="outline" className="border-slate-300 text-slate-700 font-bold hover:bg-slate-50" asChild>
+                              <Link href={`/admin/quotes?q=${quote.quoteNumber}`}>Lihat</Link>
+                            </Button>
                           )}
                         </TableCell>
                       </TableRow>
