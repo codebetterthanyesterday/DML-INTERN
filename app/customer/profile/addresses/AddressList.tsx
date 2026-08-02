@@ -87,10 +87,16 @@ export function AddressList({ addresses }: AddressListProps) {
             <SheetHeader className="mb-6">
               <SheetTitle>{editingAddress ? "Ubah Alamat" : "Tambah Alamat Baru"}</SheetTitle>
             </SheetHeader>
-            <AddressForm 
+            <AddressForm
               key={editingAddress ? editingAddress.id : 'new'}
-              onSubmit={handleCreateOrUpdate} 
-              initialData={editingAddress} 
+              onSubmit={handleCreateOrUpdate}
+              initialData={editingAddress ? {
+                ...editingAddress,
+                provinceId: editingAddress.provinceId ?? undefined,
+                cityId: editingAddress.cityId ?? undefined,
+                districtId: editingAddress.districtId ?? undefined,
+                district: editingAddress.district ?? undefined,
+              } : undefined}
               isLoading={isPending}
             />
           </SheetContent>
@@ -117,7 +123,7 @@ export function AddressList({ addresses }: AddressListProps) {
                     <MapPin className={`w-6 h-6 ${addr.isDefault ? 'text-blue-600' : 'text-slate-400'}`} />
                   </div>
                 </div>
-                
+
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="font-bold text-slate-900 text-lg">{addr.recipientName}</span>
@@ -127,15 +133,15 @@ export function AddressList({ addresses }: AddressListProps) {
                   </div>
                   <p className="text-slate-700 font-medium mb-1">{addr.phone}</p>
                   <p className="text-slate-600 leading-relaxed max-w-xl">
-                    {addr.fullAddress}<br/>
+                    {addr.fullAddress}<br />
                     {addr.district ? `${addr.district}, ` : ''}{addr.city ? `${addr.city}, ` : ''}{addr.province ? `${addr.province} ` : ''}{addr.postalCode}
                   </p>
                 </div>
 
                 <div className="flex sm:flex-col justify-end sm:justify-start gap-2 pt-4 sm:pt-0 border-t border-slate-100 sm:border-0">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     className="font-semibold text-slate-700"
                     onClick={() => handleOpenEdit(addr)}
                     disabled={isPending}
@@ -144,9 +150,9 @@ export function AddressList({ addresses }: AddressListProps) {
                     Ubah
                   </Button>
                   {!addr.isDefault && (
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
+                    <Button
+                      variant="outline"
+                      size="sm"
                       className="font-semibold text-slate-700"
                       onClick={() => handleSetDefault(addr.id)}
                       disabled={isPending}
@@ -155,9 +161,9 @@ export function AddressList({ addresses }: AddressListProps) {
                     </Button>
                   )}
                   {!addr.isDefault && (
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
+                    <Button
+                      variant="outline"
+                      size="sm"
                       className="font-semibold text-red-600 border-red-200 hover:bg-red-50"
                       onClick={() => handleDelete(addr.id)}
                       disabled={isPending}
