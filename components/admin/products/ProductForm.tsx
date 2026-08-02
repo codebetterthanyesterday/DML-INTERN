@@ -215,6 +215,19 @@ export function ProductForm({ action, categories, product, mode }: ProductFormPr
                     className={`border-slate-200 focus:border-blue-900 ${state.fieldErrors?.stock ? "border-red-400" : ""}`}
                   />
                 </div>
+                <div className="space-y-1">
+                  <Label htmlFor="weight" className="text-sm font-bold text-slate-700">
+                    Berat (gram) <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="weight"
+                    name="weight"
+                    type="number"
+                    min="1"
+                    defaultValue={product?.weight ?? 1000}
+                    className="border-slate-200 focus:border-blue-900"
+                  />
+                </div>
               </div>
 
               <div className="space-y-1 max-w-xs">

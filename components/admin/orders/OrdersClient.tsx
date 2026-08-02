@@ -124,6 +124,7 @@ function OrderDetailPanel({
 }) {
   const [isPending, startTransition] = useTransition();
   const [selectedStatus, setSelectedStatus] = useState<OrderStatus>(order.status as OrderStatus);
+  const [trackingNumber, setTrackingNumber] = useState<string>("");
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; msg: string } | null>(null);
 
   const cfg = STATUS_CONFIG[order.status];
@@ -133,9 +134,10 @@ function OrderDetailPanel({
     if (selectedStatus === order.status) return;
     setFeedback(null);
     startTransition(async () => {
-      const result = await updateOrderStatus(order.id, selectedStatus);
+      const result = await updateOrderStatus(order.id, selectedStatus, trackingNumber);
       if (result.success) {
         setFeedback({ type: "success", msg: "Status berhasil diperbarui." });
+        setTrackingNumber(""); // reset
       } else {
         setFeedback({ type: "error", msg: result.error ?? "Terjadi kesalahan." });
       }
@@ -178,6 +180,11 @@ function OrderDetailPanel({
           <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-bold ${order.type === "B2B" ? "bg-purple-50 text-purple-700 border-purple-200" : "bg-slate-50 text-slate-600 border-slate-200"}`}>
             {order.type}
           </span>
+          {order.trackingNumber && (
+            <span className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-bold bg-indigo-50 text-indigo-700 border-indigo-200">
+              <Truck className="w-3 h-3" /> Resi: {order.trackingNumber}
+            </span>
+          )}
         </div>
 
         {/* Buyer */}
@@ -293,36 +300,47 @@ function OrderDetailPanel({
             </div>
           )}
           <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Update Status</p>
-          <div className="flex gap-2">
-            <Select
-              value={selectedStatus}
-              onValueChange={(v) => setSelectedStatus(v as OrderStatus)}
-            >
-              <SelectTrigger className="flex-1 border-slate-200 text-sm font-semibold focus:border-blue-900">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={order.status} disabled>
-                  {STATUS_CONFIG[order.status]?.label ?? order.status} (saat ini)
-                </SelectItem>
-                {nextStatuses.map((s) => (
-                  <SelectItem key={s} value={s}>
-                    {STATUS_CONFIG[s]?.label ?? s}
+          <div className="flex flex-col gap-3">
+            <div className="flex gap-2">
+              <Select
+                value={selectedStatus}
+                onValueChange={(v) => setSelectedStatus(v as OrderStatus)}
+              >
+                <SelectTrigger className="flex-1 border-slate-200 text-sm font-semibold focus:border-blue-900">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={order.status} disabled>
+                    {STATUS_CONFIG[order.status]?.label ?? order.status} (saat ini)
                   </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button
-              onClick={handleStatusUpdate}
-              disabled={isPending || selectedStatus === order.status}
-              className="bg-red-600 hover:bg-red-700 text-white font-bold shadow-sm shadow-red-600/20 px-4"
-            >
-              {isPending ? (
-                <RefreshCw className="w-4 h-4 animate-spin" />
-              ) : (
-                "Simpan"
-              )}
-            </Button>
+                  {nextStatuses.map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {STATUS_CONFIG[s]?.label ?? s}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
+                onClick={handleStatusUpdate}
+                disabled={isPending || selectedStatus === order.status || (selectedStatus === "SHIPPED" && !trackingNumber)}
+                className="bg-red-600 hover:bg-red-700 text-white font-bold shadow-sm shadow-red-600/20 px-4"
+              >
+                {isPending ? (
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                ) : (
+                  "Simpan"
+                )}
+              </Button>
+            </div>
+            
+            {selectedStatus === "SHIPPED" && (
+              <Input
+                placeholder="Masukkan Nomor Resi Pengiriman"
+                value={trackingNumber}
+                onChange={(e) => setTrackingNumber(e.target.value)}
+                className="text-sm"
+              />
+            )}
           </div>
         </div>
       )}

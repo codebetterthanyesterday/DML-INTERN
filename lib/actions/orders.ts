@@ -27,6 +27,7 @@ export type SerializedOrder = {
   orderNumber: string;
   type: string;
   status: string;
+  trackingNumber: string | null;
   totalAmount: number;
   paymentStatus: string;
   createdAt: string;
@@ -54,6 +55,7 @@ function serializeOrder(order: RawOrder): SerializedOrder {
     orderNumber: order.orderNumber,
     type: order.type,
     status: order.status,
+    trackingNumber: order.trackingNumber,
     totalAmount: order.totalAmount.toNumber(),
     paymentStatus: order.paymentStatus,
     createdAt: order.createdAt.toISOString(),
@@ -177,12 +179,16 @@ export async function getAdminOrders(
 
 export async function updateOrderStatus(
   orderId: string,
-  newStatus: OrderStatus
+  newStatus: OrderStatus,
+  trackingNumber?: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
     await prisma.order.update({
       where: { id: orderId },
-      data: { status: newStatus },
+      data: { 
+        status: newStatus,
+        ...(trackingNumber ? { trackingNumber } : {})
+      },
     });
     revalidatePath("/admin/orders");
     return { success: true };

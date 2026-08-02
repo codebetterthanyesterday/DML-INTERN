@@ -22,6 +22,7 @@ async function main() {
   await prisma.businessDocument.deleteMany()
   await prisma.address.deleteMany()
   await prisma.user.deleteMany()
+  await prisma.siteSetting.deleteMany()
 
   // 1. Create Users
   const passwordHash = await bcrypt.hash('password123', 10)
@@ -185,7 +186,7 @@ async function main() {
       minOrderQty: 1,
       images: {
         create: [
-          { url: 'https://images.unsplash.com/photo-1584483787720-692abaf82572?w=500&q=80', displayOrder: 1 },
+          { url: 'https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=500&q=80', displayOrder: 1 },
         ],
       },
     },

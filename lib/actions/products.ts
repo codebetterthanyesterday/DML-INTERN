@@ -60,6 +60,7 @@ export async function createProduct(
   const unit = formData.get("unit") as string;
   const stock = parseInt(formData.get("stock") as string, 10);
   const minOrderQty = parseInt(formData.get("minOrderQty") as string, 10);
+  const weight = parseInt(formData.get("weight") as string, 10);
   const description = formData.get("description") as string;
   const isActive = formData.get("isActive") === "on";
 
@@ -115,6 +116,7 @@ export async function createProduct(
         unit,
         stock: isNaN(stock) ? 0 : stock,
         minOrderQty: isNaN(minOrderQty) ? 1 : minOrderQty,
+        weight: isNaN(weight) ? 1000 : weight,
         description,
         specifications: Object.keys(specifications).length > 0 ? specifications : undefined,
         isActive,
@@ -151,6 +153,7 @@ export async function updateProduct(
   const unit = formData.get("unit") as string;
   const stock = parseInt(formData.get("stock") as string, 10);
   const minOrderQty = parseInt(formData.get("minOrderQty") as string, 10);
+  const weight = parseInt(formData.get("weight") as string, 10);
   const description = formData.get("description") as string;
   const isActive = formData.get("isActive") === "on";
 
@@ -185,6 +188,7 @@ export async function updateProduct(
         unit,
         stock: isNaN(stock) ? 0 : stock,
         minOrderQty: isNaN(minOrderQty) ? 1 : minOrderQty,
+        weight: isNaN(weight) ? 1000 : weight,
         description,
         specifications: Object.keys(specifications).length > 0 ? specifications : undefined,
         isActive,
