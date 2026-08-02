@@ -19,7 +19,7 @@ export async function updateProfile(data: z.infer<typeof updateProfileSchema>) {
 
     const validatedData = updateProfileSchema.safeParse(data)
     if (!validatedData.success) {
-      return { success: false, message: validatedData.error.errors[0].message }
+      return { success: false, message: validatedData.error.issues[0]?.message || "Data tidak valid" }
     }
 
     await prisma.user.update({
