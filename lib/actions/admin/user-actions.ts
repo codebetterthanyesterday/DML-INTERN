@@ -200,3 +200,44 @@ export async function makeUserAdmin(userId: string) {
     return { success: false, error: "Failed to promote user to admin" }
   }
 }
+
+export async function createAdmin(data: any) {
+  try {
+    const session = await auth();
+    
+    if (!session?.user?.id || session.user.role !== "ADMIN") {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const { name, email, phone, password } = data;
+
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (existingUser) {
+      return { success: false, error: "Email sudah terdaftar" };
+    }
+
+    const bcrypt = (await import("bcryptjs")).default;
+    const passwordHash = await bcrypt.hash(password, 12);
+
+    const newAdmin = await prisma.user.create({
+      data: {
+        name,
+        email,
+        phone,
+        passwordHash,
+        role: "ADMIN",
+      },
+    });
+
+    await logAudit(newAdmin.id, "ROLE_CHANGED", JSON.stringify({ details: "Created as new Admin" }));
+    
+    revalidatePath("/admin/accounts");
+    return { success: true, message: "Admin berhasil dibuat" };
+  } catch (error) {
+    console.error("createAdmin error:", error);
+    return { success: false, error: "Gagal membuat admin" };
+  }
+}

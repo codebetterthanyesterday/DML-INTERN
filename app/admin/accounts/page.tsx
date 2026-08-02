@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { getUsers } from "@/lib/actions/admin/user-actions";
 import { AccountsClient } from "@/components/admin/accounts/AccountsClient";
+import { CreateAdminDialog } from "@/components/admin/accounts/CreateAdminDialog";
 import { Users, Building2, ShieldAlert, UserCheck } from "lucide-react";
 
 export const metadata = {
@@ -129,11 +130,14 @@ export default async function AdminAccountsPage({ searchParams }: PageProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-blue-950">Kelola Akun & Pengguna</h1>
-        <p className="text-slate-500 mt-1 font-medium">
-          Manajemen pengguna platform, verifikasi bisnis B2B, dan hak akses.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-extrabold tracking-tight text-blue-950">Kelola Akun & Pengguna</h1>
+          <p className="text-slate-500 mt-1 font-medium">
+            Manajemen pengguna platform, verifikasi bisnis B2B, dan hak akses.
+          </p>
+        </div>
+        <CreateAdminDialog />
       </div>
 
       <Suspense
