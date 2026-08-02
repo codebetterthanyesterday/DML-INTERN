@@ -29,11 +29,11 @@ export const businessSchema = z.object({
   email: z.string().email("Email tidak valid"),
   password: z.string().min(6, "Minimal 6 karakter"),
   npwpFile: z.any()
-    .refine((file) => file instanceof File, "NPWP wajib diupload")
+    .refine((file) => typeof window === 'undefined' ? (file && typeof file === 'object' && 'name' in file) : file instanceof File, "NPWP wajib diupload")
     .refine((file) => file?.size <= MAX_FILE_SIZE, "Ukuran file maksimal 5MB")
     .refine((file) => ACCEPTED_FILE_TYPES.includes(file?.type), "Format file tidak didukung (hanya JPG, PNG, PDF)"),
   siupFile: z.any()
-    .refine((file) => file instanceof File, "SIUP/NIB wajib diupload")
+    .refine((file) => typeof window === 'undefined' ? (file && typeof file === 'object' && 'name' in file) : file instanceof File, "SIUP/NIB wajib diupload")
     .refine((file) => file?.size <= MAX_FILE_SIZE, "Ukuran file maksimal 5MB")
     .refine((file) => ACCEPTED_FILE_TYPES.includes(file?.type), "Format file tidak didukung (hanya JPG, PNG, PDF)"),
 })

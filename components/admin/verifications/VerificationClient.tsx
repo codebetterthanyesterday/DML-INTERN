@@ -236,7 +236,9 @@ function VerificationDetailPanel({
                       )}
                       {doc.fileUrl && (
                         <div className="absolute inset-0 bg-blue-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                          <Button variant="secondary" size="sm" className="font-bold">Lihat Dokumen</Button>
+                          <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer">
+                            <Button variant="secondary" size="sm" className="font-bold">Lihat Dokumen</Button>
+                          </a>
                         </div>
                       )}
                     </div>
