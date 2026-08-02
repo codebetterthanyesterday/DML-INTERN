@@ -58,14 +58,14 @@ export function UserDetailsSheet({ userId, onClose }: { userId: string | null, o
       alert("Alasan penolakan harus diisi.");
       return;
     }
-    await updateBusinessStatus(userId!, status, "ADMIN_ID_PLACEHOLDER", rejectReason);
+    await updateBusinessStatus(userId!, status, rejectReason);
     const res = await getUserDetails(userId!);
     if (res.success) setUser(res.user);
     setIsRejecting(false);
   };
 
   const handleUpdateDocStatus = async (docId: string, status: "VERIFIED" | "REJECTED") => {
-    await updateDocumentStatus(docId, status, "ADMIN_ID_PLACEHOLDER");
+    await updateDocumentStatus(docId, status);
     const res = await getUserDetails(userId!);
     if (res.success) setUser(res.user);
   };

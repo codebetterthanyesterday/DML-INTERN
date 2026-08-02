@@ -435,3 +435,17 @@ model AuditLog {
   @@index([targetId])
   @@map("audit_logs")
 }
+
+// ============================================
+// CMS / SITE SETTINGS
+// ============================================
+
+model SiteSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("site_settings")
+}

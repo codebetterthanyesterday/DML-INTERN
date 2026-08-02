@@ -1,4 +1,3 @@
-
 import { 
   Building2, 
   Target, 
@@ -6,10 +5,25 @@ import {
   Settings, 
   Users,
   CheckCircle2,
-  ArrowRight
+  ArrowRight,
+  HelpCircle
 } from "lucide-react"
+import * as LucideIcons from "lucide-react"
+import { auth } from "@/lib/auth"
+import { getTentangPageContent } from "@/app/actions/cms"
+import { CmsTentangEditorSheet } from "@/components/cms/cms-tentang-editor-sheet"
+
+// Helper to render lucide icon from string
+const renderIcon = (name: string, className: string) => {
+  const Icon = (LucideIcons as any)[name] || HelpCircle
+  return <Icon className={className} />
+}
 
 export default async function TentangPage() {
+  const session = await auth()
+  const isAdmin = session?.user?.role === "ADMIN"
+  const cmsData = await getTentangPageContent()
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       <main className="flex-1 w-full">
@@ -18,7 +32,7 @@ export default async function TentangPage() {
           {/* Background Image */}
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: "url('/images/tentang-bg.png')" }}
+            style={{ backgroundImage: `url('${cmsData.hero.backgroundImageUrl}')` }}
           ></div>
           
           {/* Overlay gradient for modern look */}
@@ -28,13 +42,13 @@ export default async function TentangPage() {
           
           <div className="relative z-20 text-center px-4 max-w-4xl mx-auto mt-10">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-600/20 border border-red-500/50 text-red-200 text-xs font-bold uppercase tracking-widest mb-6">
-              <Building2 className="w-4 h-4" /> Profil Perusahaan
+              <Building2 className="w-4 h-4" /> {cmsData.hero.badgeText}
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight mb-6">
-              PT Duta Mitra Luhur
+              {cmsData.hero.title}
             </h1>
-            <p className="text-lg text-blue-100 max-w-2xl mx-auto leading-relaxed">
-              Pelopor manufaktur komponen karet presisi untuk kebutuhan ritel dan skala industri berat sejak 2005.
+            <p className="text-lg text-blue-100 max-w-2xl mx-auto leading-relaxed whitespace-pre-wrap">
+              {cmsData.hero.subtitle}
             </p>
           </div>
         </section>
@@ -44,20 +58,14 @@ export default async function TentangPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <div>
-                <h2 className="text-sm font-extrabold text-red-600 uppercase tracking-widest mb-3">Tentang Kami</h2>
+                <h2 className="text-sm font-extrabold text-red-600 uppercase tracking-widest mb-3">{cmsData.about.label}</h2>
                 <h3 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-6 leading-tight">
-                  Berdedikasi untuk Kualitas & Keandalan Industri
+                  {cmsData.about.title}
                 </h3>
                 <div className="space-y-4 text-slate-600 leading-relaxed">
-                  <p>
-                    Didirikan pada tahun 2005 di Tangerang, PT Duta Mitra Luhur bermula dari fasilitas manufaktur kecil yang berfokus pada cetakan karet konvensional. Seiring dengan tingginya permintaan pasar atas produk karet yang lebih spesifik dan tahan lama, kami terus berinovasi dan memperluas kapasitas produksi.
-                  </p>
-                  <p>
-                    Kini, dengan lebih dari 15 tahun pengalaman, kami telah berevolusi menjadi penyedia solusi polimer komprehensif. Kami melayani ribuan klien B2B dari berbagai sektor termasuk pertambangan, otomotif, konstruksi, hingga kebutuhan perumahan eceran. 
-                  </p>
-                  <p>
-                    Fasilitas modern kami dilengkapi dengan mesin vulkanisasi presisi tinggi, memastikan setiap lembar Rubber Sheet, Gasket, dan Footwear safety yang kami produksi memenuhi standar internasional.
-                  </p>
+                  <p>{cmsData.about.paragraph1}</p>
+                  <p>{cmsData.about.paragraph2}</p>
+                  <p>{cmsData.about.paragraph3}</p>
                 </div>
                 
                 <div className="mt-8 flex items-center gap-4">
@@ -77,8 +85,8 @@ export default async function TentangPage() {
                   <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/grid-me.png')] opacity-5"></div>
                   <Building2 className="w-24 h-24 text-slate-300" />
                   <div className="absolute bottom-6 left-6 right-6 bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-lg border border-white/50">
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Kapasitas Ekstraksi</p>
-                    <p className="text-xl font-extrabold text-blue-950">50,000+ Ton <span className="text-sm font-medium text-slate-600">/ Tahun</span></p>
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{cmsData.about.statsLabel}</p>
+                    <p className="text-xl font-extrabold text-blue-950">{cmsData.about.statsValue} <span className="text-sm font-medium text-slate-600">{cmsData.about.statsSubtext}</span></p>
                   </div>
                 </div>
               </div>
@@ -90,51 +98,29 @@ export default async function TentangPage() {
         <section className="py-20 bg-slate-50 border-t border-slate-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              
-              {/* Card 1 */}
-              <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm hover:shadow-xl hover:shadow-blue-900/5 transition-all group">
-                <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-950 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-blue-950 group-hover:text-white transition-all">
-                  <Target className="w-7 h-7" />
+              {cmsData.highlights.map((card, idx) => (
+                <div key={idx} className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm hover:shadow-xl hover:shadow-blue-900/5 transition-all group">
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-all group-hover:scale-110 group-hover:text-white ${idx === 1 ? 'bg-red-50 text-red-600 group-hover:bg-red-600' : 'bg-blue-50 text-blue-950 group-hover:bg-blue-950'}`}>
+                    {renderIcon(card.icon, "w-7 h-7")}
+                  </div>
+                  <h3 className="text-xl font-extrabold text-slate-900 mb-4">{card.title}</h3>
+                  {card.description && (
+                    <p className="text-sm text-slate-600 leading-relaxed mb-4">
+                      {card.description}
+                    </p>
+                  )}
+                  {card.listItems && card.listItems.length > 0 && (
+                    <ul className="space-y-3 text-sm text-slate-600">
+                      {card.listItems.map((item, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
-                <h3 className="text-xl font-extrabold text-slate-900 mb-4">Visi & Misi</h3>
-                <p className="text-sm text-slate-600 leading-relaxed mb-4">
-                  Menjadi mitra strategis industri nasional dalam penyediaan komponen karet presisi, dengan mengedepankan inovasi material, efisiensi produksi, dan pelayanan purna jual yang andal.
-                </p>
-              </div>
-
-              {/* Card 2 */}
-              <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm hover:shadow-xl hover:shadow-red-900/5 transition-all group">
-                <div className="w-14 h-14 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-red-600 group-hover:text-white transition-all">
-                  <Award className="w-7 h-7" />
-                </div>
-                <h3 className="text-xl font-extrabold text-slate-900 mb-4">Sertifikasi & Standar</h3>
-                <ul className="space-y-3 text-sm text-slate-600">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
-                    <span>ISO 9001:2015 - Manajemen Mutu</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
-                    <span>SNI 1234:2020 - Standar Material Karet</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
-                    <span>SGS Material Testing Certified</span>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Card 3 */}
-              <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm hover:shadow-xl hover:shadow-blue-900/5 transition-all group">
-                <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-950 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-blue-950 group-hover:text-white transition-all">
-                  <Settings className="w-7 h-7" />
-                </div>
-                <h3 className="text-xl font-extrabold text-slate-900 mb-4">Fasilitas Produksi</h3>
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  Pabrik seluas 2 Hektar dilengkapi mesin Vulcanizing Press hidrolik otomatis, lab pengujian kompon mandiri, dan gudang penyimpanan terpusat untuk menjamin ketersediaan stok skala besar.
-                </p>
-              </div>
-
+              ))}
             </div>
           </div>
         </section>
@@ -149,17 +135,11 @@ export default async function TentangPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {[
-                { name: "Haris Santoso", role: "Direktur Utama", initial: "HS" },
-                { name: "Linda Wijaya", role: "VP Operations", initial: "LW" },
-                { name: "Bima Arya", role: "Kepala Teknik & R&D", initial: "BA" },
-                { name: "Siti Rahma", role: "Sales & B2B Manager", initial: "SR" }
-              ].map((member, idx) => (
+              {cmsData.team.map((member, idx) => (
                 <div key={idx} className="bg-slate-50 border border-slate-100 rounded-3xl p-6 text-center group hover:bg-white hover:border-slate-200 hover:shadow-lg transition-all">
                   <div className="w-24 h-24 mx-auto bg-slate-200 rounded-full mb-5 flex items-center justify-center overflow-hidden relative">
-                    {/* Placeholder for human portrait */}
                     <div className="absolute inset-0 bg-blue-950/10 group-hover:bg-transparent transition-colors z-10"></div>
-                    <Users className="w-10 h-10 text-slate-400 group-hover:scale-110 transition-transform" />
+                    <span className="text-2xl font-black text-slate-400 group-hover:scale-110 transition-transform">{member.initial}</span>
                   </div>
                   <h4 className="text-lg font-bold text-slate-900">{member.name}</h4>
                   <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1">{member.role}</p>
@@ -176,6 +156,8 @@ export default async function TentangPage() {
         </section>
 
       </main>
+
+      {isAdmin && <CmsTentangEditorSheet initialData={cmsData} />}
     </div>
   )
 }

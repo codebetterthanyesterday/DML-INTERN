@@ -3,6 +3,8 @@ import { ArrowRight, Factory, ShieldCheck, ShoppingBag, Star } from "lucide-reac
 
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
+import { getLandingPageContent } from "@/app/actions/cms"
+import { CmsEditorSheet } from "@/components/cms/cms-editor-sheet"
 
 export default async function LandingPage() {
   const session = await auth()
@@ -14,6 +16,8 @@ export default async function LandingPage() {
       : userRole === "BUSINESS"
         ? "/business"
         : "/customer"
+
+  const cmsData = await getLandingPageContent()
 
   // Fetch featured products dynamically
   const featuredProducts = await prisma.product.findMany({
@@ -39,7 +43,7 @@ export default async function LandingPage() {
           {/* Background Image */}
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: "url('/images/hero-bg.png')" }}
+            style={{ backgroundImage: `url('${cmsData.hero.backgroundImageUrl}')` }}
           ></div>
 
           {/* Overlay gradient for modern look */}
@@ -49,15 +53,15 @@ export default async function LandingPage() {
 
           <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 flex flex-col items-center text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-slate-100 text-xs sm:text-sm font-semibold uppercase tracking-widest mb-8 backdrop-blur-md shadow-lg">
-              <ShieldCheck className="w-4 h-4 text-red-400" /> Solusi Karet Terbaik
+              <ShieldCheck className="w-4 h-4 text-red-400" /> {cmsData.hero.badgeText}
             </div>
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white tracking-tight leading-[1.15] mb-6 max-w-5xl drop-shadow-lg">
-              Material Karet Berkualitas untuk Segala <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-rose-400">Kebutuhan</span>
+              {cmsData.hero.titlePart1} <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-rose-400">{cmsData.hero.titlePart2Gradient}</span>
             </h1>
 
             <p className="text-base sm:text-lg md:text-xl text-slate-300 mb-10 max-w-2xl mx-auto font-medium leading-relaxed drop-shadow-md">
-              Dari produk retail harian hingga suplai industri berat (B2B). Kami menyediakan rubber sheet, seal, gasket, dan conveyor belt terbaik di kelasnya.
+              {cmsData.hero.subtitle}
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto justify-center">
@@ -66,7 +70,7 @@ export default async function LandingPage() {
                 id="hero-catalog-btn"
                 className="w-full sm:w-auto px-8 py-4 text-sm sm:text-base font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-[0_0_40px_-10px_rgba(220,38,38,0.6)] hover:shadow-[0_0_60px_-15px_rgba(220,38,38,0.8)] transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-1"
               >
-                Lihat Katalog <ArrowRight className="w-5 h-5" />
+                {cmsData.hero.ctaPrimaryText} <ArrowRight className="w-5 h-5" />
               </Link>
 
               {/* Dynamic secondary CTA */}
@@ -76,7 +80,7 @@ export default async function LandingPage() {
                   id="hero-dashboard-btn"
                   className="w-full sm:w-auto px-8 py-4 text-sm sm:text-base font-bold text-white bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md rounded-xl transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-1"
                 >
-                  Dashboard Saya <ArrowRight className="w-5 h-5" />
+                  {cmsData.hero.ctaSecondaryLoggedInText} <ArrowRight className="w-5 h-5" />
                 </Link>
               ) : (
                 <Link
@@ -84,7 +88,7 @@ export default async function LandingPage() {
                   id="hero-b2b-btn"
                   className="w-full sm:w-auto px-8 py-4 text-sm sm:text-base font-bold text-white bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md rounded-xl transition-all duration-300 flex items-center justify-center transform hover:-translate-y-1"
                 >
-                  Ajukan Penawaran B2B
+                  {cmsData.hero.ctaSecondaryLoggedOutText}
                 </Link>
               )}
             </div>
@@ -101,24 +105,24 @@ export default async function LandingPage() {
               <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-950 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
                 <ShoppingBag className="w-7 h-7" />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Rumah Tangga & Retail</h3>
-              <p className="text-sm text-slate-500">Pesan satuan dengan harga terbaik. Pengiriman cepat langsung ke alamat Anda.</p>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">{cmsData.valueProps[0].title}</h3>
+              <p className="text-sm text-slate-500">{cmsData.valueProps[0].description}</p>
             </div>
 
             <div className="p-8 text-center flex flex-col items-center group">
               <div className="w-14 h-14 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
                 <Factory className="w-7 h-7" />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Industri & Bisnis (B2B)</h3>
-              <p className="text-sm text-slate-500">Kapasitas besar, negosiasi harga (RFQ), dan metode pembayaran fleksibel/berjangka.</p>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">{cmsData.valueProps[1].title}</h3>
+              <p className="text-sm text-slate-500">{cmsData.valueProps[1].description}</p>
             </div>
 
             <div className="p-8 text-center flex flex-col items-center group">
               <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-950 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
                 <ShieldCheck className="w-7 h-7" />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Kualitas & Sertifikasi</h3>
-              <p className="text-sm text-slate-500">Standar industri terjamin. Material tersertifikasi yang tahan terhadap kondisi ekstrem.</p>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">{cmsData.valueProps[2].title}</h3>
+              <p className="text-sm text-slate-500">{cmsData.valueProps[2].description}</p>
             </div>
           </div>
         </section>
@@ -204,6 +208,10 @@ export default async function LandingPage() {
             )}
           </div>
         </section>
+
+        {userRole === "ADMIN" && (
+          <CmsEditorSheet initialData={cmsData} />
+        )}
       </main>
     </div>
   )

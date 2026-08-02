@@ -19,6 +19,7 @@ import {
 import type { Session } from "next-auth"
 import toast from "react-hot-toast"
 import { addToCart } from "@/lib/actions/cart"
+import type { KatalogPageContent } from "@/lib/validators/cms"
 
 // Types
 type ProductType = "RETAIL" | "INDUSTRIAL"
@@ -66,9 +67,10 @@ interface KatalogPageClientProps {
   totalCount: number
   currentPage: number
   totalPages: number
+  cmsData: KatalogPageContent
 }
 
-export function KatalogPageClient({ session, products, categories, totalCount, currentPage, totalPages }: KatalogPageClientProps) {
+export function KatalogPageClient({ session, products, categories, totalCount, currentPage, totalPages, cmsData }: KatalogPageClientProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -192,7 +194,7 @@ export function KatalogPageClient({ session, products, categories, totalCount, c
         {/* Background Image */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url('/images/katalog-bg.png')" }}
+          style={{ backgroundImage: `url('${cmsData.header.backgroundImageUrl}')` }}
         ></div>
         
         {/* Overlay gradient for modern look */}
@@ -203,11 +205,11 @@ export function KatalogPageClient({ session, products, categories, totalCount, c
         <div className="relative z-10 max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-900/60 text-blue-200 text-xs font-semibold uppercase tracking-wider mb-2">
-              Katalog Produk Lengkap
+              {cmsData.header.badgeText}
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Cari & Temukan Material Karet Industri</h1>
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">{cmsData.header.title}</h1>
             <p className="text-xs sm:text-sm text-blue-200 mt-1 max-w-xl">
-              Tersedia pembelian eceran retail berharga grosir dan sistem pengajuan penawaran harga (RFQ) untuk akun bisnis.
+              {cmsData.header.subtitle}
             </p>
           </div>
 

@@ -3,6 +3,8 @@ import { KatalogPageClient } from "./KatalogPageClient"
 import type { Session } from "next-auth"
 import prisma from "@/lib/prisma"
 import { ProductType } from "@prisma/client"
+import { getKatalogPageContent } from "@/app/actions/cms"
+import { CmsKatalogEditorSheet } from "@/components/cms/cms-katalog-editor-sheet"
 
 export default async function KatalogPage({
   searchParams,
@@ -11,6 +13,8 @@ export default async function KatalogPage({
 }) {
   const session = (await auth()) as Session | null
   const params = await searchParams
+  
+  const cmsData = await getKatalogPageContent()
 
   const q = typeof params.q === "string" ? params.q : undefined
   const type = typeof params.type === "string" ? params.type : "ALL"
@@ -106,13 +110,19 @@ export default async function KatalogPage({
   const categoryNames = ["Semua Kategori", ...dbCategories.map(c => c.name)]
 
   return (
-    <KatalogPageClient 
-      session={session} 
-      products={products} 
-      categories={categoryNames}
-      totalCount={totalCount}
-      currentPage={page}
-      totalPages={Math.ceil(totalCount / pageSize)}
-    />
+    <>
+      <KatalogPageClient 
+        session={session} 
+        products={products} 
+        categories={categoryNames}
+        totalCount={totalCount}
+        currentPage={page}
+        totalPages={Math.ceil(totalCount / pageSize)}
+        cmsData={cmsData}
+      />
+      {session?.user?.role === "ADMIN" && (
+        <CmsKatalogEditorSheet initialData={cmsData} />
+      )}
+    </>
   )
 }

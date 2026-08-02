@@ -3,10 +3,19 @@
 import prisma from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { AuditAction, BusinessStatus, DocStatus } from "@prisma/client"
+import { auth } from "@/lib/auth"
 
 // Helper to log audit actions
-async function logAudit(adminId: string, targetId: string, action: AuditAction, details?: string) {
+async function logAudit(targetId: string, action: AuditAction, details?: string) {
   try {
+    const session = await auth()
+    const adminId = session?.user?.id
+    
+    if (!adminId) {
+      console.error("No admin session found for audit log")
+      return
+    }
+
     await prisma.auditLog.create({
       data: {
         adminId,
@@ -94,7 +103,7 @@ export async function getUserDetails(userId: string) {
   }
 }
 
-export async function updateBusinessStatus(userId: string, status: BusinessStatus, adminId: string, reason?: string) {
+export async function updateBusinessStatus(userId: string, status: BusinessStatus, reason?: string) {
   try {
     await prisma.user.update({
       where: { id: userId },
@@ -110,7 +119,7 @@ export async function updateBusinessStatus(userId: string, status: BusinessStatu
           message: "Selamat! Akun bisnis Anda telah disetujui. Anda sekarang dapat mengakses fitur B2B.",
         }
       })
-      await logAudit(adminId, userId, "USER_APPROVED")
+      await logAudit(userId, "USER_APPROVED")
     } else if (status === "REJECTED") {
       await prisma.notification.create({
         data: {
@@ -120,7 +129,7 @@ export async function updateBusinessStatus(userId: string, status: BusinessStatu
           message: reason || "Maaf, pendaftaran akun bisnis Anda tidak dapat disetujui saat ini.",
         }
       })
-      await logAudit(adminId, userId, "USER_REJECTED", JSON.stringify({ reason }))
+      await logAudit(userId, "USER_REJECTED", JSON.stringify({ reason }))
     }
 
     revalidatePath("/admin/accounts")
@@ -131,13 +140,13 @@ export async function updateBusinessStatus(userId: string, status: BusinessStatu
   }
 }
 
-export async function updateDocumentStatus(docId: string, status: DocStatus, adminId: string) {
+export async function updateDocumentStatus(docId: string, status: DocStatus) {
   try {
     const doc = await prisma.businessDocument.update({
       where: { id: docId },
       data: { status }
     })
-    await logAudit(adminId, doc.userId, status === "VERIFIED" ? "DOCUMENT_VERIFIED" : "DOCUMENT_REJECTED", JSON.stringify({ docId, type: doc.docType }))
+    await logAudit(doc.userId, status === "VERIFIED" ? "DOCUMENT_VERIFIED" : "DOCUMENT_REJECTED", JSON.stringify({ docId, type: doc.docType }))
     revalidatePath("/admin/accounts")
     return { success: true }
   } catch (error) {
@@ -146,14 +155,14 @@ export async function updateDocumentStatus(docId: string, status: DocStatus, adm
   }
 }
 
-export async function toggleUserSuspension(userId: string, isSuspended: boolean, adminId: string) {
+export async function toggleUserSuspension(userId: string, isSuspended: boolean) {
   try {
     await prisma.user.update({
       where: { id: userId },
       data: { isSuspended }
     })
     
-    await logAudit(adminId, userId, isSuspended ? "USER_SUSPENDED" : "USER_UNSUSPENDED")
+    await logAudit(userId, isSuspended ? "USER_SUSPENDED" : "USER_UNSUSPENDED")
     revalidatePath("/admin/accounts")
     return { success: true }
   } catch (error) {
@@ -162,17 +171,32 @@ export async function toggleUserSuspension(userId: string, isSuspended: boolean,
   }
 }
 
-export async function deleteUser(userId: string, adminId: string) {
+export async function deleteUser(userId: string) {
   try {
     // Delete related records that might not have cascade delete, though User model has many cascades.
     await prisma.user.delete({
       where: { id: userId }
     })
-    await logAudit(adminId, userId, "USER_DELETED")
+    await logAudit(userId, "USER_DELETED")
     revalidatePath("/admin/accounts")
     return { success: true }
   } catch (error) {
     console.error("deleteUser error:", error)
     return { success: false, error: "Failed to delete user" }
+  }
+}
+
+export async function makeUserAdmin(userId: string) {
+  try {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { role: "ADMIN" }
+    })
+    await logAudit(userId, "ROLE_CHANGED", JSON.stringify({ newRole: "ADMIN" }))
+    revalidatePath("/admin/accounts")
+    return { success: true }
+  } catch (error) {
+    console.error("makeUserAdmin error:", error)
+    return { success: false, error: "Failed to promote user to admin" }
   }
 }

@@ -26,6 +26,18 @@ async function AccountsContent({ searchParams }: PageProps) {
   const totalB2B = allUsers.filter(u => u.role === "BUSINESS").length;
   const totalAdmins = allUsers.filter(u => u.role === "ADMIN").length;
 
+  const roleCounts = {
+    CUSTOMER: allUsers.filter(u => u.role === "CUSTOMER").length,
+    BUSINESS: totalB2B,
+    ADMIN: totalAdmins,
+  };
+
+  const statusCounts = {
+    PENDING: pendingB2B,
+    APPROVED: allUsers.filter(u => u.businessStatus === "APPROVED").length,
+    REJECTED: allUsers.filter(u => u.businessStatus === "REJECTED").length,
+  };
+
   const statCards = [
     {
       label: "Total Pengguna",
@@ -106,6 +118,8 @@ async function AccountsContent({ searchParams }: PageProps) {
         currentRole={role}
         currentStatus={status}
         currentQ={q}
+        roleCounts={roleCounts}
+        statusCounts={statusCounts}
       />
     </>
   );

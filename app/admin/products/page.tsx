@@ -4,7 +4,7 @@ import { getAdminProducts } from "@/lib/actions/products";
 import { ProductTable } from "@/components/admin/products/ProductTable";
 import { ProductFilters } from "@/components/admin/products/ProductFilters";
 import { Button } from "@/components/ui/button";
-import { Plus, Package } from "lucide-react";
+import { Plus, Package, Store, Factory, Archive } from "lucide-react";
 
 export const metadata = {
   title: "Kelola Produk — DML Admin",
@@ -51,24 +51,66 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Total Produk", value: stats.total, color: "bg-blue-50 text-blue-950" },
-          { label: "Retail", value: stats.retail, color: "bg-slate-50 text-slate-700" },
-          { label: "Industrial", value: stats.industrial, color: "bg-red-50 text-red-700" },
-          { label: "Nonaktif", value: stats.inactive, color: "bg-orange-50 text-orange-700" },
-        ].map((stat) => (
+          { 
+            label: "Total Produk", 
+            value: stats.total, 
+            icon: Package,
+            gradient: "from-blue-500 to-indigo-600",
+            bg: "bg-blue-50",
+            text: "text-blue-600",
+            ring: "ring-blue-100/50"
+          },
+          { 
+            label: "Retail", 
+            value: stats.retail, 
+            icon: Store,
+            gradient: "from-emerald-500 to-teal-600",
+            bg: "bg-emerald-50",
+            text: "text-emerald-600",
+            ring: "ring-emerald-100/50"
+          },
+          { 
+            label: "Industrial", 
+            value: stats.industrial, 
+            icon: Factory,
+            gradient: "from-orange-500 to-red-600",
+            bg: "bg-orange-50",
+            text: "text-orange-600",
+            ring: "ring-orange-100/50"
+          },
+          { 
+            label: "Nonaktif", 
+            value: stats.inactive, 
+            icon: Archive,
+            gradient: "from-slate-400 to-slate-600",
+            bg: "bg-slate-100",
+            text: "text-slate-600",
+            ring: "ring-slate-200/50"
+          },
+        ].map((stat) => {
+          const Icon = stat.icon;
+          return (
           <div
             key={stat.label}
-            className={`rounded-xl border border-slate-200 px-4 py-3 flex items-center gap-3 ${stat.color}`}
+            className="group relative overflow-hidden rounded-2xl bg-white border border-slate-200/60 p-5 shadow-sm hover:shadow-xl hover:shadow-blue-900/5 hover:-translate-y-1 transition-all duration-300 ease-out"
           >
-            <Package className="w-4 h-4 shrink-0 opacity-70" />
-            <div>
-              <div className="text-xl font-extrabold leading-none">{stat.value}</div>
-              <div className="text-xs font-semibold opacity-70 mt-0.5">{stat.label}</div>
+            <div className={`absolute inset-0 opacity-0 group-hover:opacity-5 bg-gradient-to-br ${stat.gradient} transition-opacity duration-300`} />
+            
+            <div className="flex items-center gap-4 relative z-10">
+              <div className={`p-3 rounded-xl ${stat.bg} ${stat.text} ring-1 ring-inset ${stat.ring} shadow-inner shrink-0`}>
+                <Icon className="w-6 h-6" strokeWidth={2.5} />
+              </div>
+              <div className="min-w-0">
+                <div className="text-3xl font-black text-slate-800 tracking-tight leading-none truncate">{stat.value}</div>
+                <div className="text-sm font-bold text-slate-500 mt-1.5 truncate">{stat.label}</div>
+              </div>
             </div>
+            
+            <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${stat.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
           </div>
-        ))}
+        )})}
       </div>
 
       {/* Filters */}
