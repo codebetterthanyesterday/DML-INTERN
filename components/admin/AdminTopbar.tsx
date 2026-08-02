@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, Search, Menu, X } from "lucide-react";
+import { Bell, Search, Menu, X, Home, User, Settings, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Link from "next/link";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,11 +24,11 @@ export function AdminTopbar({ user }: { user?: { name?: string | null; email?: s
 
   const initials = user?.name
     ? user.name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .substring(0, 2)
-        .toUpperCase()
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .substring(0, 2)
+      .toUpperCase()
     : "AD";
 
   return (
@@ -45,10 +46,10 @@ export function AdminTopbar({ user }: { user?: { name?: string | null; email?: s
               />
             </div>
           </form>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="shrink-0 text-slate-500 hover:text-blue-950" 
+          <Button
+            variant="ghost"
+            size="icon"
+            className="shrink-0 text-slate-500 hover:text-blue-950"
             onClick={() => setIsSearchOpen(false)}
             aria-label="Tutup pencarian"
           >
@@ -59,9 +60,9 @@ export function AdminTopbar({ user }: { user?: { name?: string | null; email?: s
         <>
           <Sheet>
             <SheetTrigger asChild>
-              <Button 
-                variant="outline" 
-                size="icon" 
+              <Button
+                variant="outline"
+                size="icon"
                 className="shrink-0 md:hidden text-slate-500 hover:text-blue-950 border-slate-200 focus-visible:ring-2"
                 aria-label="Buka menu navigasi"
                 aria-expanded="false"
@@ -74,7 +75,7 @@ export function AdminTopbar({ user }: { user?: { name?: string | null; email?: s
               <AdminSidebar />
             </SheetContent>
           </Sheet>
-          
+
           <div className="flex-1 flex justify-end md:justify-start">
             {/* Desktop Search */}
             <form className="hidden md:block w-full">
@@ -88,25 +89,25 @@ export function AdminTopbar({ user }: { user?: { name?: string | null; email?: s
               </div>
             </form>
             {/* Mobile Search Trigger */}
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="md:hidden text-slate-500 hover:text-blue-950 hover:bg-slate-100 focus-visible:ring-2" 
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden text-slate-500 hover:text-blue-950 hover:bg-slate-100 focus-visible:ring-2"
               onClick={() => setIsSearchOpen(true)}
               aria-label="Buka pencarian"
             >
               <Search className="h-5 w-5" />
             </Button>
           </div>
-          
+
           <div className="flex items-center gap-2 md:gap-4">
             <AdminNotificationsDropdown />
-            
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="secondary" 
-                  size="icon" 
+                <Button
+                  variant="secondary"
+                  size="icon"
                   className="rounded-full bg-slate-100 border border-slate-200 hover:bg-slate-200 focus-visible:ring-2"
                   aria-label="Menu profil pengguna"
                 >
@@ -128,14 +129,29 @@ export function AdminTopbar({ user }: { user?: { name?: string | null; email?: s
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer hover:bg-slate-50 focus:bg-slate-50">Profil</DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer hover:bg-slate-50 focus:bg-slate-50">Pengaturan</DropdownMenuItem>
+                <DropdownMenuItem asChild className="cursor-pointer hover:bg-slate-50 focus:bg-slate-50">
+                  <Link href="/" className="flex items-center">
+                    <Home className="mr-2 h-4 w-4" />
+                    <span>Ke Beranda</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="cursor-pointer hover:bg-slate-50 focus:bg-slate-50">
+                  <Link href="/admin/profile" className="flex items-center w-full">
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profil</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer hover:bg-slate-50 focus:bg-slate-50">
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Pengaturan</span>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   className="text-red-600 cursor-pointer focus:bg-red-50 focus:text-red-700 hover:bg-red-50 hover:text-red-700"
                   onClick={() => signOut({ callbackUrl: "/login" })}
                 >
-                  Keluar
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Keluar</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
