@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -29,9 +30,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { MoreHorizontal, Pencil, Trash2, ToggleLeft, ToggleRight, ImageOff } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, ToggleLeft, ToggleRight, ImageOff, Eye, Package, Tag } from "lucide-react";
 import { deleteProduct, toggleProductStatus } from "@/lib/actions/products";
 import type { Product, Category, ProductImage } from "@prisma/client";
+import { ProductDetailsSheet } from "./ProductDetailsSheet";
 
 type ProductWithRelations = Omit<Product, "price"> & {
   price: number | null;
@@ -43,22 +45,28 @@ interface ProductTableProps {
   products: ProductWithRelations[];
 }
 
-const typeBadge = (type: string) => {
-  switch (type) {
-    case "RETAIL":
-      return <Badge className="bg-blue-50 text-blue-700 border-blue-200 font-bold hover:bg-blue-50">Retail</Badge>;
-    case "INDUSTRIAL":
-      return <Badge className="bg-red-50 text-red-600 border-red-100 font-bold hover:bg-red-50">Industrial</Badge>;
-    case "BOTH":
-      return <Badge className="bg-purple-50 text-purple-700 border-purple-200 font-bold hover:bg-purple-50">Keduanya</Badge>;
-    default:
-      return null;
-  }
-};
-
 export function ProductTable({ products }: ProductTableProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<ProductWithRelations | null>(null);
+
+  const initialProductId = searchParams.get("productId");
+
+  useEffect(() => {
+    if (initialProductId && products.length > 0) {
+      const product = products.find((p) => p.id === initialProductId);
+      if (product) {
+        setSelectedProduct(product);
+        // Clean up the URL to remove productId so it doesn't reopen on refresh or if sheet is closed
+        const newParams = new URLSearchParams(searchParams.toString());
+        newParams.delete("productId");
+        router.replace(`${pathname}?${newParams.toString()}`);
+      }
+    }
+  }, [initialProductId, products, searchParams, pathname, router]);
 
   const handleToggle = (id: string, current: boolean) => {
     startTransition(() => {
@@ -84,62 +92,65 @@ export function ProductTable({ products }: ProductTableProps) {
 
   return (
     <>
-      <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm">
-        <Table>
+      <div className="rounded-xl border border-slate-200 bg-white overflow-x-auto shadow-sm ring-1 ring-slate-900/5">
+        <Table className="min-w-[800px]">
           <TableHeader>
-            <TableRow className="bg-slate-50 hover:bg-slate-50">
-              <TableHead className="text-slate-500 font-bold text-xs uppercase tracking-wide w-12">Foto</TableHead>
-              <TableHead className="text-slate-500 font-bold text-xs uppercase tracking-wide">Nama / SKU</TableHead>
-              <TableHead className="text-slate-500 font-bold text-xs uppercase tracking-wide">Kategori</TableHead>
-              <TableHead className="text-slate-500 font-bold text-xs uppercase tracking-wide">Tipe</TableHead>
-              <TableHead className="text-slate-500 font-bold text-xs uppercase tracking-wide">Stok</TableHead>
-              <TableHead className="text-slate-500 font-bold text-xs uppercase tracking-wide">Harga</TableHead>
-              <TableHead className="text-slate-500 font-bold text-xs uppercase tracking-wide">Status</TableHead>
-              <TableHead className="text-slate-500 font-bold text-xs uppercase tracking-wide text-right">Aksi</TableHead>
+            <TableRow className="bg-slate-50/80 hover:bg-slate-50/80 border-b border-slate-200">
+              <TableHead className="text-slate-500 font-bold text-xs uppercase tracking-wider py-4 pl-6">Produk</TableHead>
+              <TableHead className="text-slate-500 font-bold text-xs uppercase tracking-wider">Kategori</TableHead>
+              <TableHead className="text-slate-500 font-bold text-xs uppercase tracking-wider">Stok</TableHead>
+              <TableHead className="text-slate-500 font-bold text-xs uppercase tracking-wider">Status</TableHead>
+              <TableHead className="text-slate-500 font-bold text-xs uppercase tracking-wider text-right pr-6">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {products.map((product) => (
-              <TableRow key={product.id} className="hover:bg-slate-50 border-slate-100 transition-colors">
-                <TableCell>
-                  {product.images[0] ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={product.images[0].url}
-                      alt={product.name}
-                      className="w-10 h-10 object-cover rounded-lg border border-slate-200"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center">
-                      <ImageOff className="w-4 h-4 text-slate-300" />
+              <TableRow 
+                key={product.id} 
+                className="group hover:bg-blue-50/40 border-slate-100 transition-all cursor-pointer"
+                onClick={() => setSelectedProduct(product)}
+              >
+                <TableCell className="pl-6 py-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-11 h-11 rounded-xl overflow-hidden border border-slate-200/60 bg-slate-50 flex items-center justify-center shrink-0 shadow-sm">
+                      {product.images[0] ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={product.images[0].url} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                      ) : (
+                        <Package className="w-5 h-5 text-slate-300" />
+                      )}
                     </div>
-                  )}
+                    <div className="flex flex-col justify-center">
+                      <div className="font-bold text-slate-900 text-sm group-hover:text-blue-700 transition-colors line-clamp-1">{product.name}</div>
+                      <div className="text-xs text-slate-500 font-mono mt-0.5 flex items-center gap-1.5">
+                        <Tag className="w-3 h-3 text-slate-400" />
+                        {product.sku}
+                      </div>
+                    </div>
+                  </div>
                 </TableCell>
                 <TableCell>
-                  <div className="font-bold text-blue-950 text-sm">{product.name}</div>
-                  <div className="text-xs text-slate-400 font-mono mt-0.5">{product.sku}</div>
+                  <Badge variant="outline" className="bg-slate-50/50 text-slate-600 font-medium border-slate-200/60 shadow-sm">
+                    {product.category.name}
+                  </Badge>
                 </TableCell>
-                <TableCell className="text-slate-600 text-sm font-medium">{product.category.name}</TableCell>
-                <TableCell>{typeBadge(product.productType)}</TableCell>
                 <TableCell>
-                  <span className={`font-bold text-sm ${product.stock === 0 ? "text-red-500" : product.stock < 20 ? "text-orange-500" : "text-blue-950"}`}>
-                    {product.stock.toLocaleString("id-ID")}
-                  </span>
-                  <span className="text-xs text-slate-400 ml-1">{product.unit}</span>
-                </TableCell>
-                <TableCell className="text-slate-700 text-sm font-semibold">
-                  {product.price
-                    ? `Rp ${Number(product.price).toLocaleString("id-ID")}`
-                    : <span className="text-slate-400 italic text-xs">Custom (B2B)</span>}
+                  <div className="flex flex-col justify-center">
+                    <span className={`font-bold text-sm flex items-center gap-1.5 ${product.stock === 0 ? "text-red-600" : product.stock < 20 ? "text-amber-600" : "text-emerald-600"}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${product.stock === 0 ? "bg-red-500" : product.stock < 20 ? "bg-amber-500" : "bg-emerald-500"}`}></span>
+                      {product.stock.toLocaleString("id-ID")}
+                    </span>
+                    <span className="text-[11px] text-slate-400 font-medium uppercase tracking-wider ml-3">{product.unit}</span>
+                  </div>
                 </TableCell>
                 <TableCell>
                   {product.isActive ? (
-                    <Badge className="bg-green-50 text-green-700 border-green-200 font-bold hover:bg-green-50">Aktif</Badge>
+                    <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200/60 font-semibold hover:bg-emerald-50 shadow-sm">Aktif</Badge>
                   ) : (
-                    <Badge className="bg-slate-100 text-slate-500 border-slate-200 font-bold hover:bg-slate-100">Nonaktif</Badge>
+                    <Badge className="bg-slate-100 text-slate-600 border-slate-200/60 font-semibold hover:bg-slate-100 shadow-sm">Nonaktif</Badge>
                   )}
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-right pr-6" onClick={(e) => e.stopPropagation()}>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
@@ -153,6 +164,13 @@ export function ProductTable({ products }: ProductTableProps) {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-44">
+                      <DropdownMenuItem
+                        className="flex items-center gap-2 cursor-pointer text-blue-700 focus:bg-blue-50 focus:text-blue-800"
+                        onClick={() => setSelectedProduct(product)}
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        Lihat Detail
+                      </DropdownMenuItem>
                       <DropdownMenuItem asChild className="cursor-pointer">
                         <Link href={`/admin/products/${product.id}/edit`} className="flex items-center gap-2">
                           <Pencil className="w-3.5 h-3.5" />
@@ -161,7 +179,10 @@ export function ProductTable({ products }: ProductTableProps) {
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         className="flex items-center gap-2 cursor-pointer"
-                        onClick={() => handleToggle(product.id, product.isActive)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggle(product.id, product.isActive);
+                        }}
                       >
                         {product.isActive ? (
                           <><ToggleLeft className="w-3.5 h-3.5" />Nonaktifkan</>
@@ -172,7 +193,10 @@ export function ProductTable({ products }: ProductTableProps) {
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
                         className="flex items-center gap-2 cursor-pointer text-red-600 focus:bg-red-50 focus:text-red-700"
-                        onClick={() => setDeleteId(product.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeleteId(product.id);
+                        }}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                         Hapus Produk
@@ -207,6 +231,12 @@ export function ProductTable({ products }: ProductTableProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <ProductDetailsSheet
+        product={selectedProduct}
+        open={!!selectedProduct}
+        onOpenChange={(open) => !open && setSelectedProduct(null)}
+      />
     </>
   );
 }

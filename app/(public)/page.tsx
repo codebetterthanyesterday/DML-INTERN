@@ -1,10 +1,11 @@
 import Link from "next/link"
-import { ArrowRight, Factory, ShieldCheck, ShoppingBag, Star } from "lucide-react"
+import { ArrowRight, Factory, ShieldCheck, ShoppingBag, Star, Settings, Plus } from "lucide-react"
 
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import { getLandingPageContent } from "@/app/actions/cms"
 import { CmsEditorSheet } from "@/components/cms/cms-editor-sheet"
+import { AddToCartIconBtn } from "@/components/shared/AddToCartIconBtn"
 
 export default async function LandingPage() {
   const session = await auth()
@@ -139,7 +140,18 @@ export default async function LandingPage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className={`grid grid-cols-1 sm:grid-cols-2 gap-6 ${userRole === "ADMIN" ? "lg:grid-cols-5" : "lg:grid-cols-4"}`}>
+            {userRole === "ADMIN" && (
+              <Link href="/admin/products/new" className="group bg-slate-50/50 rounded-2xl border-2 border-dashed border-slate-300 hover:border-blue-950 hover:bg-blue-50/50 transition-all duration-300 flex flex-col items-center justify-center min-h-[380px] p-6 text-center cursor-pointer">
+                <div className="w-14 h-14 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-400 group-hover:text-blue-950 group-hover:scale-110 transition-all duration-300 mb-4">
+                  <Plus className="w-6 h-6" />
+                </div>
+                <h3 className="text-base font-bold text-slate-700 group-hover:text-blue-950 transition-colors">Tambah Produk Baru</h3>
+                <p className="text-xs text-slate-500 mt-2">
+                  Tambahkan produk baru ke dalam katalog langsung dari halaman ini.
+                </p>
+              </Link>
+            )}
             {featuredProducts.map((product) => {
               const avgRating = product.reviews.length > 0
                 ? (product.reviews.reduce((acc, r) => acc + r.rating, 0) / product.reviews.length).toFixed(1)
@@ -177,13 +189,17 @@ export default async function LandingPage() {
                     <div className="mt-auto flex items-center justify-between pt-3 border-t border-slate-100">
                       <span className="text-base sm:text-lg font-extrabold text-blue-950">{priceDisplay}</span>
                       {isLoggedIn ? (
-                        <button
-                          id={`add-to-cart-${product.id}`}
-                          className="w-8 h-8 rounded-full bg-blue-950 text-white flex items-center justify-center hover:bg-red-600 transition-colors shrink-0"
-                          title="Tambah ke Keranjang"
-                        >
-                          <ShoppingBag className="w-4 h-4" />
-                        </button>
+                        userRole === "ADMIN" ? (
+                          <Link
+                            href={`/admin/products?productId=${product.id}`}
+                            className="w-8 h-8 rounded-full bg-slate-100 text-blue-950 flex items-center justify-center hover:bg-blue-950 hover:text-white transition-colors shrink-0"
+                            title="Kelola Produk di Admin"
+                          >
+                            <Settings className="w-4 h-4" />
+                          </Link>
+                        ) : (
+                          <AddToCartIconBtn productId={product.id} />
+                        )
                       ) : (
                         <Link
                           href={`/login?callbackUrl=/katalog/${product.slug}`}

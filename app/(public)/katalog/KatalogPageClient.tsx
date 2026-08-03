@@ -15,6 +15,8 @@ import {
   Check,
   RotateCcw,
   LogIn,
+  Plus,
+  Settings,
 } from "lucide-react"
 import type { Session } from "next-auth"
 import toast from "react-hot-toast"
@@ -435,6 +437,17 @@ export function KatalogPageClient({ session, products, categories, totalCount, c
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {session?.user?.role === "ADMIN" && (
+                  <Link href="/admin/products/new" className="group bg-slate-50/50 rounded-2xl border-2 border-dashed border-slate-300 hover:border-blue-950 hover:bg-blue-50/50 transition-all duration-300 flex flex-col items-center justify-center min-h-[350px] p-6 text-center cursor-pointer">
+                    <div className="w-14 h-14 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-400 group-hover:text-blue-950 group-hover:scale-110 transition-all duration-300 mb-4">
+                      <Plus className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-base font-bold text-slate-700 group-hover:text-blue-950 transition-colors">Tambah Produk Baru</h3>
+                    <p className="text-xs text-slate-500 mt-2">
+                      Tambahkan produk baru ke dalam katalog langsung dari halaman ini.
+                    </p>
+                  </Link>
+                )}
                 {products.map((product) => (
                   <div
                     key={product.id}
@@ -498,7 +511,15 @@ export function KatalogPageClient({ session, products, categories, totalCount, c
                             <span className="text-[10px] text-slate-500">/{product.unit}</span>
                           </div>
                           {/* Auth-aware cart button */}
-                          {cartConfig.isButton ? (
+                          {session?.user?.role === "ADMIN" ? (
+                            <Link
+                              href={`/admin/products?productId=${product.id}`}
+                              className="w-9 h-9 rounded-xl bg-slate-100 text-blue-950 flex items-center justify-center hover:bg-blue-950 hover:text-white transition-colors shrink-0"
+                              title="Kelola Produk di Admin"
+                            >
+                              <Settings className="w-4 h-4" />
+                            </Link>
+                          ) : cartConfig.isButton ? (
                             <button
                               onClick={() => handleAddToCart(product.id)}
                               disabled={isPending}
@@ -520,6 +541,15 @@ export function KatalogPageClient({ session, products, categories, totalCount, c
                         <div className="flex flex-col gap-2 pt-3 border-t border-slate-100">
                           <div className="flex items-center justify-between">
                             <span className="text-xs font-bold text-red-600 italic">Minta Penawaran (RFQ)</span>
+                            {session?.user?.role === "ADMIN" && (
+                              <Link
+                                href={`/admin/products?productId=${product.id}`}
+                                className="w-7 h-7 rounded-xl bg-slate-100 text-blue-950 flex items-center justify-center hover:bg-blue-950 hover:text-white transition-colors shrink-0"
+                                title="Kelola Produk di Admin"
+                              >
+                                <Settings className="w-3.5 h-3.5" />
+                              </Link>
+                            )}
                           </div>
                           <Link
                             href={rfqConfig.href}
