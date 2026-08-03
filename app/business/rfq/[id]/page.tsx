@@ -1,33 +1,50 @@
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, MessageSquare, XCircle, Send } from "lucide-react";
+import { ArrowLeft, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Textarea } from "@/components/ui/textarea";
+import { auth } from "@/lib/auth";
+import prisma from "@/lib/prisma";
+import { notFound, redirect } from "next/navigation";
+import { format } from "date-fns";
+import { id as localeId } from "date-fns/locale";
+import QuoteResponseClient from "./QuoteResponseClient";
 
 export default async function RFQDetailPage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
-  
-  // Dummy Data for demonstration
-  const rfqData = {
-    id: params.id,
-    date: "12 Jul 2026",
-    status: "QUOTED", // PENDING | QUOTED | ACCEPTED | REJECTED
-    items: [
-      {
-        id: 1,
-        productName: "Rubber Sheet SBR (Tebal 5mm)",
-        qtyRequested: 500,
-        unit: "meter",
-        notes: "Mohon penawaran harga grosir",
-        quotedPrice: 150000,
+  const session = await auth();
+  if (!session?.user?.id) {
+    redirect("/login");
+  }
+
+  const quote = await prisma.quote.findUnique({
+    where: { 
+      id: params.id,
+      userId: session.user.id
+    },
+    include: {
+      items: {
+        include: { product: true }
       }
-    ],
-    adminNotes: "Kami bisa memberikan harga Rp150.000/meter untuk kuantitas 500 meter. Total estimasi Rp 75.000.000 (belum termasuk PPN).",
+    }
+  });
+
+  if (!quote) {
+    notFound();
+  }
+
+  const isQuoted = quote.status === "QUOTED";
+
+  const statusConfig: Record<string, { label: string, className: string }> = {
+    PENDING: { label: "Menunggu Review", className: "bg-amber-50 text-amber-700 border-amber-200" },
+    REVIEWED: { label: "Sedang Direview", className: "bg-blue-50 text-blue-700 border-blue-200" },
+    QUOTED: { label: "Ditawarkan", className: "bg-indigo-50 text-indigo-700 border-indigo-200" },
+    ACCEPTED: { label: "Disetujui", className: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+    REJECTED: { label: "Ditolak", className: "bg-red-50 text-red-700 border-red-200" },
   };
 
-  const isQuoted = rfqData.status === "QUOTED";
+  const config = statusConfig[quote.status] || { label: quote.status, className: "bg-slate-50 text-slate-700" };
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -39,10 +56,12 @@ export default async function RFQDetailPage(props: { params: Promise<{ id: strin
         </Button>
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{rfqData.id}</h1>
-            <Badge className="bg-blue-50 text-blue-700 hover:bg-blue-50 border-blue-200">Ditawarkan</Badge>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{quote.quoteNumber}</h1>
+            <Badge className={`hover:bg-transparent ${config.className}`}>{config.label}</Badge>
           </div>
-          <p className="text-slate-500 mt-1">Diajukan pada {rfqData.date}</p>
+          <p className="text-slate-500 mt-1">
+            Diajukan pada {format(new Date(quote.createdAt), "dd MMM yyyy", { locale: localeId })}
+          </p>
         </div>
       </div>
 
@@ -53,103 +72,61 @@ export default async function RFQDetailPage(props: { params: Promise<{ id: strin
               <CardTitle>Rincian Item</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {rfqData.items.map((item) => (
+              {quote.items.map((item) => (
                 <div key={item.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-lg bg-slate-50 border border-slate-100">
                   <div>
-                    <h3 className="font-semibold text-slate-900">{item.productName}</h3>
-                    <p className="text-sm text-slate-500 mt-1">Qty: {item.qtyRequested} {item.unit}</p>
-                    {item.notes && <p className="text-xs text-slate-400 mt-2 italic">"{item.notes}"</p>}
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm text-slate-500 mb-1">Harga Penawaran</p>
-                    {item.quotedPrice ? (
-                      <p className="font-bold text-lg text-slate-900">
-                        Rp {item.quotedPrice.toLocaleString('id-ID')} <span className="text-sm font-normal text-slate-500">/{item.unit}</span>
-                      </p>
-                    ) : (
-                      <p className="text-slate-400 italic">Belum diisi</p>
+                    <h3 className="font-semibold text-slate-900">{item.product.name}</h3>
+                    <p className="text-sm text-slate-500 mt-1">Qty: {item.qtyRequested} {item.product.unit}</p>
+                    {item.notes && (
+                      <div className="mt-2 text-sm text-slate-600 flex items-start gap-2 bg-white p-2 rounded border border-slate-200">
+                        <MessageSquare className="w-4 h-4 mt-0.5 shrink-0 text-slate-400" />
+                        <p>{item.notes}</p>
+                      </div>
                     )}
                   </div>
+                  {isQuoted && item.quotedPrice && (
+                    <div className="text-right shrink-0 bg-white p-3 rounded-lg border border-slate-200">
+                      <p className="text-xs text-slate-500 uppercase font-semibold tracking-wider mb-1">Harga Penawaran</p>
+                      <p className="font-bold text-slate-900">
+                        Rp {Number(item.quotedPrice).toLocaleString("id-ID")}
+                        <span className="text-sm font-normal text-slate-500"> / {item.product.unit}</span>
+                      </p>
+                    </div>
+                  )}
                 </div>
               ))}
             </CardContent>
           </Card>
-
-          {isQuoted && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5 text-slate-500" />
-                  Tanggapan Admin
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="p-4 rounded-lg bg-blue-50/50 border border-blue-100 text-slate-700 text-sm leading-relaxed">
-                  {rfqData.adminNotes}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {isQuoted && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Respon Anda (Negosiasi)</CardTitle>
-                <CardDescription>Jika harga sudah sesuai, Anda bisa langsung menyetujui. Atau kirim pesan untuk negosiasi ulang.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Textarea 
-                  placeholder="Ketik pesan balasan untuk admin jika ingin negosiasi ulang..." 
-                  className="min-h-[100px]"
-                />
-              </CardContent>
-              <CardFooter className="flex flex-wrap gap-3 justify-end">
-                <Button variant="outline" className="text-red-600 hover:text-red-700 hover:bg-red-50">
-                  <XCircle className="h-4 w-4 mr-2" />
-                  Tolak Penawaran
-                </Button>
-                <Button variant="outline">
-                  <Send className="h-4 w-4 mr-2" />
-                  Kirim Pesan Nego
-                </Button>
-                <Button className="bg-emerald-600 hover:bg-emerald-700">
-                  <CheckCircle2 className="h-4 w-4 mr-2" />
-                  Setujui & Lanjut Invoice
-                </Button>
-              </CardFooter>
-            </Card>
-          )}
         </div>
 
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Status Dokumen</CardTitle>
+              <CardTitle>Tanggapan Admin</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 h-2 w-2 rounded-full bg-slate-300"></div>
-                <div>
-                  <p className="text-sm font-medium text-slate-500">RFQ Dibuat</p>
-                  <p className="text-xs text-slate-400">12 Jul 2026, 10:00</p>
+            <CardContent>
+              {quote.adminNotes ? (
+                <div className="bg-blue-50/50 p-4 rounded-lg border border-blue-100 text-sm text-slate-700 whitespace-pre-wrap">
+                  {quote.adminNotes}
                 </div>
-              </div>
-              <div className="w-0.5 h-4 bg-slate-200 ml-1 mt-[-12px]"></div>
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 h-2 w-2 rounded-full bg-blue-500"></div>
-                <div>
-                  <p className="text-sm font-medium text-slate-900">Admin Menawarkan Harga</p>
-                  <p className="text-xs text-slate-500">13 Jul 2026, 14:30</p>
+              ) : (
+                <div className="text-center py-6 text-sm text-slate-500">
+                  Belum ada tanggapan dari admin.
                 </div>
-              </div>
-              <div className="w-0.5 h-4 bg-slate-200 ml-1 mt-[-12px]"></div>
-              <div className="flex items-start gap-3 opacity-50">
-                <div className="mt-0.5 h-2 w-2 rounded-full border-2 border-slate-300"></div>
-                <div>
-                  <p className="text-sm font-medium text-slate-500">Disetujui / Invoice Terbit</p>
-                </div>
-              </div>
+              )}
             </CardContent>
+            
+            {isQuoted && (
+              <>
+                <Separator />
+                <CardFooter className="pt-6 flex flex-col gap-4">
+                  <div className="w-full">
+                    <h4 className="text-sm font-semibold text-slate-900 mb-3">Respon Anda:</h4>
+                    <QuoteResponseClient quoteId={quote.id} />
+                  </div>
+                </CardFooter>
+              </>
+            )}
           </Card>
         </div>
       </div>

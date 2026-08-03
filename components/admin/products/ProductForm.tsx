@@ -317,7 +317,7 @@ export function ProductForm({ action, categories, product, mode }: ProductFormPr
                   </svg>
                 </div>
                 <p className="text-xs font-semibold text-center leading-relaxed">
-                  Upload gambar produk<br/>
+                  Upload gambar produk<br />
                   <span className="font-normal opacity-70">PNG, JPG, max 5MB</span>
                 </p>
               </div>

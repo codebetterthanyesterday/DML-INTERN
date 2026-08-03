@@ -4,13 +4,13 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { createCheckoutSession } from "@/lib/actions/checkout"
-import { 
-  ArrowLeft, 
-  MapPin, 
-  Truck, 
-  CreditCard, 
-  CheckCircle2, 
-  ShieldCheck, 
+import {
+  ArrowLeft,
+  MapPin,
+  Truck,
+  CreditCard,
+  CheckCircle2,
+  ShieldCheck,
   Store,
   Wallet,
   Clock,
@@ -27,27 +27,27 @@ import { cn } from "@/lib/utils"
 import { Address, CartItem, Product } from "@prisma/client"
 
 const SHIPPING_METHODS = [
-  { 
-    id: "reguler", 
-    name: "Reguler (JNE / SiCepat)", 
-    est: "2-3 Hari Kerja", 
-    price: 20000, 
+  {
+    id: "reguler",
+    name: "Reguler (JNE / SiCepat)",
+    est: "2-3 Hari Kerja",
+    price: 20000,
     icon: Truck,
     desc: "Pengiriman standar ekonomis untuk ke seluruh Indonesia."
   },
-  { 
-    id: "ekspres", 
-    name: "Ekspres (GoSend / GrabExpress)", 
-    est: "Tiba Hari Ini", 
-    price: 45000, 
+  {
+    id: "ekspres",
+    name: "Ekspres (GoSend / GrabExpress)",
+    est: "Tiba Hari Ini",
+    price: 45000,
     icon: Truck,
     desc: "Dikirim langsung dalam beberapa jam setelah diproses."
   },
-  { 
-    id: "pickup", 
-    name: "Ambil di Gudang (DML Center)", 
-    est: "Siap dalam 2 Jam", 
-    price: 0, 
+  {
+    id: "pickup",
+    name: "Ambil di Gudang (DML Center)",
+    est: "Siap dalam 2 Jam",
+    price: 0,
     icon: Store,
     desc: "Ambil sendiri pesanan Anda di lokasi gudang kami (Tangerang)."
   },
@@ -85,8 +85,8 @@ export function CheckoutClient({ addresses, cartItems }: CheckoutClientProps) {
     const totalWeight = cartItems.reduce((acc, item) => acc + (item.qty * (item.product.weight || 1000)), 0)
     setIsLoadingShipping(true)
     const couriers = ['jne', 'pos', 'tiki']
-    
-    Promise.all(couriers.map(courier => 
+
+    Promise.all(couriers.map(courier =>
       fetch('/api/shipping/cost', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -112,10 +112,10 @@ export function CheckoutClient({ addresses, cartItems }: CheckoutClientProps) {
           })
         }
       })
-      
+
       const pickup = SHIPPING_METHODS.find(m => m.id === 'pickup')
-      if(pickup) newMethods.push(pickup)
-      
+      if (pickup) newMethods.push(pickup)
+
       setShippingMethods(newMethods)
       if (newMethods.length > 0) {
         setShipping(newMethods[0].id)
@@ -187,7 +187,7 @@ export function CheckoutClient({ addresses, cartItems }: CheckoutClientProps) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* MAIN CHECKOUT FORM */}
         <div className="lg:col-span-2 space-y-8">
-          
+
           {/* ADDRESS */}
           <Card className="border-slate-200 shadow-sm overflow-hidden border-t-4 border-t-blue-600">
             <CardHeader className="bg-white border-b border-slate-100 pb-4">
@@ -220,7 +220,7 @@ export function CheckoutClient({ addresses, cartItems }: CheckoutClientProps) {
                     </div>
                     <p className="text-slate-700 font-medium mb-1">{selectedAddress.phone}</p>
                     <p className="text-slate-600 leading-relaxed max-w-xl">
-                      {selectedAddress.fullAddress}<br/>
+                      {selectedAddress.fullAddress}<br />
                       {selectedAddress.district ? `${selectedAddress.district}, ` : ''}{selectedAddress.city ? `${selectedAddress.city}, ` : ''}{selectedAddress.province ? `${selectedAddress.province} ` : ''}{selectedAddress.postalCode}
                     </p>
                   </div>
@@ -269,8 +269,8 @@ export function CheckoutClient({ addresses, cartItems }: CheckoutClientProps) {
                     onClick={() => setShipping(method.id)}
                     className={cn(
                       "cursor-pointer rounded-xl border-2 p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 transition-all relative overflow-hidden",
-                      isSelected 
-                        ? "border-blue-600 bg-blue-50/30" 
+                      isSelected
+                        ? "border-blue-600 bg-blue-50/30"
                         : "border-slate-200 hover:border-blue-300 hover:bg-slate-50"
                     )}
                   >
@@ -284,7 +284,7 @@ export function CheckoutClient({ addresses, cartItems }: CheckoutClientProps) {
                     <div className={cn("p-3 rounded-xl flex-shrink-0", isSelected ? "bg-blue-100 text-blue-600" : "bg-slate-100 text-slate-500")}>
                       <Icon className="w-6 h-6" />
                     </div>
-                    
+
                     <div className="flex-1">
                       <div className="font-bold text-slate-900 text-base mb-1">{method.name}</div>
                       <div className="text-sm text-slate-500 mb-2">{method.desc}</div>
@@ -329,8 +329,8 @@ export function CheckoutClient({ addresses, cartItems }: CheckoutClientProps) {
                       onClick={() => setPayment(method.id)}
                       className={cn(
                         "cursor-pointer rounded-xl border-2 p-5 flex flex-col gap-3 transition-all",
-                        isSelected 
-                          ? "border-blue-600 bg-blue-50/50 shadow-sm" 
+                        isSelected
+                          ? "border-blue-600 bg-blue-50/50 shadow-sm"
                           : "border-slate-200 hover:border-blue-300 hover:bg-slate-50"
                       )}
                     >
@@ -364,7 +364,7 @@ export function CheckoutClient({ addresses, cartItems }: CheckoutClientProps) {
                 <CardTitle className="text-lg font-bold">Ringkasan Pesanan</CardTitle>
               </CardHeader>
               <CardContent className="p-6 bg-white">
-                
+
                 {/* ITEMS */}
                 <div className="mb-6 space-y-3">
                   <div className="flex items-center gap-2 mb-3">
@@ -374,14 +374,15 @@ export function CheckoutClient({ addresses, cartItems }: CheckoutClientProps) {
                   {cartItems.map((item, idx) => {
                     const price = item.product.price ? Number(item.product.price) : 0;
                     return (
-                    <div key={idx} className="flex justify-between items-start gap-4 text-sm">
-                      <div className="flex-1">
-                        <span className="font-medium text-slate-700 line-clamp-2">{item.product.name}</span>
-                        <span className="text-slate-500">{item.qty} x Rp {price.toLocaleString("id-ID")}</span>
+                      <div key={idx} className="flex justify-between items-start gap-4 text-sm">
+                        <div className="flex-1">
+                          <span className="font-medium text-slate-700 line-clamp-2">{item.product.name}</span>
+                          <span className="text-slate-500">{item.qty} x Rp {price.toLocaleString("id-ID")}</span>
+                        </div>
+                        <span className="font-bold text-slate-900 shrink-0">Rp {(item.qty * price).toLocaleString("id-ID")}</span>
                       </div>
-                      <span className="font-bold text-slate-900 shrink-0">Rp {(item.qty * price).toLocaleString("id-ID")}</span>
-                    </div>
-                  )})}
+                    )
+                  })}
                 </div>
 
                 <Separator className="my-5" />
@@ -392,16 +393,16 @@ export function CheckoutClient({ addresses, cartItems }: CheckoutClientProps) {
                   <div className="flex gap-2">
                     <div className="relative flex-1">
                       <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                      <Input 
-                        placeholder="Contoh: DMLPROMO" 
+                      <Input
+                        placeholder="Contoh: DMLPROMO"
                         className="pl-9 bg-slate-50"
                         value={promoCode}
                         onChange={(e) => setPromoCode(e.target.value)}
                         disabled={promoApplied}
                       />
                     </div>
-                    <Button 
-                      variant={promoApplied ? "secondary" : "default"} 
+                    <Button
+                      variant={promoApplied ? "secondary" : "default"}
                       onClick={handleApplyPromo}
                       disabled={promoApplied || !promoCode.trim()}
                       className={promoApplied ? "bg-emerald-100 text-emerald-700" : "bg-slate-900"}
@@ -449,8 +450,8 @@ export function CheckoutClient({ addresses, cartItems }: CheckoutClientProps) {
                   <p className="text-xs text-slate-500 text-right mt-1">Termasuk PPN jika berlaku</p>
                 </div>
 
-                <Button 
-                  onClick={handlePayment} 
+                <Button
+                  onClick={handlePayment}
                   disabled={isProcessing}
                   className="w-full bg-red-600 hover:bg-red-700 text-white font-bold h-14 text-lg rounded-xl shadow-lg shadow-red-600/30 transition-all relative overflow-hidden group"
                 >

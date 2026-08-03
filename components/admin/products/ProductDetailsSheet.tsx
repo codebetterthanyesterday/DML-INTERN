@@ -110,7 +110,7 @@ export function ProductDetailsSheet({
         {/* Scrollable Content */}
         <ScrollArea className="flex-1 px-6">
           <div className="py-6 space-y-8">
-            
+
             {/* Image Gallery */}
             <section className="space-y-3">
               <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
@@ -217,7 +217,7 @@ export function ProductDetailsSheet({
                 <span>Diperbarui: {new Date(product.updatedAt).toLocaleDateString("id-ID", { day: 'numeric', month: 'short', year: 'numeric' })}</span>
               </div>
             </section>
-            
+
             {/* Bottom padding for scroll */}
             <div className="h-6"></div>
           </div>

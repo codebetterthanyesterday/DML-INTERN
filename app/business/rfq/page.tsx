@@ -11,36 +11,24 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { auth } from "@/lib/auth";
+import prisma from "@/lib/prisma";
+import { redirect } from "next/navigation";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
 
-// Dummy data for presentation
-const rfqs = [
-  {
-    id: "RFQ-202607-0001",
-    date: "12 Jul 2026",
-    itemsCount: 3,
-    status: "QUOTED",
-    statusText: "Ditawarkan",
-    actionLink: "/business/rfq/RFQ-202607-0001",
-  },
-  {
-    id: "RFQ-202607-0002",
-    date: "15 Jul 2026",
-    itemsCount: 1,
-    status: "PENDING",
-    statusText: "Menunggu Review",
-    actionLink: "/business/rfq/RFQ-202607-0002",
-  },
-  {
-    id: "RFQ-202606-0089",
-    date: "28 Jun 2026",
-    itemsCount: 2,
-    status: "ACCEPTED",
-    statusText: "Disetujui",
-    actionLink: "/business/rfq/RFQ-202606-0089",
-  },
-];
+export default async function RFQHistoryPage() {
+  const session = await auth();
+  if (!session?.user?.id) {
+    redirect("/login");
+  }
 
-export default function RFQHistoryPage() {
+  const quotes = await prisma.quote.findMany({
+    where: { userId: session.user.id },
+    include: { items: true },
+    orderBy: { createdAt: 'desc' }
+  });
+
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -74,33 +62,48 @@ export default function RFQHistoryPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {rfqs.map((rfq) => (
-                  <TableRow key={rfq.id}>
-                    <TableCell className="font-medium">{rfq.id}</TableCell>
-                    <TableCell className="text-slate-500">{rfq.date}</TableCell>
-                    <TableCell>{rfq.itemsCount} produk</TableCell>
-                    <TableCell>
-                      <Badge 
-                        variant="secondary"
-                        className={
-                          rfq.status === "QUOTED" ? "bg-blue-50 text-blue-700 hover:bg-blue-50" :
-                          rfq.status === "PENDING" ? "bg-amber-50 text-amber-700 hover:bg-amber-50" :
-                          rfq.status === "ACCEPTED" ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-50" : ""
-                        }
-                      >
-                        {rfq.statusText}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="outline" size="sm" asChild>
-                        <Link href={rfq.actionLink}>
-                          <Eye className="h-4 w-4 mr-2" />
-                          Lihat
-                        </Link>
-                      </Button>
+                {quotes.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8 text-slate-500">
+                      Anda belum pernah mengajukan Request For Quote.
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  quotes.map((rfq) => {
+                    const statusConfig: Record<string, { label: string, className: string }> = {
+                      PENDING: { label: "Menunggu Review", className: "bg-amber-50 text-amber-700 hover:bg-amber-50" },
+                      REVIEWED: { label: "Sedang Direview", className: "bg-blue-50 text-blue-700 hover:bg-blue-50" },
+                      QUOTED: { label: "Ditawarkan", className: "bg-indigo-50 text-indigo-700 hover:bg-indigo-50" },
+                      ACCEPTED: { label: "Disetujui", className: "bg-emerald-50 text-emerald-700 hover:bg-emerald-50" },
+                      REJECTED: { label: "Ditolak", className: "bg-red-50 text-red-700 hover:bg-red-50" },
+                    };
+
+                    const config = statusConfig[rfq.status] || { label: rfq.status, className: "bg-slate-50 text-slate-700" };
+
+                    return (
+                      <TableRow key={rfq.id}>
+                        <TableCell className="font-medium">{rfq.quoteNumber}</TableCell>
+                        <TableCell className="text-slate-500">
+                          {format(new Date(rfq.createdAt), "dd MMM yyyy", { locale: id })}
+                        </TableCell>
+                        <TableCell>{rfq.items.length} produk</TableCell>
+                        <TableCell>
+                          <Badge variant="secondary" className={config.className}>
+                            {config.label}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="outline" size="sm" asChild>
+                            <Link href={`/business/rfq/${rfq.id}`}>
+                              <Eye className="h-4 w-4 mr-2" />
+                              Lihat
+                            </Link>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
               </TableBody>
             </Table>
           </div>
