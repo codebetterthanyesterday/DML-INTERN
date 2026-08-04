@@ -69,11 +69,11 @@ export function ManageAdminsClient({ admins }: ManageAdminsClientProps) {
     });
     
     if (res.success) {
-      toast.success(res.message);
+      toast.success(res.message || "Success");
       setIsCreateOpen(false);
       resetForm();
     } else {
-      toast.error(res.error);
+      toast.error(res.error || "An error occurred");
     }
     setIsLoading(false);
   };
@@ -91,11 +91,11 @@ export function ManageAdminsClient({ admins }: ManageAdminsClientProps) {
     });
 
     if (res.success) {
-      toast.success(res.message);
+      toast.success(res.message || "Success");
       setIsEditOpen(false);
       resetForm();
     } else {
-      toast.error(res.error);
+      toast.error(res.error || "An error occurred");
     }
     setIsLoading(false);
   };
@@ -104,9 +104,9 @@ export function ManageAdminsClient({ admins }: ManageAdminsClientProps) {
     if (confirm(`Apakah Anda yakin ingin ${admin.isSuspended ? 'memulihkan' : 'menangguhkan'} akun admin ini?`)) {
       const res = await toggleAdminSuspension(admin.id, !admin.isSuspended);
       if (res.success) {
-        toast.success(res.message);
+        toast.success(res.message || "Success");
       } else {
-        toast.error(res.error);
+        toast.error(res.error || "An error occurred");
       }
     }
   };

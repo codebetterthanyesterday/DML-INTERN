@@ -60,7 +60,7 @@ export default async function KatalogPage({
   if (sort === "price-asc") orderBy = { price: "asc" }
   if (sort === "price-desc") orderBy = { price: "desc" }
 
-  const [dbProducts, totalCount, dbCategories] = await prisma.$transaction([
+  const [dbProducts, totalCount, dbCategories] = await Promise.all([
     prisma.product.findMany({
       where,
       include: {

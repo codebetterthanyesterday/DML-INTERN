@@ -15,11 +15,13 @@ import {
   ShieldCheck,
   BarChart3,
   Settings,
+  Layers,
 } from "lucide-react";
 
 const navigation = [
   { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
   { name: "Produk", href: "/admin/products", icon: Package },
+  { name: "Kategori", href: "/admin/categories", icon: Layers },
   { name: "Pesanan", href: "/admin/orders", icon: ShoppingCart },
   { name: "RFQ", href: "/admin/quotes", icon: FileText },
   { name: "Akun & Pengguna", href: "/admin/accounts", icon: Users },
