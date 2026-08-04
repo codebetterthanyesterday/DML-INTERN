@@ -24,7 +24,7 @@ import { Separator } from "@/components/ui/separator"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
-import { Address, CartItem, Product } from "@prisma/client"
+import { Address, CartItem, Product } from "@prisma/client/browser"
 
 const SHIPPING_METHODS = [
   {

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getAdminProducts } from "@/lib/actions/products";
 import { ProductTable } from "@/components/admin/products/ProductTable";
 import { ProductFilters } from "@/components/admin/products/ProductFilters";
+import { ImportProductsModal } from "@/components/admin/products/ImportProductsModal";
 import { Button } from "@/components/ui/button";
 import { Plus, Package, Store, Factory, Archive } from "lucide-react";
 
@@ -42,12 +43,15 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
             Tambah, edit, dan kelola seluruh produk platform DML.
           </p>
         </div>
-        <Link href="/admin/products/new">
-          <Button className="bg-red-600 hover:bg-red-700 text-white font-bold shadow-md shadow-red-600/20 gap-2">
-            <Plus className="w-4 h-4" />
-            Tambah Produk
-          </Button>
-        </Link>
+        <div className="flex items-center gap-3">
+          <ImportProductsModal />
+          <Link href="/admin/products/new">
+            <Button className="bg-red-600 hover:bg-red-700 text-white font-bold shadow-md shadow-red-600/20 gap-2">
+              <Plus className="w-4 h-4" />
+              Tambah Produk
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Stats Row */}

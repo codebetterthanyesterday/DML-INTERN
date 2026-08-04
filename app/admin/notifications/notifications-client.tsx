@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { markNotificationAsRead, markAllAdminNotificationsAsRead, generateDummyNotification } from "@/lib/actions/notifications";
-import { NotificationType } from "@prisma/client";
+import { NotificationType } from "@prisma/client/browser";
 
 // Format date nicely (e.g. "2 minutes ago", "1 hour ago", "yesterday")
 function formatTimeAgo(dateString: Date) {

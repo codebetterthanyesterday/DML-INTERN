@@ -8,7 +8,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { AddressForm, AddressFormValues } from "@/components/shared/AddressForm"
 import { deleteAddress, setDefaultAddress, createAddress, updateAddress } from "@/lib/actions/addresses"
 import toast from "react-hot-toast"
-import { Address } from "@prisma/client"
+import { Address } from "@prisma/client/browser"
 
 interface AddressListProps {
   addresses: Address[]

@@ -19,7 +19,7 @@ import {
   markNotificationAsRead, 
   markAllAdminNotificationsAsRead 
 } from "@/lib/actions/notifications";
-import { NotificationType } from "@prisma/client";
+import { NotificationType } from "@prisma/client/browser";
 
 // Format date nicely (e.g. "2 minutes ago", "1 hour ago", "yesterday")
 function formatTimeAgo(dateString: Date) {

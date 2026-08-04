@@ -36,7 +36,7 @@ import {
 } from "lucide-react";
 import type { SerializedOrder } from "@/lib/actions/orders";
 import { updateOrderStatus } from "@/lib/actions/orders";
-import { OrderStatus } from "@prisma/client";
+import { OrderStatus } from "@prisma/client/browser";
 
 // ─── Status config ─────────────────────────────────────────────────────────
 

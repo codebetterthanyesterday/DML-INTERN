@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ArrowLeft, Save, Loader2, AlertCircle } from "lucide-react";
-import type { Product, Category, ProductImage } from "@prisma/client";
+import type { Product, Category, ProductImage } from "@prisma/client/browser";
 import type { ProductFormState } from "@/lib/actions/products";
 
 type ProductWithRelations = Omit<Product, "price"> & {

@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { MoreHorizontal, Pencil, Trash2, ToggleLeft, ToggleRight, ImageOff, Eye, Package, Tag } from "lucide-react";
 import { deleteProduct, toggleProductStatus } from "@/lib/actions/products";
-import type { Product, Category, ProductImage } from "@prisma/client";
+import type { Product, Category, ProductImage } from "@prisma/client/browser";
 import { ProductDetailsSheet } from "./ProductDetailsSheet";
 
 type ProductWithRelations = Omit<Product, "price"> & {

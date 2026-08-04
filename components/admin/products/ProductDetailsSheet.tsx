@@ -24,7 +24,7 @@ import {
   CheckCircle2,
   XCircle
 } from "lucide-react";
-import type { Product, Category, ProductImage } from "@prisma/client";
+import type { Product, Category, ProductImage } from "@prisma/client/browser";
 
 type ProductWithRelations = Omit<Product, "price"> & {
   price: number | null;

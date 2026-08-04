@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { formatDistanceToNow } from "date-fns";
 import { id } from "date-fns/locale";
 import { Activity, UserCheck, UserX, FileCheck, FileX, RefreshCw, AlertCircle } from "lucide-react";
-import { AuditAction } from "@prisma/client";
+import { AuditAction } from "@prisma/client/browser";
 
 interface LogEntry {
   id: string;

@@ -1,0 +1,6 @@
+sku,name,categorySlug,description,productType,price,unit,stock,minOrderQty,weight,isActive
+TEST-001,Mesin Bor Listrik,alat-keselamatan-kerja,Bor listrik kuat dan tahan lama,INDUSTRIAL,450000,pcs,25,1,2000,true
+TEST-002,Paku Payung,helm-proyek,Paku payung berkualitas tinggi,RETAIL,500,pcs,1000,100,5,true
+TEST-003,Gergaji Kayu,alat-keselamatan-kerja,Gergaji tangan untuk memotong kayu,BOTH,75000,pcs,50,2,500,true
+TEST-004,Semen Tiga Roda,helm-proyek,Semen berkualitas untuk konstruksi,RETAIL,60000,sak,100,1,50000,true
+TEST-005,Kabel Listrik NYM,packaging,Kabel listrik tebal 1 roll,BOTH,150000,roll,30,1,1000,true
