@@ -115,9 +115,6 @@ export function CmsEditorSheet({ initialData }: CmsEditorSheetProps) {
                   <TabsTrigger value="hero" className="flex-1 rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.1),_0_1px_2px_-1px_rgba(0,0,0,0.05)] data-[state=active]:text-red-600 font-bold transition-all duration-300 py-2 sm:py-2.5 text-xs sm:text-sm flex items-center justify-center gap-2 text-slate-500 min-w-[120px]">
                     <LayoutTemplate className="w-4 h-4 hidden sm:block" /> Hero 
                   </TabsTrigger>
-                  <TabsTrigger value="features" className="flex-1 rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.1),_0_1px_2px_-1px_rgba(0,0,0,0.05)] data-[state=active]:text-red-600 font-bold transition-all duration-300 py-2 sm:py-2.5 text-xs sm:text-sm flex items-center justify-center gap-2 text-slate-500 min-w-[120px]">
-                    <Layers className="w-4 h-4 hidden sm:block" /> Features
-                  </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="hero" className="space-y-6 sm:space-y-8 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out">
@@ -177,33 +174,6 @@ export function CmsEditorSheet({ initialData }: CmsEditorSheetProps) {
                       </div>
                     </div>
                   </div>
-                </TabsContent>
-
-                <TabsContent value="features" className="space-y-5 sm:space-y-6 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out">
-                  {[0, 1, 2].map((index) => (
-                    <div key={index} className="p-5 sm:p-6 bg-white/70 backdrop-blur-md rounded-3xl sm:rounded-[24px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/60 space-y-5 sm:space-y-6 relative overflow-hidden group hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-500">
-                      <div className="absolute top-0 left-0 w-1.5 h-full bg-slate-200 group-hover:bg-gradient-to-b group-hover:from-red-500 group-hover:to-rose-400 transition-all duration-500"></div>
-                      
-                      <h4 className="font-extrabold text-xs sm:text-sm text-slate-900 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 text-slate-500 flex items-center justify-center text-[10px] sm:text-xs font-bold border border-white shadow-sm group-hover:text-red-600 transition-colors">0{index + 1}</span>
-                          Kartu Layanan
-                        </div>
-                      </h4>
-                      
-                      <div className={inputWrapperClassName}>
-                        <Label htmlFor={`valueProps.${index}.title`} className={labelClassName}>Judul Kartu</Label>
-                        <Input id={`valueProps.${index}.title`} className={inputClassName} {...register(`valueProps.${index}.title` as const)} />
-                      </div>
-                      
-                      <div className={inputWrapperClassName}>
-                        <Label htmlFor={`valueProps.${index}.description`} className={labelClassName}>Deskripsi</Label>
-                        <Textarea id={`valueProps.${index}.description`} className={`${inputClassName} resize-none rounded-2xl sm:rounded-[20px]`} {...register(`valueProps.${index}.description` as const)} rows={3} />
-                      </div>
-                      
-                      <input type="hidden" {...register(`valueProps.${index}.icon` as const)} />
-                    </div>
-                  ))}
                 </TabsContent>
               </Tabs>
             </form>

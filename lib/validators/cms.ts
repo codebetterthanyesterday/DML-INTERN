@@ -17,7 +17,7 @@ export const landingPageSchema = z.object({
       title: z.string().min(1, "Title is required"),
       description: z.string().min(1, "Description is required"),
     })
-  ).length(3)
+  ).min(1, "At least one value proposition is required")
 })
 
 export type LandingPageContent = z.infer<typeof landingPageSchema>
@@ -57,7 +57,7 @@ export const tentangPageSchema = z.object({
       description: z.string().min(1, "Deskripsi tidak boleh kosong"),
       listItems: z.array(z.string()).optional(),
     })
-  ).length(3, "Harus tepat 3 highlight cards"),
+  ).min(1, "Minimal 1 highlight"),
   team: z.array(
     z.object({
       name: z.string().min(1, "Nama tidak boleh kosong"),

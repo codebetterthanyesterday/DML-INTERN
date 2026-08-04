@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import { getLandingPageContent } from "@/app/actions/cms"
 import { CmsEditorSheet } from "@/components/cms/cms-editor-sheet"
+import { ValuePropsEditor } from "@/components/cms/value-props-editor"
 import { AddToCartIconBtn } from "@/components/shared/AddToCartIconBtn"
 
 export default async function LandingPage() {
@@ -100,33 +101,7 @@ export default async function LandingPage() {
         </section>
 
         {/* VALUE PROPOSITIONS */}
-        <section className="py-16 bg-white relative z-20 -mt-10 sm:-mt-16 mx-4 sm:mx-6 lg:mx-auto max-w-7xl rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100">
-          <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-100">
-            <div className="p-8 text-center flex flex-col items-center group">
-              <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-950 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
-                <ShoppingBag className="w-7 h-7" />
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">{cmsData.valueProps[0].title}</h3>
-              <p className="text-sm text-slate-500">{cmsData.valueProps[0].description}</p>
-            </div>
-
-            <div className="p-8 text-center flex flex-col items-center group">
-              <div className="w-14 h-14 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
-                <Factory className="w-7 h-7" />
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">{cmsData.valueProps[1].title}</h3>
-              <p className="text-sm text-slate-500">{cmsData.valueProps[1].description}</p>
-            </div>
-
-            <div className="p-8 text-center flex flex-col items-center group">
-              <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-950 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
-                <ShieldCheck className="w-7 h-7" />
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">{cmsData.valueProps[2].title}</h3>
-              <p className="text-sm text-slate-500">{cmsData.valueProps[2].description}</p>
-            </div>
-          </div>
-        </section>
+        <ValuePropsEditor cmsData={cmsData} isAdmin={userRole === "ADMIN"} />
 
         {/* FEATURED PRODUCTS */}
         <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">

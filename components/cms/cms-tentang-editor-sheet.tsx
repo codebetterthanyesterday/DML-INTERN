@@ -44,10 +44,7 @@ export function CmsTentangEditorSheet({ initialData }: CmsTentangEditorSheetProp
     defaultValues: initialData
   })
 
-  const { fields: teamFields, append: appendTeam, remove: removeTeam } = useFieldArray({
-    control,
-    name: "team"
-  })
+
 
   const onSubmit = (data: TentangPageContent) => {
     startTransition(async () => {
@@ -118,8 +115,6 @@ export function CmsTentangEditorSheet({ initialData }: CmsTentangEditorSheetProp
                 <TabsList className="grid w-full grid-cols-4 bg-slate-200/50 p-1 rounded-xl">
                   <TabsTrigger value="hero" className="rounded-lg text-xs font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">Hero</TabsTrigger>
                   <TabsTrigger value="about" className="rounded-lg text-xs font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">Profil</TabsTrigger>
-                  <TabsTrigger value="highlights" className="rounded-lg text-xs font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">Highlight</TabsTrigger>
-                  <TabsTrigger value="team" className="rounded-lg text-xs font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">Tim</TabsTrigger>
                 </TabsList>
               </div>
 
@@ -187,62 +182,8 @@ export function CmsTentangEditorSheet({ initialData }: CmsTentangEditorSheetProp
                   </div>
                 </TabsContent>
 
-                {/* HIGHLIGHTS TAB */}
-                <TabsContent value="highlights" className="mt-0 space-y-8 outline-none">
-                  {[0, 1, 2].map((i) => (
-                    <div key={i} className="p-5 bg-white/50 border border-slate-200/60 rounded-2xl space-y-4">
-                      <h4 className="text-xs font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2">
-                        <span className="w-5 h-5 rounded bg-indigo-100 text-indigo-700 flex items-center justify-center text-[10px]">{i + 1}</span> 
-                        Highlight Card
-                      </h4>
-                      <div className={inputWrapperClassName}>
-                        <label className={labelClassName}>Nama Icon (Lucide)</label>
-                        <Input {...register(`highlights.${i}.icon` as const)} className={inputClassName} />
-                      </div>
-                      <div className={inputWrapperClassName}>
-                        <label className={labelClassName}>Judul</label>
-                        <Input {...register(`highlights.${i}.title` as const)} className={inputClassName} />
-                      </div>
-                      <div className={inputWrapperClassName}>
-                        <label className={labelClassName}>Deskripsi</label>
-                        <Textarea {...register(`highlights.${i}.description` as const)} className={`${inputClassName} min-h-[80px] resize-y`} />
-                      </div>
-                      {/* For simplicity in the form, listItems editing is omitted here, they will just preserve what's there unless we build a complex array field. Since we know Card 2 has listItems, we could map them if they exist, but letting it be is fine for this iteration. */}
-                    </div>
-                  ))}
-                </TabsContent>
 
-                {/* TEAM TAB */}
-                <TabsContent value="team" className="mt-0 space-y-4 outline-none">
-                  <div className="flex justify-between items-center mb-2">
-                    <p className="text-xs text-slate-500 font-medium">Atur anggota tim manajemen Anda.</p>
-                    <Button type="button" size="sm" variant="outline" onClick={() => appendTeam({ name: "", role: "", initial: "" })} className="rounded-lg text-xs h-8">
-                      <Plus className="w-3 h-3 mr-1" /> Tambah
-                    </Button>
-                  </div>
-                  
-                  {teamFields.map((field, index) => (
-                    <div key={field.id} className="p-4 bg-white/50 border border-slate-200/60 rounded-2xl flex items-start gap-4 group">
-                      <div className="flex-1 grid grid-cols-2 gap-3">
-                        <div className={inputWrapperClassName}>
-                          <label className={labelClassName}>Nama</label>
-                          <Input {...register(`team.${index}.name` as const)} className={inputClassName} />
-                        </div>
-                        <div className={inputWrapperClassName}>
-                          <label className={labelClassName}>Inisial</label>
-                          <Input {...register(`team.${index}.initial` as const)} className={inputClassName} />
-                        </div>
-                        <div className={`${inputWrapperClassName} col-span-2`}>
-                          <label className={labelClassName}>Role / Jabatan</label>
-                          <Input {...register(`team.${index}.role` as const)} className={inputClassName} />
-                        </div>
-                      </div>
-                      <button type="button" onClick={() => removeTeam(index)} className="mt-6 text-slate-400 hover:text-red-500 transition-colors">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                </TabsContent>
+
               </div>
             </Tabs>
           </form>
