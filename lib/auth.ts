@@ -10,14 +10,14 @@ declare module "next-auth" {
   interface User {
     id: string
     rememberMe?: boolean
-    role: "CUSTOMER" | "BUSINESS" | "ADMIN"
+    role: "CUSTOMER" | "BUSINESS" | "ADMIN" | "SUPER_ADMIN"
     companyName?: string | null
     isSuspended?: boolean
   }
   interface Session {
     user: User & {
       rememberMe?: boolean
-      role: "CUSTOMER" | "BUSINESS" | "ADMIN"
+      role: "CUSTOMER" | "BUSINESS" | "ADMIN" | "SUPER_ADMIN"
       companyName?: string | null
       isSuspended?: boolean
     }
@@ -28,7 +28,7 @@ declare module "next-auth/jwt" {
   interface JWT {
     id: string
     rememberMe?: boolean
-    role: "CUSTOMER" | "BUSINESS" | "ADMIN"
+    role: "CUSTOMER" | "BUSINESS" | "ADMIN" | "SUPER_ADMIN"
     companyName?: string | null
     isSuspended?: boolean
   }
@@ -122,7 +122,7 @@ export const authConfig: NextAuthConfig = {
         }
 
         session.user.id = token.id as string
-        session.user.role = token.role as "CUSTOMER" | "BUSINESS" | "ADMIN"
+        session.user.role = token.role as "CUSTOMER" | "BUSINESS" | "ADMIN" | "SUPER_ADMIN"
         session.user.companyName = token.companyName as string | null
         session.user.isSuspended = token.isSuspended as boolean | undefined
       }

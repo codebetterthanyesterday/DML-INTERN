@@ -10,7 +10,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // ============================================
@@ -21,6 +20,7 @@ enum Role {
   CUSTOMER
   BUSINESS
   ADMIN
+  SUPER_ADMIN
 }
 
 enum BusinessStatus {
@@ -99,6 +99,7 @@ enum NotificationType {
   PAYMENT_RECEIVED
   SYSTEM_ALERT
   BUSINESS_VERIFICATION
+  LOW_STOCK_ALERT
 }
 
 enum AuditAction {

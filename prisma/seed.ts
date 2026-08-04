@@ -1,7 +1,5 @@
-import { Prisma, PrismaClient } from '@prisma/client'
+import prisma from '../lib/prisma'
 import bcrypt from 'bcryptjs'
-
-const prisma = new PrismaClient()
 
 async function main() {
   console.log('Seeding database...')
@@ -34,6 +32,16 @@ async function main() {
       passwordHash,
       role: 'ADMIN',
       phone: '08111111111',
+    },
+  })
+
+  const superAdmin = await prisma.user.create({
+    data: {
+      name: 'Super Admin User',
+      email: 'superadmin@dml.com',
+      passwordHash,
+      role: 'SUPER_ADMIN',
+      phone: '08999999999',
     },
   })
 

@@ -1,8 +1,5 @@
-import { PrismaClient } from '@prisma/client'
+import prisma from '../lib/prisma'
 import bcrypt from 'bcryptjs'
-
-const prisma = new PrismaClient()
-
 async function main() {
   const passwordHash = await bcrypt.hash('password123', 10)
   const email = `test.customer.${Date.now()}@test.com`
