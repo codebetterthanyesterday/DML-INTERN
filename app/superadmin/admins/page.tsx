@@ -3,19 +3,34 @@ export const metadata = {
   description: "Manajemen akun Admin",
 };
 
-export default function SuperAdminManageAdminsPage() {
+import prisma from "@/lib/prisma";
+import { ManageAdminsClient } from "@/components/superadmin/ManageAdminsClient";
+
+export const dynamic = "force-dynamic";
+
+export default async function SuperAdminAdminsPage() {
+  const admins = await prisma.user.findMany({
+    where: { role: "ADMIN" },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      isSuspended: true,
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-indigo-950">Kelola Admin</h1>
-        <p className="text-slate-500 mt-2">
-          Halaman ini digunakan untuk mengelola akun Admin pada platform.
+        <h1 className="text-3xl font-bold text-indigo-950">Kelola Admin</h1>
+        <p className="text-slate-600 mt-2">
+          Tambah, perbarui, atau tangguhkan akun administrator sistem.
         </p>
       </div>
 
-      <div className="rounded-xl border bg-white p-6 shadow-sm min-h-[400px] flex items-center justify-center text-slate-400">
-        <p>Fitur Kelola Admin akan dikembangkan di sini.</p>
-      </div>
+      <ManageAdminsClient admins={admins} />
     </div>
   );
 }
