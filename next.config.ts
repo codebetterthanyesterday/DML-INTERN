@@ -23,9 +23,6 @@ const nextConfig: NextConfig = {
 
   //Ignore error build 
   //Karna ada error pada bagian admin dan tidak bisa run build kalau tidak di ignore
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   typescript: {
     ignoreBuildErrors: true,
   },
