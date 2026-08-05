@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { OrderPaymentStatus, PaymentStatus } from '@prisma/client';
 import { createAdminNotification } from '@/lib/actions/notifications';
+import { notifyIfLowStock } from '@/lib/actions/products';
 
 export async function POST(req: Request) {
   try {
@@ -20,7 +21,14 @@ export async function POST(req: Request) {
     // 3. Find Order and Payment
     const order = await prisma.order.findUnique({
       where: { orderNumber: external_id },
-      include: { payment: true },
+      include: {
+        payment: true,
+        items: {
+          include: {
+            product: { select: { id: true, name: true, sku: true, stock: true, lowStockThreshold: true } },
+          },
+        },
+      },
     });
 
     if (!order || !order.payment) {
@@ -32,6 +40,12 @@ export async function POST(req: Request) {
     let newOrderPaymentStatus = order.paymentStatus;
     let paidAt = order.payment.paidAt;
 
+    // Guard against duplicate webhook deliveries: only treat this as a
+    // "fresh" payment confirmation if the order wasn't already marked PAID.
+    const isNewlyPaid =
+      (status === 'PAID' || status === 'SETTLED') &&
+      order.paymentStatus !== OrderPaymentStatus.PAID;
+
     if (status === 'PAID' || status === 'SETTLED') {
       newPaymentStatus = PaymentStatus.SUCCESS;
       newOrderPaymentStatus = OrderPaymentStatus.PAID;
@@ -41,22 +55,34 @@ export async function POST(req: Request) {
       newOrderPaymentStatus = OrderPaymentStatus.UNPAID; // Order can be marked as failed if expired, depends on business logic
     }
 
-    // 5. Update Database Transactionally
-    await prisma.$transaction([
-      prisma.payment.update({
-        where: { id: order.payment.id },
-        data: { 
+    // 5. Update Database Transactionally (payment/order status + stock deduction)
+    await prisma.$transaction(async (tx) => {
+      await tx.payment.update({
+        where: { id: order.payment!.id },
+        data: {
           status: newPaymentStatus,
           paidAt: paidAt
         },
-      }),
-      prisma.order.update({
+      });
+
+      await tx.order.update({
         where: { id: order.id },
-        data: { 
+        data: {
           paymentStatus: newOrderPaymentStatus,
         },
-      })
-    ]);
+      });
+
+      // Decrement stock only once, the first time this order is confirmed paid,
+      // so retried/duplicate webhook calls don't deduct stock twice.
+      if (isNewlyPaid) {
+        for (const item of order.items) {
+          await tx.product.update({
+            where: { id: item.productId },
+            data: { stock: { decrement: item.qty } },
+          });
+        }
+      }
+    });
 
     // Notify admins when payment succeeds
     if (status === 'PAID' || status === 'SETTLED') {
@@ -66,6 +92,20 @@ export async function POST(req: Request) {
         message: `Pembayaran untuk pesanan ${order.orderNumber} senilai Rp ${Number(order.totalAmount).toLocaleString("id-ID")} telah berhasil dikonfirmasi.`,
         linkUrl: `/admin/orders`,
       }).catch(() => {});
+    }
+
+    // Check for low stock and notify admins, once per newly-paid order
+    if (isNewlyPaid) {
+      for (const item of order.items) {
+        const newStock = item.product.stock - item.qty;
+        await notifyIfLowStock({
+          id: item.product.id,
+          name: item.product.name,
+          sku: item.product.sku,
+          stock: newStock,
+          lowStockThreshold: item.product.lowStockThreshold,
+        }).catch(() => {});
+      }
     }
 
     return NextResponse.json({ message: 'Webhook processed successfully' }, { status: 200 });

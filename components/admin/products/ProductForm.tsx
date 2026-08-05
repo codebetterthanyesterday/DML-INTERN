@@ -216,6 +216,21 @@ export function ProductForm({ action, categories, product, mode }: ProductFormPr
                   />
                 </div>
                 <div className="space-y-1">
+                  <Label htmlFor="lowStockThreshold" className="text-sm font-bold text-slate-700">
+                    Batas Stok Menipis
+                    <span className="ml-1 text-xs font-normal text-slate-400">alert admin</span>
+                  </Label>
+                  <Input
+                    id="lowStockThreshold"
+                    name="lowStockThreshold"
+                    type="number"
+                    min="0"
+                    defaultValue={product?.lowStockThreshold ?? 5}
+                    className={`border-slate-200 focus:border-blue-900 ${state.fieldErrors?.lowStockThreshold ? "border-red-400" : ""}`}
+                  />
+                  {state.fieldErrors?.lowStockThreshold && <p className="text-xs text-red-500 font-medium">{state.fieldErrors.lowStockThreshold}</p>}
+                </div>
+                <div className="space-y-1">
                   <Label htmlFor="weight" className="text-sm font-bold text-slate-700">
                     Berat (gram) <span className="text-red-500">*</span>
                   </Label>
