@@ -7,10 +7,11 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FileUp, Download, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
+import { FileUp, Download, AlertCircle, CheckCircle2, Loader2, ChevronDown, ChevronRight, ArrowUpRight } from "lucide-react";
 import toast from "react-hot-toast";
-import { importProducts } from "@/lib/actions/import";
+import { importProducts, type ImportProductsResult, type ImportedProductDetail } from "@/lib/actions/import";
 import { importProductRowSchema, ImportProductRow } from "@/lib/validations/import";
+import { ProductDetailsSheet, type ProductWithRelations } from "./ProductDetailsSheet";
 
 export function ImportProductsModal() {
   const router = useRouter();
@@ -19,6 +20,9 @@ export function ImportProductsModal() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [previewData, setPreviewData] = useState<ImportProductRow[]>([]);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [importResult, setImportResult] = useState<ImportProductsResult | null>(null);
+  const [updatedItemsOpen, setUpdatedItemsOpen] = useState(true);
+  const [selectedProduct, setSelectedProduct] = useState<ProductWithRelations | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDownloadTemplate = () => {
@@ -49,8 +53,19 @@ export function ImportProductsModal() {
       setFile(selectedFile);
       setPreviewData([]);
       setValidationErrors([]);
+      setImportResult(null);
+      setSelectedProduct(null);
     }
   };
+
+  const mapImportedProductToDetailsSheetProduct = (
+    product: ImportedProductDetail
+  ): ProductWithRelations => ({
+    ...product,
+    createdAt: new Date(product.createdAt),
+    updatedAt: new Date(product.updatedAt),
+    specifications: null,
+  });
 
   const parseFile = async () => {
     if (!file) return;
@@ -111,15 +126,22 @@ export function ImportProductsModal() {
     
     try {
       const res = await importProducts(previewData);
-      
-      if (res.errors && res.errors.length > 0) {
-        toast.error(`Berhasil import ${res.success}. Gagal ${res.failed}.`);
-        setValidationErrors(res.errors);
+      setImportResult(res);
+      setValidationErrors(res.errors);
+      setPreviewData([]);
+      setFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      setUpdatedItemsOpen(true);
+
+      if (res.failed > 0) {
+        toast.error(`Import selesai: ${res.success} berhasil, ${res.failed} gagal.`);
+      } else if (res.updated > 0) {
+        toast.success(`Import selesai: ${res.success} berhasil, ${res.updated} produk diperbarui.`);
       } else {
         toast.success(`Berhasil mengimport ${res.success} produk!`);
-        resetModal();
-        router.refresh();
       }
+
+      router.refresh();
     } catch (error) {
       toast.error("Terjadi kesalahan sistem saat import.");
     } finally {
@@ -132,7 +154,14 @@ export function ImportProductsModal() {
     setFile(null);
     setPreviewData([]);
     setValidationErrors([]);
+    setImportResult(null);
+    setUpdatedItemsOpen(true);
+    setSelectedProduct(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleOpenProduct = (product: ImportedProductDetail) => {
+    setSelectedProduct(mapImportedProductToDetailsSheetProduct(product));
   };
 
   return (
@@ -146,7 +175,7 @@ export function ImportProductsModal() {
           Import Produk
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-[calc(100vw-1rem)] sm:max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">Import Produk via Excel/CSV</DialogTitle>
           <DialogDescription>
@@ -192,14 +221,105 @@ export function ImportProductsModal() {
             </div>
           </div>
 
-          {validationErrors.length > 0 && (
-            <div className="bg-red-50 border border-red-200 rounded-xl p-4 max-h-48 overflow-y-auto">
-              <h4 className="font-semibold text-red-800 mb-2">Ditemukan Kesalahan:</h4>
-              <ul className="text-sm text-red-600 space-y-1 list-disc pl-5">
-                {validationErrors.map((err, i) => (
-                  <li key={i}>{err}</li>
-                ))}
-              </ul>
+          {(validationErrors.length > 0 || importResult) && (
+            <div className="space-y-4">
+              {validationErrors.length > 0 && (
+                <div className="bg-red-50 border border-red-200 rounded-2xl p-4 sm:p-5 max-h-56 overflow-y-auto">
+                  <h4 className="font-semibold text-red-800 mb-2">Ditemukan Kesalahan:</h4>
+                  <ul className="text-sm text-red-600 space-y-1 list-disc pl-5">
+                    {validationErrors.map((err, i) => (
+                      <li key={i}>{err}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {importResult && (
+                <div className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4 sm:p-5 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                    <div>
+                      <div className="flex items-center gap-2 text-emerald-800 font-semibold">
+                        <CheckCircle2 className="w-4 h-4" />
+                        Import selesai
+                      </div>
+                      <p className="text-sm text-emerald-700 mt-1">
+                        {importResult.success} produk berhasil diproses.
+                        {importResult.updated > 0 ? ` ${importResult.updated} produk diperbarui.` : ""}
+                        {importResult.created > 0 ? ` ${importResult.created} produk baru ditambahkan.` : ""}
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full sm:w-auto">
+                      {[
+                        { label: "Berhasil", value: importResult.success, tone: "text-emerald-700 bg-white border-emerald-200" },
+                        { label: "Baru", value: importResult.created, tone: "text-blue-700 bg-white border-blue-200" },
+                        { label: "Diperbarui", value: importResult.updated, tone: "text-amber-700 bg-white border-amber-200" },
+                        { label: "Gagal", value: importResult.failed, tone: "text-red-700 bg-white border-red-200" },
+                      ].map((item) => (
+                        <div key={item.label} className={`rounded-xl border px-3 py-2 ${item.tone}`}>
+                          <div className="text-[11px] uppercase tracking-wider font-semibold opacity-70">{item.label}</div>
+                          <div className="text-lg font-extrabold leading-none mt-1">{item.value}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {importResult.updatedProducts.length > 0 && (
+                    <div className="rounded-2xl border border-amber-200 bg-white/90 overflow-hidden">
+                      <button
+                        type="button"
+                        onClick={() => setUpdatedItemsOpen((open) => !open)}
+                        className="w-full flex items-center justify-between gap-3 p-4 text-left hover:bg-amber-50 transition-colors"
+                      >
+                        <div>
+                          <h4 className="font-semibold text-amber-900">Produk yang diperbarui</h4>
+                          <p className="text-sm text-amber-700">
+                            Klik item untuk melihat detail produk.
+                          </p>
+                        </div>
+                        {updatedItemsOpen ? (
+                          <ChevronDown className="w-5 h-5 text-amber-700 shrink-0" />
+                        ) : (
+                          <ChevronRight className="w-5 h-5 text-amber-700 shrink-0" />
+                        )}
+                      </button>
+
+                      {updatedItemsOpen && (
+                        <div className="border-t border-amber-100 p-3 sm:p-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {importResult.updatedProducts.map((product) => (
+                              <button
+                                key={product.id}
+                                type="button"
+                                onClick={() => handleOpenProduct(product)}
+                                className="w-full rounded-xl border border-slate-200 bg-white p-3 text-left shadow-sm hover:border-blue-300 hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              >
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="min-w-0">
+                                    <div className="font-semibold text-slate-900 truncate">{product.name}</div>
+                                    <div className="text-xs text-slate-500 mt-0.5 font-mono truncate">{product.sku}</div>
+                                  </div>
+                                  <ArrowUpRight className="w-4 h-4 text-blue-600 shrink-0" />
+                                </div>
+                                <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+                                  <span className="rounded-full bg-slate-100 px-2.5 py-1 font-semibold text-slate-600">
+                                    {product.category.name}
+                                  </span>
+                                  <span className="rounded-full bg-amber-50 px-2.5 py-1 font-semibold text-amber-700">
+                                    {product.productType}
+                                  </span>
+                                  <span className="rounded-full bg-emerald-50 px-2.5 py-1 font-semibold text-emerald-700">
+                                    Stok {product.stock.toLocaleString("id-ID")}
+                                  </span>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
@@ -262,6 +382,12 @@ export function ImportProductsModal() {
           )}
         </div>
       </DialogContent>
+
+      <ProductDetailsSheet
+        product={selectedProduct}
+        open={!!selectedProduct}
+        onOpenChange={(open) => !open && setSelectedProduct(null)}
+      />
     </Dialog>
   );
 }

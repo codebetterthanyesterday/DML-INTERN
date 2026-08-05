@@ -24,12 +24,38 @@ import {
   CheckCircle2,
   XCircle
 } from "lucide-react";
-import type { Product, Category, ProductImage } from "@prisma/client/browser";
+import type { ProductType } from "@prisma/client/browser";
 
-type ProductWithRelations = Omit<Product, "price"> & {
+type ProductCategory = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
+type ProductImageItem = {
+  id: string;
+  url: string;
+  displayOrder: number;
+};
+
+export type ProductWithRelations = {
+  id: string;
+  name: string;
+  slug: string;
+  sku: string;
+  description: string | null;
+  productType: ProductType;
   price: number | null;
-  category: Category;
-  images: ProductImage[];
+  unit: string;
+  stock: number;
+  minOrderQty: number;
+  weight: number;
+  isActive: boolean;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+  specifications: unknown | null;
+  category: ProductCategory;
+  images: ProductImageItem[];
 };
 
 interface ProductDetailsSheetProps {

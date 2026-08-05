@@ -214,6 +214,39 @@ export async function toggleProductStatus(id: string, currentStatus: boolean) {
 
 // ─── Delete Product ───────────────────────────────────────────────────────────
 export async function deleteProduct(id: string) {
-  await prisma.product.delete({ where: { id } });
-  revalidatePath("/admin/products");
+  const isForeignKeyConstraintError = (error: unknown) => {
+    if (!error || typeof error !== "object") return false;
+
+    const code = (error as { code?: unknown }).code;
+    if (code === "P2003" || code === "23001") return true;
+
+    const messageParts = [
+      (error as { message?: unknown }).message,
+      (error as { cause?: unknown }).cause,
+      (error as { meta?: unknown }).meta,
+    ]
+      .filter((part): part is string => typeof part === "string")
+      .join(" ")
+      .toLowerCase();
+
+    return (
+      messageParts.includes("foreign key") ||
+      messageParts.includes("violates restrict setting") ||
+      messageParts.includes("order_items_productid_fkey") ||
+      messageParts.includes("cart_items_productid_fkey") ||
+      messageParts.includes("quote_items_productid_fkey") ||
+      messageParts.includes("reviews_productid_fkey")
+    );
+  };
+
+  try {
+    await prisma.product.delete({ where: { id } });
+    revalidatePath("/admin/products");
+    return { success: true };
+  } catch (err: unknown) {
+    if (isForeignKeyConstraintError(err)) {
+      return { error: "Produk tidak dapat dihapus karena sudah terkait dengan pesanan, keranjang, atau data lain. Sebaiknya nonaktifkan produk ini." };
+    }
+    return { error: "Gagal menghapus produk. Silakan coba lagi." };
+  }
 }

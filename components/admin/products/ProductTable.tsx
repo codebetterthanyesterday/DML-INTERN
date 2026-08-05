@@ -34,6 +34,7 @@ import { MoreHorizontal, Pencil, Trash2, ToggleLeft, ToggleRight, ImageOff, Eye,
 import { deleteProduct, toggleProductStatus } from "@/lib/actions/products";
 import type { Product, Category, ProductImage } from "@prisma/client/browser";
 import { ProductDetailsSheet } from "./ProductDetailsSheet";
+import toast from "react-hot-toast";
 
 type ProductWithRelations = Omit<Product, "price"> & {
   price: number | null;
@@ -76,7 +77,20 @@ export function ProductTable({ products }: ProductTableProps) {
 
   const handleDelete = (id: string) => {
     startTransition(() => {
-      deleteProduct(id).then(() => setDeleteId(null));
+      deleteProduct(id)
+        .then((result) => {
+          if (result?.error) {
+            toast.error(result.error);
+          } else {
+            toast.success("Produk berhasil dihapus");
+          }
+        })
+        .catch(() => {
+          toast.error("Gagal menghapus produk. Silakan coba lagi.");
+        })
+        .finally(() => {
+          setDeleteId(null);
+        });
     });
   };
 
