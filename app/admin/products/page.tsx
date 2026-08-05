@@ -34,28 +34,28 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-blue-950">Kelola Produk</h1>
-          <p className="text-slate-500 mt-1 font-medium">
+    <div className="space-y-6 pb-8">
+      {/* Header Section */}
+      <div className="flex flex-col gap-4 sm:gap-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-blue-950 leading-tight">Kelola Produk</h1>
+          <p className="text-slate-600 mt-2 font-medium text-sm sm:text-base">
             Tambah, edit, dan kelola seluruh produk platform DML.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col xs:flex-row items-stretch xs:items-center gap-2 xs:gap-3 w-full sm:w-auto shrink-0">
           <ImportProductsModal />
-          <Link href="/admin/products/new">
-            <Button className="bg-red-600 hover:bg-red-700 text-white font-bold shadow-md shadow-red-600/20 gap-2">
-              <Plus className="w-4 h-4" />
-              Tambah Produk
+          <Link href="/admin/products/new" className="w-full xs:w-auto">
+            <Button className="w-full xs:w-auto bg-red-600 hover:bg-red-700 text-white font-bold shadow-md shadow-red-600/20 gap-2 transition-all duration-200">
+              <Plus className="w-4 h-4 shrink-0" />
+              <span>Tambah Produk</span>
             </Button>
           </Link>
         </div>
       </div>
 
-      {/* Stats Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[
           { 
             label: "Total Produk", 
@@ -96,32 +96,33 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
         ].map((stat) => {
           const Icon = stat.icon;
           return (
-          <div
-            key={stat.label}
-            className="group relative overflow-hidden rounded-2xl bg-white border border-slate-200/60 p-5 shadow-sm hover:shadow-xl hover:shadow-blue-900/5 hover:-translate-y-1 transition-all duration-300 ease-out"
-          >
-            <div className={`absolute inset-0 opacity-0 group-hover:opacity-5 bg-gradient-to-br ${stat.gradient} transition-opacity duration-300`} />
-            
-            <div className="flex items-center gap-4 relative z-10">
-              <div className={`p-3 rounded-xl ${stat.bg} ${stat.text} ring-1 ring-inset ${stat.ring} shadow-inner shrink-0`}>
-                <Icon className="w-6 h-6" strokeWidth={2.5} />
+            <div
+              key={stat.label}
+              className="group relative overflow-hidden rounded-xl sm:rounded-2xl bg-white border border-slate-200 p-4 sm:p-5 shadow-sm hover:shadow-lg hover:shadow-blue-900/8 hover:-translate-y-0.5 transition-all duration-300 ease-out"
+            >
+              <div className={`absolute inset-0 opacity-0 group-hover:opacity-5 bg-gradient-to-br ${stat.gradient} transition-opacity duration-300`} />
+              
+              <div className="flex items-center gap-3 sm:gap-4 relative">
+                <div className={`p-2.5 sm:p-3 rounded-lg sm:rounded-xl ${stat.bg} ${stat.text} ring-1 ring-inset ${stat.ring} shadow-inner shrink-0`}>
+                  <Icon className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.5} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight leading-none">{stat.value}</div>
+                  <div className="text-xs sm:text-sm font-bold text-slate-500 mt-1 sm:mt-1.5">{stat.label}</div>
+                </div>
               </div>
-              <div className="min-w-0">
-                <div className="text-3xl font-black text-slate-800 tracking-tight leading-none truncate">{stat.value}</div>
-                <div className="text-sm font-bold text-slate-500 mt-1.5 truncate">{stat.label}</div>
-              </div>
+              
+              <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${stat.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
             </div>
-            
-            <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${stat.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
-          </div>
-        )})}
+          );
+        })}
       </div>
 
       {/* Filters */}
       <ProductFilters currentQ={q} currentType={type} currentStatus={status} />
 
       {/* Table */}
-      <Suspense fallback={<div className="text-slate-400 text-sm py-8 text-center">Memuat produk...</div>}>
+      <Suspense fallback={<div className="text-slate-400 text-sm py-12 text-center font-medium">Memuat produk...</div>}>
         <ProductTable products={products} />
       </Suspense>
     </div>

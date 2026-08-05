@@ -73,10 +73,10 @@ async function OrdersContent({ searchParams }: PageProps) {
         {statCards.map((card) => (
           <div
             key={card.label}
-            className={`relative overflow-hidden rounded-2xl bg-[#fbfbfb] border border-slate-200/80 ${card.accentBorder} border-t-4 p-5 flex flex-col justify-between gap-4 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group`}
+            className={`relative overflow-hidden rounded-xl sm:rounded-2xl bg-[#fbfbfb] border border-slate-200/80 ${card.accentBorder} border-t-4 p-4 sm:p-5 flex flex-col justify-between gap-3 sm:gap-4 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group`}
           >
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0 flex-1">
                 <p className="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider truncate">{card.label}</p>
                 <p className="text-3xl font-black text-blue-950 tracking-tight mt-1">{card.value}</p>
               </div>
@@ -117,18 +117,18 @@ async function OrdersContent({ searchParams }: PageProps) {
 
 export default async function AdminOrdersPage({ searchParams }: PageProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-blue-950">Kelola Pesanan</h1>
-        <p className="text-slate-500 mt-1 font-medium">
+        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-blue-950">Kelola Pesanan</h1>
+        <p className="text-slate-500 mt-1 font-medium text-sm sm:text-base">
           Monitor dan update status seluruh pesanan masuk platform DML.
         </p>
       </div>
 
       <Suspense
         fallback={
-          <div className="rounded-xl border border-slate-200 bg-white p-16 flex flex-col items-center gap-3 text-slate-400">
+          <div className="rounded-xl border border-slate-200 bg-white p-10 sm:p-16 flex flex-col items-center gap-3 text-slate-400">
             <ShoppingCart className="w-8 h-8 animate-pulse" />
             <p className="text-sm font-semibold">Memuat pesanan...</p>
           </div>

@@ -5,6 +5,41 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { ProductType } from "@prisma/client";
 import { createAdminNotification } from "@/lib/actions/notifications";
+import { toPublicImageUrl } from "@/lib/blob";
+import { del } from "@vercel/blob";
+
+// ─── Product Images ────────────────────────────────────────────────────────────
+interface ProductImageInput {
+  url: string;
+  displayOrder: number;
+}
+
+// Parses the `images` hidden field populated by <ProductImageManager>. Falls
+// back to an empty list on malformed input rather than throwing, since a
+// missing/broken images field should never block saving the rest of the form.
+function parseImagesField(formData: FormData): ProductImageInput[] {
+  const raw = formData.get("images") as string | null;
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter((img): img is ProductImageInput => typeof img?.url === "string" && typeof img?.displayOrder === "number")
+      .map((img) => ({ url: img.url, displayOrder: img.displayOrder }));
+  } catch {
+    return [];
+  }
+}
+
+// Deletes now-orphaned blob files (images removed by the admin). Best-effort:
+// failures are logged but must never block the product save itself.
+async function deleteRemovedBlobs(removedUrls: string[]) {
+  await Promise.all(
+    removedUrls.map((url) =>
+      del(url).catch((err) => console.error("Failed to delete orphaned product image blob:", url, err))
+    )
+  );
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export interface ProductFormState {
@@ -15,7 +50,7 @@ export interface ProductFormState {
 
 // ─── List Products ────────────────────────────────────────────────────────────
 export async function getAdminProducts(query?: string, type?: string, status?: string) {
-  return await prisma.product.findMany({
+  const products = await prisma.product.findMany({
     where: {
       AND: [
         query
@@ -33,6 +68,13 @@ export async function getAdminProducts(query?: string, type?: string, status?: s
     include: { category: true, images: { take: 1 } },
     orderBy: { updatedAt: "desc" },
   });
+
+  // Product images are stored as private blob URLs — proxy them for display
+  // in the admin table/details sheet (see lib/blob.ts).
+  return products.map((product) => ({
+    ...product,
+    images: product.images.map((img) => ({ ...img, url: toPublicImageUrl(img.url) ?? img.url })),
+  }));
 }
 
 // ─── Get Single Product ───────────────────────────────────────────────────────
@@ -135,6 +177,7 @@ export async function createProduct(
 
     const finalStock = isNaN(stock) ? 0 : stock;
     const finalLowStockThreshold = isNaN(lowStockThreshold) ? 5 : lowStockThreshold;
+    const images = parseImagesField(formData);
 
     const newProduct = await prisma.product.create({
       data: {
@@ -152,6 +195,9 @@ export async function createProduct(
         description,
         specifications: Object.keys(specifications).length > 0 ? specifications : undefined,
         isActive,
+        images: images.length > 0
+          ? { createMany: { data: images.map(({ url, displayOrder }) => ({ url, displayOrder })) } }
+          : undefined,
       },
     });
 
@@ -243,6 +289,29 @@ export async function updateProduct(
       },
     });
 
+    // Reconcile ProductImage rows against the submitted image list: replace
+    // the full set (simplest way to also capture reordering) and clean up
+    // any blobs for images the admin removed.
+    if (formData.has("images")) {
+      const submittedImages = parseImagesField(formData);
+      const existingImages = await prisma.productImage.findMany({ where: { productId: id } });
+      const submittedUrls = new Set(submittedImages.map((img) => img.url));
+      const removedUrls = existingImages.filter((img) => !submittedUrls.has(img.url)).map((img) => img.url);
+
+      await prisma.$transaction([
+        prisma.productImage.deleteMany({ where: { productId: id } }),
+        ...(submittedImages.length > 0
+          ? [
+              prisma.productImage.createMany({
+                data: submittedImages.map(({ url, displayOrder }) => ({ productId: id, url, displayOrder })),
+              }),
+            ]
+          : []),
+      ]);
+
+      if (removedUrls.length > 0) await deleteRemovedBlobs(removedUrls);
+    }
+
     revalidatePath("/admin/products");
 
     // Alert admins if the edited product now has low stock. Awaited so
@@ -298,7 +367,11 @@ export async function deleteProduct(id: string) {
   };
 
   try {
+    // Fetch image URLs before the cascading delete removes the DB rows, so
+    // we can also clean up the underlying blob files.
+    const images = await prisma.productImage.findMany({ where: { productId: id }, select: { url: true } });
     await prisma.product.delete({ where: { id } });
+    if (images.length > 0) await deleteRemovedBlobs(images.map((img) => img.url));
     revalidatePath("/admin/products");
     return { success: true };
   } catch (err: unknown) {

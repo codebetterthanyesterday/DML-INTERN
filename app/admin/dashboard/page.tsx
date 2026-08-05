@@ -177,61 +177,61 @@ export default async function AdminDashboardPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-8">
       <div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-blue-950">Dashboard</h1>
-        <p className="text-slate-500 mt-1 font-medium">Ringkasan aktivitas dan performa platform DML.</p>
+        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-blue-950">Dashboard</h1>
+        <p className="text-slate-500 mt-1 font-medium text-sm sm:text-base">Ringkasan aktivitas dan performa platform DML.</p>
       </div>
 
       {/* Metrics Section */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 xs:grid-cols-2 lg:grid-cols-4">
         <Card className="hover:shadow-lg hover:shadow-blue-900/5 transition-all border-slate-200 group">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-bold text-slate-600">Pesanan Baru</CardTitle>
-            <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <ShoppingCart className="h-4 w-4 text-blue-950" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 sm:pb-3">
+            <CardTitle className="text-xs sm:text-sm font-bold text-slate-600 uppercase tracking-wider">Pesanan Baru</CardTitle>
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform flex-none">
+              <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5 text-blue-950" />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-extrabold text-blue-950">{newOrdersToday}</div>
+          <CardContent className="pt-2">
+            <div className="text-2xl sm:text-3xl font-extrabold text-blue-950">{newOrdersToday}</div>
             <p className={`text-xs font-semibold mt-1 ${newOrdersGrowth >= 0 ? 'text-green-600' : 'text-red-500'}`}>
               {newOrdersGrowth > 0 ? '+' : ''}{newOrdersGrowth} dari hari kemarin
             </p>
           </CardContent>
         </Card>
         <Card className="hover:shadow-lg hover:shadow-red-900/5 transition-all border-slate-200 group">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-bold text-slate-600">RFQ Menunggu</CardTitle>
-            <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <FileText className="h-4 w-4 text-red-600" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 sm:pb-3">
+            <CardTitle className="text-xs sm:text-sm font-bold text-slate-600 uppercase tracking-wider">RFQ Menunggu</CardTitle>
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-red-50 flex items-center justify-center group-hover:scale-110 transition-transform flex-none">
+              <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-extrabold text-blue-950">{rfqPendingCount}</div>
+          <CardContent className="pt-2">
+            <div className="text-2xl sm:text-3xl font-extrabold text-blue-950">{rfqPendingCount}</div>
             <p className="text-xs font-semibold text-red-500 mt-1">Perlu review harga</p>
           </CardContent>
         </Card>
         <Card className="hover:shadow-lg hover:shadow-blue-900/5 transition-all border-slate-200 group">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-bold text-slate-600">Akun Bisnis Pending</CardTitle>
-            <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <Building2 className="h-4 w-4 text-slate-600" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 sm:pb-3">
+            <CardTitle className="text-xs sm:text-sm font-bold text-slate-600 uppercase tracking-wider">Akun Bisnis Pending</CardTitle>
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-slate-100 flex items-center justify-center group-hover:scale-110 transition-transform flex-none">
+              <Building2 className="h-4 w-4 sm:h-5 sm:w-5 text-slate-600" />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-extrabold text-blue-950">{businessPendingCount}</div>
+          <CardContent className="pt-2">
+            <div className="text-2xl sm:text-3xl font-extrabold text-blue-950">{businessPendingCount}</div>
             <p className="text-xs font-semibold text-slate-500 mt-1">Menunggu verifikasi</p>
           </CardContent>
         </Card>
         <Card className="hover:shadow-lg hover:shadow-green-900/5 transition-all border-slate-200 group">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-bold text-slate-600">Pendapatan Bulan Ini</CardTitle>
-            <div className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <Wallet className="h-4 w-4 text-green-600" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 sm:pb-3">
+            <CardTitle className="text-xs sm:text-sm font-bold text-slate-600 uppercase tracking-wider">Pendapatan</CardTitle>
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-green-50 flex items-center justify-center group-hover:scale-110 transition-transform flex-none">
+              <Wallet className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-extrabold text-blue-950">{formatCurrencyCompact(revenueThisMonth)}</div>
+          <CardContent className="pt-2">
+            <div className="text-2xl sm:text-3xl font-extrabold text-blue-950">{formatCurrencyCompact(revenueThisMonth)}</div>
             <p className={`text-xs font-semibold mt-1 ${revenueGrowth >= 0 ? 'text-green-600' : 'text-red-500'}`}>
               {revenueGrowth > 0 ? '+' : ''}{revenueGrowth}% dari bulan lalu
             </p>
@@ -239,13 +239,15 @@ export default async function AdminDashboardPage() {
         </Card>
       </div>
 
-      <div className="grid gap-6 grid-cols-1 lg:grid-cols-7">
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-7">
         {/* Antrian RFQ Terbaru */}
-        <Card className="lg:col-span-4 border-slate-200 min-w-0">
-          <CardHeader>
-            <CardTitle className="text-blue-950 font-bold">Antrian RFQ Terbaru</CardTitle>
+        <Card className="lg:col-span-4 border-slate-200 overflow-hidden">
+          <CardHeader className="pb-3 sm:pb-4">
+            <CardTitle className="text-lg sm:text-xl text-blue-950 font-bold">Antrian RFQ Terbaru</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-0">
+            {/* Desktop Table */}
+            <div className="hidden sm:block overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
@@ -291,6 +293,48 @@ export default async function AdminDashboardPage() {
                 )}
               </TableBody>
             </Table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="sm:hidden space-y-3 px-4 py-3">
+              {recentQuotes.length > 0 ? (
+                recentQuotes.map((quote) => {
+                  const badge = getBadgeProps(quote.status);
+                  return (
+                    <div key={quote.id} className="rounded-lg border border-slate-200 bg-slate-50 p-3 space-y-2">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">No. RFQ</p>
+                          <p className="text-sm font-bold text-blue-950 mt-0.5">{quote.quoteNumber}</p>
+                        </div>
+                        <Badge variant="secondary" className={`${badge.className} text-xs`}>
+                          {badge.label}
+                        </Badge>
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Perusahaan</p>
+                        <p className="text-sm font-medium text-slate-700 mt-0.5">{quote.user?.companyName || quote.user?.name}</p>
+                      </div>
+                      <div className="pt-2">
+                        {(quote.status === 'PENDING' || quote.status === 'REVIEWED') ? (
+                          <Button size="sm" className="w-full bg-blue-950 hover:bg-blue-900 text-white font-bold shadow-md shadow-blue-900/20" asChild>
+                            <Link href={`/admin/quotes?q=${quote.quoteNumber}`}>Beri Harga</Link>
+                          </Button>
+                        ) : (
+                          <Button size="sm" variant="outline" className="w-full border-slate-300 text-slate-700 font-bold hover:bg-slate-50" asChild>
+                            <Link href={`/admin/quotes?q=${quote.quoteNumber}`}>Lihat</Link>
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="text-center text-slate-500 py-6 font-medium">
+                  Tidak ada antrian RFQ terbaru.
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
 

@@ -79,7 +79,7 @@ export function DateRangePicker({
             id="date"
             variant={"outline"}
             className={cn(
-              "w-[300px] justify-start text-left font-semibold border-slate-200 shadow-sm hover:bg-slate-50 transition-all",
+              "w-full sm:w-[300px] justify-start text-left font-semibold border-slate-200 shadow-sm hover:bg-slate-50 transition-all",
               !date && "text-muted-foreground"
             )}
           >
@@ -98,14 +98,15 @@ export function DateRangePicker({
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0 flex flex-col sm:flex-row bg-white/95 backdrop-blur-md border-slate-200 shadow-xl shadow-blue-900/10 rounded-xl overflow-hidden" align="end">
-          <div className="flex flex-col gap-1 p-3 border-r border-slate-100 bg-slate-50/50 min-w-[160px]">
+        <PopoverContent className="w-auto max-w-[calc(100vw-2rem)] p-0 flex flex-col sm:flex-row bg-white/95 backdrop-blur-md border-slate-200 shadow-xl shadow-blue-900/10 rounded-xl overflow-hidden" align="end">
+          <div className="flex flex-col gap-1 p-3 border-b sm:border-b-0 sm:border-r border-slate-100 bg-slate-50/50 sm:min-w-[160px]">
             <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-2">Preset</div>
+            <div className="flex sm:flex-col gap-1 flex-wrap">
             {presets.map((preset) => (
               <Button
                 key={preset.label}
                 variant="ghost"
-                className="justify-start font-medium text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-700 w-full"
+                className="justify-start font-medium text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-700 w-auto sm:w-full"
                 onClick={() => {
                   preset.onClick();
                   setIsOpen(false);
@@ -114,8 +115,9 @@ export function DateRangePicker({
                 {preset.label}
               </Button>
             ))}
+            </div>
           </div>
-          <div className="p-3">
+          <div className="p-3 overflow-x-auto">
             <Calendar
               mode="range"
               defaultMonth={date?.from}

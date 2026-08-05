@@ -158,20 +158,20 @@ export default async function AdminReportsPage({ searchParams }: PageProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-blue-950">Laporan & Analytics</h1>
-          <p className="text-slate-500 mt-1 font-medium">Analisis performa penjualan Retail dan Industrial.</p>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-blue-950">Laporan & Analytics</h1>
+          <p className="text-slate-500 mt-1 font-medium text-sm sm:text-base">Analisis performa penjualan Retail dan Industrial.</p>
         </div>
-        <div className="flex flex-col sm:flex-row gap-3 items-end sm:items-center">
+        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
           <DateRangePicker />
           <ExportCSVButton data={summaryMetrics} />
         </div>
       </div>
 
       {/* Metrics Section */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3">
         <Card className="hover:shadow-lg hover:shadow-blue-900/5 transition-all border-slate-200 group relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-110" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
@@ -229,7 +229,8 @@ export default async function AdminReportsPage({ searchParams }: PageProps) {
         </CardHeader>
         <CardContent>
           <div className="rounded-xl border border-slate-100 overflow-hidden">
-            <Table>
+            <div className="overflow-x-auto">
+            <Table className="min-w-[600px]">
               <TableHeader className="bg-slate-50/50">
                 <TableRow className="hover:bg-transparent">
                   <TableHead className="w-12 text-center text-slate-500 font-bold uppercase text-xs tracking-wider">No</TableHead>
@@ -267,6 +268,7 @@ export default async function AdminReportsPage({ searchParams }: PageProps) {
                 )}
               </TableBody>
             </Table>
+            </div>
           </div>
         </CardContent>
       </Card>

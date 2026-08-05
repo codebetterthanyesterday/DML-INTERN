@@ -2,6 +2,7 @@ import { notFound } from "next/navigation"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import { ProductDetailClient, type ProductDetailProps } from "./ProductDetailClient"
+import { toPublicImageUrl } from "@/lib/blob"
 
 export default async function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params
@@ -48,7 +49,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     description: dbProduct.description || "",
     rating: Number(averageRating.toFixed(1)),
     reviewsCount: dbProduct._count.reviews,
-    images: dbProduct.images.map((img: any) => img.url),
+    images: dbProduct.images.map((img: any) => toPublicImageUrl(img.url)).filter((url: string | null): url is string => !!url),
     reviews: dbProduct.reviews.map((rev: any) => ({
       id: rev.id,
       user: rev.user.name || "Anonymous",

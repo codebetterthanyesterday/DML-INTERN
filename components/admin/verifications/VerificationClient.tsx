@@ -370,8 +370,7 @@ export function VerificationClient({
   return (
     <>
       <div
-        className="flex flex-col rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden"
-        style={{ minHeight: "70vh" }}
+        className="flex flex-col rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden min-h-[50vh] sm:min-h-[70vh]"
       >
         {/* ── List ── */}
         <div className="flex flex-col w-full">

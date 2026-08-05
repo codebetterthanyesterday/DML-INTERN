@@ -7,6 +7,7 @@ import { getLandingPageContent } from "@/app/actions/cms"
 import { CmsEditorSheet } from "@/components/cms/cms-editor-sheet"
 import { ValuePropsEditor } from "@/components/cms/value-props-editor"
 import { AddToCartIconBtn } from "@/components/shared/AddToCartIconBtn"
+import { toPublicImageUrl } from "@/lib/blob"
 
 export default async function LandingPage() {
   const session = await auth()
@@ -136,7 +137,7 @@ export default async function LandingPage() {
                 ? new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(Number(product.price))
                 : "Hubungi Kami"
 
-              const imageUrl = product.images[0]?.url
+              const imageUrl = toPublicImageUrl(product.images[0]?.url)
 
               return (
                 <div key={product.id} className="group bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 flex flex-col">

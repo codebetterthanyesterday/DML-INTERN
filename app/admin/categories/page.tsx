@@ -20,7 +20,7 @@ export default async function CategoriesPage() {
   }
 
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+    <div className="space-y-6 pb-8">
       <CategoryClient initialCategories={result.data} />
     </div>
   )

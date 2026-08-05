@@ -53,34 +53,34 @@ export function CategoryClient({ initialCategories }: CategoryClientProps) {
   )
 
   return (
-    <div className="flex flex-col space-y-8">
+    <div className="flex flex-col space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Categories</h2>
-          <p className="text-muted-foreground mt-1">
-            Manage your product categories, subcategories, and their visual representations.
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-blue-950">Kelola Kategori</h1>
+          <p className="text-slate-500 mt-1 font-medium text-sm sm:text-base">
+            Atur kategori produk, subkategori, dan representasi visualnya.
           </p>
         </div>
-        <Button onClick={openForCreate} className="w-full sm:w-auto shadow-sm">
+        <Button onClick={openForCreate} className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-bold shadow-md shadow-red-600/20">
           <Plus className="mr-2 h-4 w-4" />
-          Add Category
+          Tambah Kategori
         </Button>
       </div>
 
       <div className="flex flex-col space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="relative w-full max-w-sm">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <div className="flex items-center justify-between gap-3">
+          <div className="relative flex-1 max-w-sm group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
             <Input
-              placeholder="Search categories..."
-              className="pl-9 bg-background shadow-sm"
+              placeholder="Cari kategori..."
+              className="pl-9 bg-slate-50/50 hover:bg-slate-50 border-slate-200/60 focus-visible:ring-4 focus-visible:ring-blue-500/15 focus-visible:border-blue-500 rounded-xl transition-all"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <div className="hidden sm:flex items-center text-sm text-muted-foreground bg-muted/50 px-3 py-1.5 rounded-md border">
+          <div className="hidden sm:flex items-center text-sm text-slate-500 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 shrink-0">
             <Layers className="mr-2 h-4 w-4" />
-            {dataToDisplay.length} Total Categories
+            {dataToDisplay.length} Kategori
           </div>
         </div>
 
@@ -96,13 +96,13 @@ export function CategoryClient({ initialCategories }: CategoryClientProps) {
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetContent className="w-full sm:max-w-md overflow-y-auto">
           <SheetHeader className="mb-6">
-            <SheetTitle>
-              {selectedCategory ? "Edit Category" : "Create Category"}
+            <SheetTitle className="text-blue-950 font-extrabold">
+              {selectedCategory ? "Edit Kategori" : "Tambah Kategori"}
             </SheetTitle>
-            <SheetDescription>
+            <SheetDescription className="text-slate-500">
               {selectedCategory
-                ? "Update the details of the category below."
-                : "Add a new category to organize your products."}
+                ? "Perbarui detail kategori di bawah ini."
+                : "Tambahkan kategori baru untuk mengorganisir produk Anda."}
             </SheetDescription>
           </SheetHeader>
           

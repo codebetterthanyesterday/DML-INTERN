@@ -158,9 +158,9 @@ export function AccountsClient({ initialUsers, currentRole, currentStatus, curre
           />
         </div>
 
-        <div className="flex gap-2 w-full sm:w-auto">
+        <div className="flex gap-2 w-full sm:w-auto flex-wrap sm:flex-nowrap">
           <Select value={currentRole} onValueChange={(val) => updateFilters("role", val)}>
-            <SelectTrigger className="w-[170px] bg-slate-50 hover:bg-slate-100 border-slate-200/80 transition-colors shadow-sm rounded-xl h-10 font-medium text-slate-700">
+            <SelectTrigger className="flex-1 sm:flex-none sm:w-[170px] bg-slate-50 hover:bg-slate-100 border-slate-200/80 transition-colors shadow-sm rounded-xl h-10 font-medium text-slate-700">
               <Filter className="w-4 h-4 mr-2 text-slate-500" />
               <SelectValue placeholder="Peran" />
             </SelectTrigger>
@@ -192,7 +192,7 @@ export function AccountsClient({ initialUsers, currentRole, currentStatus, curre
           </Select>
 
           <Select value={currentStatus} onValueChange={(val) => updateFilters("status", val)}>
-            <SelectTrigger className="w-[200px] bg-slate-50 hover:bg-slate-100 border-slate-200/80 transition-colors shadow-sm rounded-xl h-10 font-medium text-slate-700">
+            <SelectTrigger className="flex-1 sm:flex-none sm:w-[200px] bg-slate-50 hover:bg-slate-100 border-slate-200/80 transition-colors shadow-sm rounded-xl h-10 font-medium text-slate-700">
               <SelectValue placeholder="Status Bisnis" />
             </SelectTrigger>
             <SelectContent className="rounded-xl border-slate-200 shadow-xl p-1">
@@ -230,7 +230,8 @@ export function AccountsClient({ initialUsers, currentRole, currentStatus, curre
             <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
           </div>
         )}
-        <Table>
+        <div className="overflow-x-auto">
+        <Table className="min-w-[700px]">
           <TableHeader className="bg-slate-50/80">
             <TableRow>
               <TableHead className="font-semibold text-slate-600">Pengguna</TableHead>
@@ -338,6 +339,7 @@ export function AccountsClient({ initialUsers, currentRole, currentStatus, curre
             )}
           </TableBody>
         </Table>
+        </div>
       </div>
 
       <UserDetailsSheet

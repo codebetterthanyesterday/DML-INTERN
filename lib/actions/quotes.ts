@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { QuoteStatus } from "@prisma/client";
+import { toPublicImageUrl } from "@/lib/blob";
 
 // ─── Serialized types (plain objects safe for Client Components) ──────────────
 
@@ -66,7 +67,7 @@ function serializeQuote(q: RawQuote): SerializedQuote {
         name: item.product.name,
         sku: item.product.sku,
         unit: item.product.unit,
-        imageUrl: item.product.images[0]?.url ?? null,
+        imageUrl: toPublicImageUrl(item.product.images[0]?.url) ?? null,
       },
     })),
     invoice: q.invoice

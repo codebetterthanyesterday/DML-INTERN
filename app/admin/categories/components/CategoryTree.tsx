@@ -119,8 +119,8 @@ const TreeNodeComponent = ({
         )}
         style={{ paddingLeft: `${(level + 1) * 1.5}rem` }}
       >
-        <div className="flex items-center gap-3">
-          <div className="w-6 flex justify-center">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+          <div className="w-6 flex-none flex justify-center">
             {hasChildren ? (
               <button
                 onClick={() => setIsExpanded(!isExpanded)}
@@ -137,16 +137,16 @@ const TreeNodeComponent = ({
             )}
           </div>
           
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary">
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary flex-none">
             <DynamicIcon name={node.iconUrl} className="h-4 w-4" />
           </div>
           
-          <div className="flex flex-col">
-            <span className="font-medium text-sm text-foreground">{node.name}</span>
-            <span className="text-xs text-muted-foreground font-mono">/{node.slug}</span>
+          <div className="flex flex-col min-w-0">
+            <span className="font-medium text-sm text-foreground truncate">{node.name}</span>
+            <span className="text-xs text-muted-foreground font-mono truncate">/{node.slug}</span>
           </div>
 
-          <div className="ml-4 flex items-center gap-2">
+          <div className="ml-2 flex items-center gap-2 flex-none">
              {(node.totalProducts ?? 0) > 0 && (
                 <Badge variant="secondary" className="text-[10px] font-normal px-2 py-0 h-5">
                    {node.totalProducts} Products

@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma"
 import { ProductType } from "@prisma/client"
 import { getKatalogPageContent } from "@/app/actions/cms"
 import { CmsKatalogEditorSheet } from "@/components/cms/cms-katalog-editor-sheet"
+import { toPublicImageUrl } from "@/lib/blob"
 
 export default async function KatalogPage({
   searchParams,
@@ -103,7 +104,7 @@ export default async function KatalogPage({
       specs: specsString || "Spesifikasi tidak tersedia",
       rating: Number(averageRating.toFixed(1)),
       reviewsCount: p._count.reviews,
-      imageUrl: p.images[0]?.url || null
+      imageUrl: toPublicImageUrl(p.images[0]?.url) || null
     }
   })
 
