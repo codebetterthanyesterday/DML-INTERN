@@ -5,6 +5,9 @@ import prisma from "@/lib/prisma";
 import { NotificationType } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
+// Notification types that map to "system" filter bucket
+const SYSTEM_TYPES: NotificationType[] = ["SYSTEM_ALERT", "LOW_STOCK_ALERT"];
+
 export async function getAdminNotifications() {
   try {
     const session = await auth();
@@ -38,7 +41,8 @@ export async function getAdminNotifications() {
   }
 }
 
-export async function getAllAdminNotifications(page = 1, limit = 50) {
+// filter: "all" | "unread" | NotificationType | "sistem"
+export async function getAllAdminNotifications(page = 1, limit = 20, filter = "all") {
   try {
     const session = await auth();
 
@@ -48,22 +52,31 @@ export async function getAllAdminNotifications(page = 1, limit = 50) {
 
     const skip = (page - 1) * limit;
 
+    const typeFilter =
+      filter === "all" || filter === "unread"
+        ? {}
+        : filter === "sistem"
+        ? { type: { in: SYSTEM_TYPES } }
+        : { type: filter as NotificationType };
+
+    const readFilter = filter === "unread" ? { isRead: false } : {};
+
+    const where = {
+      AND: [
+        { OR: [{ userId: null }, { userId: session.user.id }] },
+        typeFilter,
+        readFilter,
+      ],
+    };
+
     const [notifications, totalCount] = await Promise.all([
       prisma.notification.findMany({
-        where: {
-          OR: [{ userId: null }, { userId: session.user.id }],
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
+        where,
+        orderBy: { createdAt: "desc" },
         skip,
         take: limit,
       }),
-      prisma.notification.count({
-        where: {
-          OR: [{ userId: null }, { userId: session.user.id }],
-        },
-      }),
+      prisma.notification.count({ where }),
     ]);
 
     return { success: true, notifications, totalCount, totalPages: Math.ceil(totalCount / limit) };
@@ -149,6 +162,44 @@ export async function createAdminNotification({
   }
 }
 
+export async function deleteNotification(id: string) {
+  try {
+    const session = await auth();
+    if (!session?.user || session.user.role !== "ADMIN") {
+      return { success: false, error: "Unauthorized" };
+    }
+    await prisma.notification.delete({ where: { id } });
+    revalidatePath("/admin/notifications");
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting notification:", error);
+    return { success: false, error: "Failed to delete notification" };
+  }
+}
+
+export async function deleteAllReadNotifications() {
+  try {
+    const session = await auth();
+    if (!session?.user || session.user.role !== "ADMIN") {
+      return { success: false, error: "Unauthorized" };
+    }
+    await prisma.notification.deleteMany({
+      where: {
+        OR: [{ userId: null }, { userId: session.user.id }],
+        isRead: true,
+      },
+    });
+    revalidatePath("/admin/notifications");
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting read notifications:", error);
+    return { success: false, error: "Failed to delete read notifications" };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Simulation helper (dev/testing only – not exposed in production UI)
+// ---------------------------------------------------------------------------
 export async function generateDummyNotification() {
   try {
     const session = await auth();

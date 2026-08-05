@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 import { AuthError } from "next-auth"
 import { z } from "zod"
+import { createAdminNotification } from "@/lib/actions/notifications"
 
 export async function loginAction(formData: FormData) {
   try {
@@ -168,6 +169,14 @@ export async function registerBusinessAction(prevState: any, formData: FormData)
         ],
       })
     })
+
+    // Notify admins that a new business account needs verification
+    createAdminNotification({
+      type: "BUSINESS_VERIFICATION",
+      title: "Verifikasi Akun Bisnis Baru",
+      message: `${companyName} (PIC: ${picName}) mendaftar sebagai akun bisnis dan menunggu verifikasi dokumen.`,
+      linkUrl: `/admin/verifications`,
+    }).catch(() => {});
 
     return { success: true }
   } catch (error) {

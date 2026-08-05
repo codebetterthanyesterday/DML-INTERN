@@ -127,7 +127,8 @@ export const NotificationType = {
   NEW_QUOTE: 'NEW_QUOTE',
   PAYMENT_RECEIVED: 'PAYMENT_RECEIVED',
   SYSTEM_ALERT: 'SYSTEM_ALERT',
-  BUSINESS_VERIFICATION: 'BUSINESS_VERIFICATION'
+  BUSINESS_VERIFICATION: 'BUSINESS_VERIFICATION',
+  LOW_STOCK_ALERT: 'LOW_STOCK_ALERT'
 } as const
 
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]

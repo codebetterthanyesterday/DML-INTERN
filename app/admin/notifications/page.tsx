@@ -23,9 +23,10 @@ export default async function AdminNotificationsPage({
 
   const params = await searchParams;
   const page = typeof params.page === "string" ? parseInt(params.page) : 1;
+  const filter = typeof params.filter === "string" ? params.filter : "all";
   const limit = 20;
 
-  const result = await getAllAdminNotifications(page, limit);
+  const result = await getAllAdminNotifications(page, limit, filter);
   const notifications = result.success ? result.notifications : [];
   const totalPages = result.success ? result.totalPages : 1;
 
@@ -45,6 +46,7 @@ export default async function AdminNotificationsPage({
         initialNotifications={notifications || []}
         currentPage={page}
         totalPages={totalPages || 1}
+        currentFilter={filter}
       />
     </div>
   );

@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma"
 import { auth } from "@/lib/auth"
 import { Invoice } from "@/lib/xendit"
 import { PaymentMethod } from "@prisma/client"
+import { createAdminNotification } from "@/lib/actions/notifications"
 
 export async function createCheckoutSession({
   addressId,
@@ -116,6 +117,14 @@ export async function createCheckoutSession({
 
       return { order: newOrder, payment: newPayment }
     })
+
+    // Fire-and-forget: notify admins about the new order
+    createAdminNotification({
+      type: "NEW_ORDER",
+      title: "Pesanan Baru",
+      message: `${session.user.name ?? session.user.email} baru saja membuat pesanan ${order.orderNumber} senilai Rp ${Number(order.totalAmount).toLocaleString("id-ID")}.`,
+      linkUrl: `/admin/orders`,
+    }).catch(() => {/* notification failure must not break checkout */});
 
     return { success: true, paymentUrl: payment.paymentUrl }
 

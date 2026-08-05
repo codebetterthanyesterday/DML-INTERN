@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { OrderPaymentStatus, PaymentStatus } from '@prisma/client';
+import { createAdminNotification } from '@/lib/actions/notifications';
 
 export async function POST(req: Request) {
   try {
@@ -53,10 +54,19 @@ export async function POST(req: Request) {
         where: { id: order.id },
         data: { 
           paymentStatus: newOrderPaymentStatus,
-          // Optional: You could update order status to PROCESSING once paid
         },
       })
     ]);
+
+    // Notify admins when payment succeeds
+    if (status === 'PAID' || status === 'SETTLED') {
+      createAdminNotification({
+        type: "PAYMENT_RECEIVED",
+        title: "Pembayaran Diterima",
+        message: `Pembayaran untuk pesanan ${order.orderNumber} senilai Rp ${Number(order.totalAmount).toLocaleString("id-ID")} telah berhasil dikonfirmasi.`,
+        linkUrl: `/admin/orders`,
+      }).catch(() => {});
+    }
 
     return NextResponse.json({ message: 'Webhook processed successfully' }, { status: 200 });
   } catch (error) {

@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { Invoice as XenditInvoice } from "@/lib/xendit";
 import { PaymentMethod } from "@prisma/client";
+import { createAdminNotification } from "@/lib/actions/notifications";
 
 export async function submitRfq(
   items: { productId: string; qtyRequested: number; notes?: string }[],
@@ -56,6 +57,15 @@ export async function submitRfq(
   });
 
   revalidatePath("/business/rfq");
+
+  // Notify admins about the new RFQ
+  createAdminNotification({
+    type: "NEW_QUOTE",
+    title: "Permintaan Penawaran Baru (RFQ)",
+    message: `${user.companyName ?? user.name} mengajukan RFQ ${quoteNumber} untuk ${items.length} produk.`,
+    linkUrl: `/admin/quotes`,
+  }).catch(() => {});
+
   return { success: true, quoteId: quote.id };
 }
 
@@ -216,5 +226,14 @@ export async function uploadManualPaymentProof(invoiceId: string, proofUrl: stri
   });
 
   revalidatePath("/business/invoices");
+
+  // Notify admins: manual payment proof uploaded, awaiting review
+  createAdminNotification({
+    type: "PAYMENT_RECEIVED",
+    title: "Bukti Pembayaran Diterima",
+    message: `Bukti transfer untuk Invoice ${invoice.invoiceNumber} (Rp ${Number(invoice.amount).toLocaleString("id-ID")}) telah diunggah dan menunggu verifikasi.`,
+    linkUrl: `/admin/quotes`,
+  }).catch(() => {});
+
   return { success: true };
 }
