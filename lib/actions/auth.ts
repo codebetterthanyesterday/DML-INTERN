@@ -97,8 +97,6 @@ export async function registerCustomerAction(prevState: any, formData: FormData)
 }
 
 import { businessSchema } from "@/lib/validators/auth"
-import fs from "fs/promises"
-import path from "path"
 
 export async function registerBusinessAction(prevState: any, formData: FormData) {
   const payload = Object.fromEntries(formData.entries())
@@ -108,7 +106,11 @@ export async function registerBusinessAction(prevState: any, formData: FormData)
     return { errors: parsed.error.flatten().fieldErrors }
   }
 
-  const { companyName, npwp, address, city, province, postalCode, picName, picPhone, email, password, npwpFile, siupFile } = parsed.data
+  // npwpFile/siupFile are Vercel Blob URLs — the actual files were already
+  // uploaded directly from the browser to Blob storage (see
+  // app/api/blob/business-docs/route.ts), so the Server Action never has to
+  // handle raw file bytes.
+  const { companyName, npwp, address, city, province, postalCode, picName, picPhone, email, password, npwpFile: npwpUrl, siupFile: siupUrl } = parsed.data
 
   try {
     const existing = await prisma.user.findUnique({ where: { email } })
@@ -117,22 +119,6 @@ export async function registerBusinessAction(prevState: any, formData: FormData)
     }
 
     const passwordHash = await bcrypt.hash(password, 10)
-
-    // Save files locally to public/uploads/business-docs
-    const uploadDir = path.join(process.cwd(), "public/uploads/business-docs")
-    await fs.mkdir(uploadDir, { recursive: true })
-
-    const npwpFilename = `${Date.now()}-npwp-${(npwpFile as File).name.replace(/\\s+/g, '-')}`
-    const siupFilename = `${Date.now()}-siup-${(siupFile as File).name.replace(/\\s+/g, '-')}`
-
-    const npwpBuffer = Buffer.from(await (npwpFile as File).arrayBuffer())
-    const siupBuffer = Buffer.from(await (siupFile as File).arrayBuffer())
-
-    await fs.writeFile(path.join(uploadDir, npwpFilename), npwpBuffer)
-    await fs.writeFile(path.join(uploadDir, siupFilename), siupBuffer)
-
-    const npwpUrl = `/uploads/business-docs/${npwpFilename}`
-    const siupUrl = `/uploads/business-docs/${siupFilename}`
 
     await prisma.$transaction(async (tx) => {
       const user = await tx.user.create({

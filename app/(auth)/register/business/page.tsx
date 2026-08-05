@@ -5,11 +5,12 @@ import logoImg from "@/public/logo.png"
 import { useState, useTransition } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Eye, EyeOff, ArrowLeft, UploadCloud, FileText } from "lucide-react"
+import { Eye, EyeOff, ArrowLeft, UploadCloud, Loader2, CheckCircle2, XCircle } from "lucide-react"
 import { registerBusinessAction } from "@/lib/actions/auth"
-import { useForm, Controller } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { businessSchema, type BusinessFormValues } from "@/lib/validators/auth"
+import { businessSchema, type BusinessFormValues, MAX_FILE_SIZE, ACCEPTED_FILE_TYPES } from "@/lib/validators/auth"
+import { upload } from "@vercel/blob/client"
 
 function InputField({ id, label, type = "text", placeholder, errorMsg, suffix, registration }: {
   id: string; label: string; type?: string; placeholder: string
@@ -30,19 +31,81 @@ function InputField({ id, label, type = "text", placeholder, errorMsg, suffix, r
   )
 }
 
-function UploadZone({ label, fieldName, errorMsg, file, onChange }: {
-  label: string; fieldName: string; errorMsg?: string; file?: File | null; onChange: (file: File | null) => void
+// Uploads the selected file directly from the browser to Vercel Blob storage
+// (bypassing the Server Action entirely for the raw bytes), then reports the
+// resulting Blob URL back to react-hook-form via onUploaded.
+function DocumentUploadZone({ label, docType, url, fileName, errorMsg, onUploaded, onUploadStart, onError }: {
+  label: string
+  docType: "NPWP" | "SIUP"
+  url?: string
+  fileName?: string
+  errorMsg?: string
+  onUploaded: (url: string, fileName: string) => void
+  onUploadStart: () => void
+  onError: (message: string) => void
 }) {
+  const [progress, setProgress] = useState(0)
+  const [status, setStatus] = useState<"idle" | "uploading" | "done" | "error">(url ? "done" : "idle")
+
+  const handleFile = async (file: File | null) => {
+    if (!file) return
+
+    if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
+      setStatus("error")
+      onError("Format file tidak didukung (hanya JPG, PNG, PDF)")
+      return
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      setStatus("error")
+      onError("Ukuran file maksimal 5MB")
+      return
+    }
+
+    setStatus("uploading")
+    setProgress(0)
+    onUploadStart()
+
+    try {
+      const blob = await upload(`business-docs/${docType.toLowerCase()}-${crypto.randomUUID()}-${file.name}`, file, {
+        access: "private",
+        handleUploadUrl: "/api/blob/business-docs",
+        clientPayload: JSON.stringify({ docType }),
+        onUploadProgress: ({ percentage }) => setProgress(percentage),
+      })
+      setStatus("done")
+      onUploaded(blob.url, file.name)
+    } catch {
+      setStatus("error")
+      onError("Gagal mengupload dokumen. Silakan coba lagi.")
+    }
+  }
+
+  const hasError = status === "error" || !!errorMsg
+
   return (
     <div>
-      <label className={`relative flex flex-col items-center justify-center gap-1.5 p-5 rounded-xl border-2 border-dashed transition-all cursor-pointer group min-h-[80px] ${errorMsg ? 'border-red-300 bg-red-50 hover:border-red-400' : 'border-slate-200 hover:border-red-400 bg-slate-50 hover:bg-red-50'}`}>
-        <input type="file" className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-          accept="image/jpeg,image/png,application/pdf" onChange={(e) => onChange(e.target.files?.[0] ?? null)} />
-        {file ? (
+      <label className={`relative flex flex-col items-center justify-center gap-1.5 p-5 rounded-xl border-2 border-dashed transition-all cursor-pointer group min-h-[80px] ${hasError ? 'border-red-300 bg-red-50 hover:border-red-400' : 'border-slate-200 hover:border-red-400 bg-slate-50 hover:bg-red-50'}`}>
+        <input type="file" className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" disabled={status === "uploading"}
+          accept="image/jpeg,image/png,application/pdf" onChange={(e) => handleFile(e.target.files?.[0] ?? null)} />
+        {status === "uploading" ? (
           <>
-            <FileText className="w-6 h-6 text-red-500" />
-            <span className="text-xs font-semibold text-red-600 text-center">{file.name}</span>
+            <Loader2 className="w-6 h-6 text-red-500 animate-spin" />
+            <span className="text-xs font-semibold text-red-600 text-center">Mengupload... {progress}%</span>
+            <div className="w-full h-1.5 rounded-full bg-red-100 overflow-hidden">
+              <div className="h-full bg-red-500 transition-all" style={{ width: `${progress}%` }} />
+            </div>
+          </>
+        ) : status === "done" && fileName ? (
+          <>
+            <CheckCircle2 className="w-6 h-6 text-green-600" />
+            <span className="text-xs font-semibold text-green-700 text-center">{fileName}</span>
             <span className="text-xs text-slate-400">Klik untuk ganti</span>
+          </>
+        ) : status === "error" ? (
+          <>
+            <XCircle className="w-6 h-6 text-red-500" />
+            <span className="text-xs font-semibold text-red-600 text-center">{errorMsg || "Upload gagal"}</span>
+            <span className="text-xs text-slate-400">Klik untuk coba lagi</span>
           </>
         ) : (
           <>
@@ -52,7 +115,7 @@ function UploadZone({ label, fieldName, errorMsg, file, onChange }: {
           </>
         )}
       </label>
-      {errorMsg && <p className="text-red-500 text-xs mt-1">{errorMsg}</p>}
+      {status !== "error" && errorMsg && <p className="text-red-500 text-xs mt-1">{errorMsg}</p>}
     </div>
   )
 }
@@ -62,15 +125,37 @@ export default function RegisterBusinessPage() {
   const [isPending, startTransition] = useTransition()
   const [showPw, setShowPw] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [uploadingCount, setUploadingCount] = useState(0)
+  const [fileNames, setFileNames] = useState<{ npwpFile?: string; siupFile?: string }>({})
 
-  const { register, handleSubmit, formState: { errors }, control } = useForm<BusinessFormValues>({
+  const { register, handleSubmit, formState: { errors }, setValue, watch, setError: setFieldError, clearErrors } = useForm<BusinessFormValues>({
     resolver: zodResolver(businessSchema),
     defaultValues: {
-      companyName: "", npwp: "", address: "", city: "", province: "", postalCode: "", picName: "", picPhone: "", email: "", password: ""
+      companyName: "", npwp: "", address: "", city: "", province: "", postalCode: "", picName: "", picPhone: "", email: "", password: "",
+      npwpFile: "", siupFile: ""
     }
   })
+  const watchedNpwpFile = watch("npwpFile")
+  const watchedSiupFile = watch("siupFile")
+
+  const handleUploadStart = () => setUploadingCount((n) => n + 1)
+  const handleUploaded = (field: "npwpFile" | "siupFile", url: string, fileName: string) => {
+    setUploadingCount((n) => Math.max(0, n - 1))
+    setFileNames((prev) => ({ ...prev, [field]: fileName }))
+    setValue(field, url, { shouldValidate: true })
+    clearErrors(field)
+  }
+  const handleUploadError = (field: "npwpFile" | "siupFile", message: string) => {
+    setUploadingCount((n) => Math.max(0, n - 1))
+    setValue(field, "", { shouldValidate: false })
+    setFieldError(field, { type: "manual", message })
+  }
 
   const onSubmit = async (data: BusinessFormValues) => {
+    if (uploadingCount > 0) {
+      setError("Mohon tunggu hingga dokumen selesai diupload.")
+      return
+    }
     setError(null)
     const formData = new FormData()
     
@@ -170,41 +255,35 @@ export default function RegisterBusinessPage() {
               <h2 className="text-xs font-bold text-slate-700 uppercase tracking-widest">Upload Dokumen Legalitas</h2>
             </div>
 
-            <Controller
-              name="npwpFile"
-              control={control}
-              render={({ field }) => (
-                <UploadZone 
-                  label="Upload NPWP" 
-                  fieldName="npwpFile"
-                  file={field.value}
-                  onChange={field.onChange}
-                  errorMsg={errors.npwpFile?.message as string}
-                />
-              )}
+            <DocumentUploadZone
+              label="Upload NPWP"
+              docType="NPWP"
+              url={watchedNpwpFile}
+              fileName={fileNames.npwpFile}
+              errorMsg={errors.npwpFile?.message as string}
+              onUploaded={(url, fileName) => handleUploaded("npwpFile", url, fileName)}
+              onUploadStart={handleUploadStart}
+              onError={(message) => handleUploadError("npwpFile", message)}
             />
 
-            <Controller
-              name="siupFile"
-              control={control}
-              render={({ field }) => (
-                <UploadZone 
-                  label="Upload SIUP / NIB" 
-                  fieldName="siupFile"
-                  file={field.value}
-                  onChange={field.onChange}
-                  errorMsg={errors.siupFile?.message as string}
-                />
-              )}
+            <DocumentUploadZone
+              label="Upload SIUP / NIB"
+              docType="SIUP"
+              url={watchedSiupFile}
+              fileName={fileNames.siupFile}
+              errorMsg={errors.siupFile?.message as string}
+              onUploaded={(url, fileName) => handleUploaded("siupFile", url, fileName)}
+              onUploadStart={handleUploadStart}
+              onError={(message) => handleUploadError("siupFile", message)}
             />
 
             <p className="text-xs text-slate-400 italic">
               Dokumen akan diverifikasi Admin (1–2 hari kerja). Akun aktif setelah verifikasi selesai.
             </p>
 
-            <button type="submit" disabled={isPending}
+            <button type="submit" disabled={isPending || uploadingCount > 0}
               className="w-full py-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-sm shadow-md shadow-red-200 transition-all disabled:opacity-60 mt-auto">
-              {isPending ? "Mengirim Pendaftaran..." : "Kirim Pendaftaran"}
+              {isPending ? "Mengirim Pendaftaran..." : uploadingCount > 0 ? "Menunggu Upload Selesai..." : "Kirim Pendaftaran"}
             </button>
 
             <p className="text-center text-xs text-slate-500">

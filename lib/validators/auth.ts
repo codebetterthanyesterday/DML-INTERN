@@ -14,8 +14,19 @@ export const customerSchema = z.object({
 
 export type CustomerFormValues = z.infer<typeof customerSchema>
 
-const MAX_FILE_SIZE = 5000000 // 5MB
-const ACCEPTED_FILE_TYPES = ["image/jpeg", "image/png", "application/pdf"]
+export const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
+export const ACCEPTED_FILE_TYPES = ["image/jpeg", "image/png", "application/pdf"]
+
+// Files are uploaded directly from the browser to Vercel Blob (see
+// components/registration/DocumentUploadZone.tsx). By the time the form is
+// submitted, these fields hold the resulting Blob URL, not a raw File —
+// this keeps the Server Action payload tiny and avoids Vercel's function
+// body size limit.
+const blobUrlField = (requiredMsg: string) =>
+  z.string({ error: () => requiredMsg })
+    .min(1, requiredMsg)
+    .url("URL dokumen tidak valid")
+    .refine((url) => /^https:\/\/[a-z0-9]+\.private\.blob\.vercel-storage\.com\//.test(url), "Dokumen belum diupload dengan benar")
 
 export const businessSchema = z.object({
   companyName: z.string().min(2, "Nama perusahaan wajib diisi"),
@@ -28,14 +39,8 @@ export const businessSchema = z.object({
   picPhone: z.string().min(8, "No. HP PIC tidak valid"),
   email: z.string().email("Email tidak valid"),
   password: z.string().min(6, "Minimal 6 karakter"),
-  npwpFile: z.any()
-    .refine((file) => typeof window === 'undefined' ? (file && typeof file === 'object' && 'name' in file) : file instanceof File, "NPWP wajib diupload")
-    .refine((file) => file?.size <= MAX_FILE_SIZE, "Ukuran file maksimal 5MB")
-    .refine((file) => ACCEPTED_FILE_TYPES.includes(file?.type), "Format file tidak didukung (hanya JPG, PNG, PDF)"),
-  siupFile: z.any()
-    .refine((file) => typeof window === 'undefined' ? (file && typeof file === 'object' && 'name' in file) : file instanceof File, "SIUP/NIB wajib diupload")
-    .refine((file) => file?.size <= MAX_FILE_SIZE, "Ukuran file maksimal 5MB")
-    .refine((file) => ACCEPTED_FILE_TYPES.includes(file?.type), "Format file tidak didukung (hanya JPG, PNG, PDF)"),
+  npwpFile: blobUrlField("NPWP wajib diupload"),
+  siupFile: blobUrlField("SIUP/NIB wajib diupload"),
 })
 
 export type BusinessFormValues = z.infer<typeof businessSchema>

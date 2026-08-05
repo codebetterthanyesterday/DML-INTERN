@@ -234,7 +234,7 @@ export function UserDetailsSheet({ userId, onClose }: { userId: string | null, o
                           </div>
                           <div className="flex items-center gap-2">
                             <Button size="sm" variant="outline" asChild>
-                              <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer">
+                              <a href={`/api/admin/documents?url=${encodeURIComponent(doc.fileUrl)}`} target="_blank" rel="noopener noreferrer">
                                 <ExternalLink className="w-3.5 h-3.5 mr-1.5" /> Lihat
                               </a>
                             </Button>
