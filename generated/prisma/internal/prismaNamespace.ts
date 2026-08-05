@@ -1877,6 +1877,7 @@ export const ProductScalarFieldEnum = {
   price: 'price',
   unit: 'unit',
   stock: 'stock',
+  lowStockThreshold: 'lowStockThreshold',
   minOrderQty: 'minOrderQty',
   weight: 'weight',
   specifications: 'specifications',

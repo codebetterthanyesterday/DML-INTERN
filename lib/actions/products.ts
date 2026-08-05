@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { ProductType } from "@prisma/client";
+import { createAdminNotification } from "@/lib/actions/notifications";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export interface ProductFormState {
@@ -42,9 +43,34 @@ export async function getProductById(id: string) {
   });
 }
 
-// ─── Get Categories ───────────────────────────────────────────────────────────
+// ─── Categories ───────────────────────────────────────────────────────────────
 export async function getCategories() {
   return await prisma.category.findMany({ orderBy: { name: "asc" } });
+}
+
+// ─── Low Stock Notification Helper ────────────────────────────────────────────
+// Fires a LOW_STOCK_ALERT to admins whenever a product's stock is at or below
+// its configured threshold. Safe to call unconditionally (fire-and-forget) —
+// failures here must never break product create/update flows.
+export async function notifyIfLowStock(product: {
+  id: string;
+  name: string;
+  sku: string;
+  stock: number;
+  lowStockThreshold: number;
+}) {
+  if (product.stock > product.lowStockThreshold) return;
+
+  try {
+    await createAdminNotification({
+      type: "LOW_STOCK_ALERT",
+      title: "Stok Produk Menipis",
+      message: `Stok produk "${product.name}" (SKU: ${product.sku}) tersisa ${product.stock} unit, di bawah batas ${product.lowStockThreshold}. Segera lakukan restock.`,
+      linkUrl: `/admin/products/${product.id}/edit`,
+    });
+  } catch {
+    /* notification failure must not break product save flows */
+  }
 }
 
 // ─── Create Product ───────────────────────────────────────────────────────────
@@ -59,6 +85,7 @@ export async function createProduct(
   const priceRaw = formData.get("price") as string;
   const unit = formData.get("unit") as string;
   const stock = parseInt(formData.get("stock") as string, 10);
+  const lowStockThreshold = parseInt(formData.get("lowStockThreshold") as string, 10);
   const minOrderQty = parseInt(formData.get("minOrderQty") as string, 10);
   const weight = parseInt(formData.get("weight") as string, 10);
   const description = formData.get("description") as string;
@@ -76,6 +103,7 @@ export async function createProduct(
   if (!sku) fieldErrors.sku = "SKU wajib diisi";
   if (!unit) fieldErrors.unit = "Satuan wajib diisi";
   if (isNaN(stock)) fieldErrors.stock = "Stok harus berupa angka";
+  if (!isNaN(lowStockThreshold) && lowStockThreshold < 0) fieldErrors.lowStockThreshold = "Batas stok tidak boleh negatif";
 
   if (Object.keys(fieldErrors).length > 0) return { fieldErrors };
 
@@ -105,7 +133,10 @@ export async function createProduct(
       finalCategoryId = defaultCat.id;
     }
 
-    await prisma.product.create({
+    const finalStock = isNaN(stock) ? 0 : stock;
+    const finalLowStockThreshold = isNaN(lowStockThreshold) ? 5 : lowStockThreshold;
+
+    const newProduct = await prisma.product.create({
       data: {
         name,
         sku,
@@ -114,7 +145,8 @@ export async function createProduct(
         productType: productType || "RETAIL",
         price: priceRaw ? parseFloat(priceRaw) : null,
         unit,
-        stock: isNaN(stock) ? 0 : stock,
+        stock: finalStock,
+        lowStockThreshold: finalLowStockThreshold,
         minOrderQty: isNaN(minOrderQty) ? 1 : minOrderQty,
         weight: isNaN(weight) ? 1000 : weight,
         description,
@@ -124,6 +156,16 @@ export async function createProduct(
     });
 
     revalidatePath("/admin/products");
+
+    // Alert admins if the product is created with low stock. Awaited so
+    // the notification is persisted before the redirect below ends the request.
+    await notifyIfLowStock({
+      id: newProduct.id,
+      name: newProduct.name,
+      sku: newProduct.sku,
+      stock: finalStock,
+      lowStockThreshold: finalLowStockThreshold,
+    });
   } catch (err: unknown) {
     if (
       err &&
@@ -152,6 +194,7 @@ export async function updateProduct(
   const priceRaw = formData.get("price") as string;
   const unit = formData.get("unit") as string;
   const stock = parseInt(formData.get("stock") as string, 10);
+  const lowStockThreshold = parseInt(formData.get("lowStockThreshold") as string, 10);
   const minOrderQty = parseInt(formData.get("minOrderQty") as string, 10);
   const weight = parseInt(formData.get("weight") as string, 10);
   const description = formData.get("description") as string;
@@ -166,6 +209,7 @@ export async function updateProduct(
   if (!name) fieldErrors.name = "Nama produk wajib diisi";
   if (!sku) fieldErrors.sku = "SKU wajib diisi";
   if (!unit) fieldErrors.unit = "Satuan wajib diisi";
+  if (!isNaN(lowStockThreshold) && lowStockThreshold < 0) fieldErrors.lowStockThreshold = "Batas stok tidak boleh negatif";
 
   if (Object.keys(fieldErrors).length > 0) return { fieldErrors };
 
@@ -177,7 +221,10 @@ export async function updateProduct(
       ...(ukuran ? { ukuran } : {}),
     };
 
-    await prisma.product.update({
+    const finalStock = isNaN(stock) ? 0 : stock;
+    const finalLowStockThreshold = isNaN(lowStockThreshold) ? 5 : lowStockThreshold;
+
+    const updatedProduct = await prisma.product.update({
       where: { id },
       data: {
         name,
@@ -186,7 +233,8 @@ export async function updateProduct(
         productType: productType || "RETAIL",
         price: priceRaw ? parseFloat(priceRaw) : null,
         unit,
-        stock: isNaN(stock) ? 0 : stock,
+        stock: finalStock,
+        lowStockThreshold: finalLowStockThreshold,
         minOrderQty: isNaN(minOrderQty) ? 1 : minOrderQty,
         weight: isNaN(weight) ? 1000 : weight,
         description,
@@ -196,6 +244,16 @@ export async function updateProduct(
     });
 
     revalidatePath("/admin/products");
+
+    // Alert admins if the edited product now has low stock. Awaited so
+    // the notification is persisted before the redirect below ends the request.
+    await notifyIfLowStock({
+      id: updatedProduct.id,
+      name: updatedProduct.name,
+      sku: updatedProduct.sku,
+      stock: finalStock,
+      lowStockThreshold: finalLowStockThreshold,
+    });
   } catch {
     return { error: "Gagal memperbarui produk." };
   }
