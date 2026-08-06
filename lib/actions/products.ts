@@ -7,6 +7,7 @@ import { ProductType } from "@prisma/client";
 import { createAdminNotification } from "@/lib/actions/notifications";
 import { toPublicImageUrl } from "@/lib/blob";
 import { del } from "@vercel/blob";
+import { getStockAvailability, type StockAvailability } from "@/lib/utils/stock";
 
 // ─── Product Images ────────────────────────────────────────────────────────────
 interface ProductImageInput {
@@ -49,7 +50,12 @@ export interface ProductFormState {
 }
 
 // ─── List Products ────────────────────────────────────────────────────────────
-export async function getAdminProducts(query?: string, type?: string, status?: string) {
+// `availability` filters by real-time stock health (Tersedia/Menipis/Habis).
+// Since each product has its own lowStockThreshold, this bucketing is a
+// column-to-column comparison that Prisma's `where` can't express directly,
+// so it's applied in-memory after the query — the admin catalog is small
+// enough (hundreds, not millions of rows) for this to stay fast and simple.
+export async function getAdminProducts(query?: string, type?: string, status?: string, availability?: string) {
   const products = await prisma.product.findMany({
     where: {
       AND: [
@@ -69,9 +75,14 @@ export async function getAdminProducts(query?: string, type?: string, status?: s
     orderBy: { updatedAt: "desc" },
   });
 
+  const filtered =
+    availability && availability !== "ALL"
+      ? products.filter((p) => getStockAvailability(p) === (availability as StockAvailability))
+      : products;
+
   // Product images are stored as private blob URLs — proxy them for display
   // in the admin table/details sheet (see lib/blob.ts).
-  return products.map((product) => ({
+  return filtered.map((product) => ({
     ...product,
     images: product.images.map((img) => ({ ...img, url: toPublicImageUrl(img.url) ?? img.url })),
   }));

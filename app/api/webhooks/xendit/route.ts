@@ -76,9 +76,24 @@ export async function POST(req: Request) {
       // so retried/duplicate webhook calls don't deduct stock twice.
       if (isNewlyPaid) {
         for (const item of order.items) {
-          await tx.product.update({
+          const updatedProduct = await tx.product.update({
             where: { id: item.productId },
             data: { stock: { decrement: item.qty } },
+          });
+
+          // Record the movement in StockLog so admins see the deduction
+          // in real-time, and we have an audit trail of the sale.
+          await tx.stockLog.create({
+            data: {
+              productId: item.productId,
+              type: "STOCK_OUT",
+              reason: "SALE",
+              quantityChange: -item.qty,
+              stockBefore: item.product.stock,
+              stockAfter: updatedProduct.stock,
+              note: `Pembayaran otomatis via Xendit untuk Pesanan ${order.orderNumber}`,
+              referenceId: order.id,
+            },
           });
         }
       }

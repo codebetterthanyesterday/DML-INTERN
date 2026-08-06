@@ -45,7 +45,7 @@ export interface StockLogRow {
   note: string | null;
   createdAt: string | Date;
   product: { id: string; name: string; sku: string; unit: string };
-  admin: { id: string; name: string };
+  admin?: { id: string; name: string } | null;
 }
 
 const REASON_LABELS: Record<string, string> = {
@@ -160,7 +160,7 @@ export function StockLogClient({ logs, currentPage, totalPages, currentType, cur
       Perubahan: log.quantityChange,
       "Stok Sebelum": log.stockBefore,
       "Stok Sesudah": log.stockAfter,
-      Admin: log.admin.name,
+      Admin: log.admin?.name ?? "Sistem",
       Catatan: log.note ?? "",
     }));
     const worksheet = XLSX.utils.json_to_sheet(rows);
@@ -312,7 +312,7 @@ export function StockLogClient({ logs, currentPage, totalPages, currentType, cur
                         <TableCell className="text-right whitespace-nowrap px-3 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-slate-600">
                           {log.stockBefore} → <span className="font-semibold text-slate-800">{log.stockAfter}</span>
                         </TableCell>
-                        <TableCell className="text-xs sm:text-sm text-slate-600 px-3 sm:px-4 py-3 sm:py-4">{log.admin.name}</TableCell>
+                        <TableCell className="text-xs sm:text-sm text-slate-600 px-3 sm:px-4 py-3 sm:py-4">{log.admin?.name ?? "Sistem"}</TableCell>
                         <TableCell className="text-xs sm:text-sm text-slate-500 max-w-[150px] sm:max-w-[200px] truncate px-3 sm:px-4 py-3 sm:py-4" title={log.note ?? ""}>
                           {log.note ?? "-"}
                         </TableCell>

@@ -5,7 +5,8 @@ import { ProductTable } from "@/components/admin/products/ProductTable";
 import { ProductFilters } from "@/components/admin/products/ProductFilters";
 import { ImportProductsModal } from "@/components/admin/products/ImportProductsModal";
 import { Button } from "@/components/ui/button";
-import { Plus, Package, Store, Factory, Archive, ListChecks } from "lucide-react";
+import { getStockAvailability } from "@/lib/utils/stock";
+import { Plus, Package, Store, Factory, Archive, ListChecks, AlertTriangle, PackageX } from "lucide-react";
 
 export const metadata = {
   title: "Kelola Produk — DML Admin",
@@ -13,14 +14,14 @@ export const metadata = {
 };
 
 interface PageProps {
-  searchParams: Promise<{ q?: string; type?: string; status?: string }>;
+  searchParams: Promise<{ q?: string; type?: string; status?: string; availability?: string }>;
 }
 
 export default async function AdminProductsPage({ searchParams }: PageProps) {
   const params = await searchParams;
-  const { q = "", type = "ALL", status = "ALL" } = params;
+  const { q = "", type = "ALL", status = "ALL", availability = "ALL" } = params;
 
-  const productsRaw = await getAdminProducts(q, type, status);
+  const productsRaw = await getAdminProducts(q, type, status, availability);
   const products = productsRaw.map((p) => ({
     ...p,
     price: p.price ? p.price.toNumber() : null,
@@ -31,6 +32,8 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
     retail: products.filter((p: { productType: string }) => p.productType === "RETAIL" || p.productType === "BOTH").length,
     industrial: products.filter((p: { productType: string }) => p.productType === "INDUSTRIAL" || p.productType === "BOTH").length,
     inactive: products.filter((p: { isActive: boolean }) => !p.isActive).length,
+    lowStock: products.filter((p) => getStockAvailability(p) === "LOW_STOCK").length,
+    outOfStock: products.filter((p) => getStockAvailability(p) === "OUT_OF_STOCK").length,
   };
 
   return (
@@ -61,7 +64,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
         {[
           { 
             label: "Total Produk", 
@@ -99,6 +102,24 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
             text: "text-slate-600",
             ring: "ring-slate-200/50"
           },
+          {
+            label: "Stok Menipis",
+            value: stats.lowStock,
+            icon: AlertTriangle,
+            gradient: "from-amber-500 to-orange-600",
+            bg: "bg-amber-50",
+            text: "text-amber-600",
+            ring: "ring-amber-100/50"
+          },
+          {
+            label: "Stok Habis",
+            value: stats.outOfStock,
+            icon: PackageX,
+            gradient: "from-red-500 to-rose-600",
+            bg: "bg-red-50",
+            text: "text-red-600",
+            ring: "ring-red-100/50"
+          },
         ].map((stat) => {
           const Icon = stat.icon;
           return (
@@ -125,7 +146,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
       </div>
 
       {/* Filters */}
-      <ProductFilters currentQ={q} currentType={type} currentStatus={status} />
+      <ProductFilters currentQ={q} currentType={type} currentStatus={status} currentAvailability={availability} />
 
       {/* Table */}
       <Suspense fallback={<div className="text-slate-400 text-sm py-12 text-center font-medium">Memuat produk...</div>}>

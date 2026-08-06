@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition, useEffect, useRef } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import {
   Table,
@@ -30,10 +30,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { MoreHorizontal, Pencil, Trash2, ToggleLeft, ToggleRight, ImageOff, Eye, Package, Tag } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, ToggleLeft, ToggleRight, ImageOff, Eye, Package, Tag, Radio, WifiOff } from "lucide-react";
 import { deleteProduct, toggleProductStatus } from "@/lib/actions/products";
 import type { Product, Category, ProductImage } from "@prisma/client/browser";
 import { ProductDetailsSheet } from "./ProductDetailsSheet";
+import { getStockAvailability, STOCK_AVAILABILITY_META } from "@/lib/utils/stock";
+import { cn } from "@/lib/utils";
 import toast from "react-hot-toast";
 
 type ProductWithRelations = Omit<Product, "price"> & {
@@ -53,6 +55,8 @@ export function ProductTable({ products }: ProductTableProps) {
   const [isPending, startTransition] = useTransition();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<ProductWithRelations | null>(null);
+  const [liveStatus, setLiveStatus] = useState<"connecting" | "live" | "reconnecting">("connecting");
+  const refreshTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const initialProductId = searchParams.get("productId");
 
@@ -68,6 +72,46 @@ export function ProductTable({ products }: ProductTableProps) {
       }
     }
   }, [initialProductId, products, searchParams, pathname, router]);
+
+  // Keeps the stock column live: subscribes to the stock_log_changes SSE
+  // stream (Postgres LISTEN/NOTIFY, fired on every stock in/out/opname — see
+  // /api/admin/stock-logs/stream) and refreshes this page's server data the
+  // instant any admin records a stock movement, from any tab, no polling.
+  useEffect(() => {
+    let es: EventSource | null = null;
+    let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+    let cancelled = false;
+
+    function connect() {
+      es = new EventSource("/api/admin/stock-logs/stream");
+
+      es.addEventListener("connected", () => setLiveStatus("live"));
+
+      es.addEventListener("stock_log", () => {
+        // Debounce: a burst of movements (e.g. bulk opname) should trigger a
+        // single refresh instead of one per event.
+        if (refreshTimeout.current) clearTimeout(refreshTimeout.current);
+        refreshTimeout.current = setTimeout(() => router.refresh(), 400);
+      });
+
+      es.onerror = () => {
+        if (cancelled) return;
+        setLiveStatus("reconnecting");
+        es?.close();
+        reconnectTimer = setTimeout(connect, 3000);
+      };
+    }
+
+    connect();
+
+    return () => {
+      cancelled = true;
+      es?.close();
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      if (refreshTimeout.current) clearTimeout(refreshTimeout.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleToggle = (id: string, current: boolean) => {
     startTransition(() => {
@@ -94,18 +138,41 @@ export function ProductTable({ products }: ProductTableProps) {
     });
   };
 
+  const liveIndicator = (
+    <div className="flex items-center justify-end mb-3">
+      <div
+        className={cn(
+          "flex items-center gap-1.5 rounded-full px-2.5 sm:px-3 py-1.5 text-xs font-semibold border transition-all duration-300",
+          liveStatus === "live" && "bg-emerald-50 text-emerald-700 border-emerald-200/80 shadow-sm shadow-emerald-200/50",
+          liveStatus === "connecting" && "bg-slate-100 text-slate-500 border-slate-200",
+          liveStatus === "reconnecting" && "bg-amber-50 text-amber-700 border-amber-200/80"
+        )}
+        title="Status koneksi real-time stok"
+      >
+        {liveStatus === "live" ? <Radio className="w-2.5 h-2.5 animate-pulse" /> : <WifiOff className="w-2.5 h-2.5" />}
+        <span>{liveStatus === "live" ? "Stok Live" : liveStatus === "connecting" ? "Menghubungkan..." : "Menyambung ulang..."}</span>
+      </div>
+    </div>
+  );
+
   if (products.length === 0) {
     return (
-      <div className="rounded-xl border border-slate-200 bg-white py-12 sm:py-20 flex flex-col items-center gap-3 text-slate-400 px-4">
-        <ImageOff className="w-10 h-10 opacity-40" />
-        <p className="font-semibold text-sm sm:text-base">Tidak ada produk ditemukan</p>
-        <p className="text-xs sm:text-sm text-center">Coba ubah filter atau tambahkan produk baru.</p>
-      </div>
+      <>
+        {liveIndicator}
+        <div className="rounded-xl border border-slate-200 bg-white py-12 sm:py-20 flex flex-col items-center gap-3 text-slate-400 px-4">
+          <ImageOff className="w-10 h-10 opacity-40" />
+          <p className="font-semibold text-sm sm:text-base">Tidak ada produk ditemukan</p>
+          <p className="text-xs sm:text-sm text-center">Coba ubah filter atau tambahkan produk baru.</p>
+        </div>
+      </>
     );
   }
 
   return (
     <>
+      {/* Live status - stock figures below update in real time */}
+      {liveIndicator}
+
       {/* Desktop Table View */}
       <div className="hidden sm:block rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm ring-1 ring-slate-900/5">
         <div className="overflow-x-auto">
@@ -152,8 +219,8 @@ export function ProductTable({ products }: ProductTableProps) {
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col justify-center">
-                      <span className={`font-bold text-sm flex items-center gap-1.5 ${product.stock === 0 ? "text-red-600" : product.stock < 20 ? "text-amber-600" : "text-emerald-600"}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${product.stock === 0 ? "bg-red-500" : product.stock < 20 ? "bg-amber-500" : "bg-emerald-500"}`}></span>
+                      <span className={`font-bold text-sm flex items-center gap-1.5 ${STOCK_AVAILABILITY_META[getStockAvailability(product)].textClass}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${STOCK_AVAILABILITY_META[getStockAvailability(product)].dotClass}`}></span>
                         {product.stock.toLocaleString("id-ID")}
                       </span>
                       <span className="text-[11px] text-slate-400 font-medium uppercase tracking-wider ml-3">{product.unit}</span>
@@ -322,8 +389,8 @@ export function ProductTable({ products }: ProductTableProps) {
               <div className="space-y-1">
                 <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Stok</span>
                 <div className="flex items-center gap-1.5">
-                  <span className={`w-1.5 h-1.5 rounded-full ${product.stock === 0 ? "bg-red-500" : product.stock < 20 ? "bg-amber-500" : "bg-emerald-500"}`}></span>
-                  <span className={`font-bold text-sm ${product.stock === 0 ? "text-red-600" : product.stock < 20 ? "text-amber-600" : "text-emerald-600"}`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${STOCK_AVAILABILITY_META[getStockAvailability(product)].dotClass}`}></span>
+                  <span className={`font-bold text-sm ${STOCK_AVAILABILITY_META[getStockAvailability(product)].textClass}`}>
                     {product.stock.toLocaleString("id-ID")} {product.unit}
                   </span>
                 </div>

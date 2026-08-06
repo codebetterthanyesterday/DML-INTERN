@@ -474,7 +474,7 @@ model AuditLog {
 model StockLog {
   id             String            @id @default(cuid())
   productId      String
-  adminId        String
+  adminId        String?
   type           StockMovementType
   reason         StockReason
   quantityChange Int // signed: + untuk stock in, - untuk stock out, +/- untuk opname
@@ -485,7 +485,7 @@ model StockLog {
   createdAt      DateTime          @default(now())
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  admin   User    @relation(fields: [adminId], references: [id])
+  admin   User?   @relation(fields: [adminId], references: [id])
 
   @@index([productId, createdAt])
   @@index([type])

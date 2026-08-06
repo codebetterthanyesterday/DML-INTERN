@@ -15,9 +15,10 @@ interface ProductFiltersProps {
   currentQ: string;
   currentType: string;
   currentStatus: string;
+  currentAvailability: string;
 }
 
-export function ProductFilters({ currentQ, currentType, currentStatus }: ProductFiltersProps) {
+export function ProductFilters({ currentQ, currentType, currentStatus, currentAvailability }: ProductFiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -51,12 +52,12 @@ export function ProductFilters({ currentQ, currentType, currentStatus }: Product
         />
       </form>
 
-      <div className="flex flex-col xs:flex-row gap-2 sm:gap-3">
+      <div className="grid grid-cols-1 xs:grid-cols-3 gap-2 sm:gap-3">
         <Select
           value={currentType}
           onValueChange={(v) => router.push(buildUrl({ type: v }))}
         >
-          <SelectTrigger className="w-full xs:flex-1 sm:w-[160px] bg-white border-slate-200 font-semibold text-slate-700 transition-all duration-200 rounded-lg">
+          <SelectTrigger className="w-full bg-white border-slate-200 font-semibold text-slate-700 transition-all duration-200 rounded-lg">
             <SelectValue placeholder="Tipe Produk" />
           </SelectTrigger>
           <SelectContent className="rounded-lg">
@@ -71,13 +72,28 @@ export function ProductFilters({ currentQ, currentType, currentStatus }: Product
           value={currentStatus}
           onValueChange={(v) => router.push(buildUrl({ status: v }))}
         >
-          <SelectTrigger className="w-full xs:flex-1 sm:w-[160px] bg-white border-slate-200 font-semibold text-slate-700 transition-all duration-200 rounded-lg">
+          <SelectTrigger className="w-full bg-white border-slate-200 font-semibold text-slate-700 transition-all duration-200 rounded-lg">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent className="rounded-lg">
             <SelectItem value="ALL">Semua Status</SelectItem>
             <SelectItem value="ACTIVE">Aktif</SelectItem>
             <SelectItem value="INACTIVE">Nonaktif</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select
+          value={currentAvailability}
+          onValueChange={(v) => router.push(buildUrl({ availability: v }))}
+        >
+          <SelectTrigger className="w-full bg-white border-slate-200 font-semibold text-slate-700 transition-all duration-200 rounded-lg">
+            <SelectValue placeholder="Status Stok" />
+          </SelectTrigger>
+          <SelectContent className="rounded-lg">
+            <SelectItem value="ALL">Semua Stok</SelectItem>
+            <SelectItem value="IN_STOCK">Tersedia</SelectItem>
+            <SelectItem value="LOW_STOCK">Menipis</SelectItem>
+            <SelectItem value="OUT_OF_STOCK">Habis</SelectItem>
           </SelectContent>
         </Select>
       </div>
