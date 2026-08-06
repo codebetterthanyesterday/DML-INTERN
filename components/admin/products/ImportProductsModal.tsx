@@ -184,17 +184,17 @@ export function ImportProductsModal() {
         </DialogHeader>
 
         <div className="grid gap-6 py-4">
-          <div className="bg-blue-50 border border-blue-200 p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="bg-red-50 border border-red-200 p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h4 className="font-semibold text-blue-900 flex items-center gap-2">
+              <h4 className="font-semibold text-red-700 flex items-center gap-2">
                 <AlertCircle className="w-4 h-4" />
                 Gunakan Template Tersedia
               </h4>
-              <p className="text-sm text-blue-700 mt-1">
+              <p className="text-sm text-red-600 mt-1">
                 Pastikan nama kolom (header) persis dengan template agar dapat terbaca sistem.
               </p>
             </div>
-            <Button onClick={handleDownloadTemplate} variant="secondary" className="bg-white border-blue-200 text-blue-700 hover:bg-blue-100 shadow-sm shrink-0 gap-2">
+            <Button onClick={handleDownloadTemplate} variant="secondary" className="bg-white border-red-200 text-red-600 hover:bg-red-100 shadow-sm shrink-0 gap-2">
               <Download className="w-4 h-4" />
               Unduh Template
             </Button>
@@ -251,7 +251,7 @@ export function ImportProductsModal() {
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full sm:w-auto">
                       {[
                         { label: "Berhasil", value: importResult.success, tone: "text-emerald-700 bg-white border-emerald-200" },
-                        { label: "Baru", value: importResult.created, tone: "text-blue-700 bg-white border-blue-200" },
+                        { label: "Baru", value: importResult.created, tone: "text-red-600 bg-white border-red-200" },
                         { label: "Diperbarui", value: importResult.updated, tone: "text-amber-700 bg-white border-amber-200" },
                         { label: "Gagal", value: importResult.failed, tone: "text-red-700 bg-white border-red-200" },
                       ].map((item) => (
@@ -291,14 +291,14 @@ export function ImportProductsModal() {
                                 key={product.id}
                                 type="button"
                                 onClick={() => handleOpenProduct(product)}
-                                className="w-full rounded-xl border border-slate-200 bg-white p-3 text-left shadow-sm hover:border-blue-300 hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full rounded-xl border border-slate-200 bg-white p-3 text-left shadow-sm hover:border-blue-300 hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-red-600"
                               >
                                 <div className="flex items-start justify-between gap-3">
                                   <div className="min-w-0">
                                     <div className="font-semibold text-slate-900 truncate">{product.name}</div>
                                     <div className="text-xs text-slate-500 mt-0.5 font-mono truncate">{product.sku}</div>
                                   </div>
-                                  <ArrowUpRight className="w-4 h-4 text-blue-600 shrink-0" />
+                                  <ArrowUpRight className="w-4 h-4 text-red-600 shrink-0" />
                                 </div>
                                 <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
                                   <span className="rounded-full bg-slate-100 px-2.5 py-1 font-semibold text-slate-600">

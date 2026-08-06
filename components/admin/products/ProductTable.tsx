@@ -123,7 +123,7 @@ export function ProductTable({ products }: ProductTableProps) {
               {products.map((product) => (
                 <TableRow 
                   key={product.id} 
-                  className="group hover:bg-blue-50/40 border-slate-100 transition-all cursor-pointer"
+                  className="group hover:bg-red-50/40 border-slate-100 transition-all cursor-pointer"
                   onClick={() => setSelectedProduct(product)}
                 >
                   <TableCell className="pl-6 py-4">
@@ -137,7 +137,7 @@ export function ProductTable({ products }: ProductTableProps) {
                         )}
                       </div>
                       <div className="flex flex-col justify-center">
-                        <div className="font-bold text-slate-900 text-sm group-hover:text-blue-700 transition-colors line-clamp-1">{product.name}</div>
+                        <div className="font-bold text-slate-900 text-sm group-hover:text-red-600 transition-colors line-clamp-1">{product.name}</div>
                         <div className="text-xs text-slate-500 font-mono mt-0.5 flex items-center gap-1.5">
                           <Tag className="w-3 h-3 text-slate-400" />
                           {product.sku}
@@ -172,7 +172,7 @@ export function ProductTable({ products }: ProductTableProps) {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-slate-400 hover:text-blue-950 hover:bg-slate-100 transition-all duration-200"
+                          className="h-8 w-8 text-slate-400 hover:text-slate-950 hover:bg-slate-100 transition-all duration-200"
                           disabled={isPending}
                         >
                           <MoreHorizontal className="h-4 w-4" />
@@ -181,7 +181,7 @@ export function ProductTable({ products }: ProductTableProps) {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-44 rounded-lg">
                         <DropdownMenuItem
-                          className="flex items-center gap-2 cursor-pointer text-blue-700 focus:bg-blue-50 focus:text-blue-800 transition-all duration-200"
+                          className="flex items-center gap-2 cursor-pointer text-red-600 focus:bg-red-50 focus:text-blue-800 transition-all duration-200"
                           onClick={() => setSelectedProduct(product)}
                         >
                           <Eye className="w-3.5 h-3.5" />
@@ -246,7 +246,7 @@ export function ProductTable({ products }: ProductTableProps) {
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="font-bold text-slate-900 text-sm group-hover:text-blue-700 transition-colors line-clamp-2">{product.name}</div>
+                <div className="font-bold text-slate-900 text-sm group-hover:text-red-600 transition-colors line-clamp-2">{product.name}</div>
                 <div className="text-xs text-slate-500 font-mono mt-0.5 flex items-center gap-1 line-clamp-1">
                   <Tag className="w-3 h-3 text-slate-400 shrink-0" />
                   {product.sku}
@@ -258,7 +258,7 @@ export function ProductTable({ products }: ProductTableProps) {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-slate-400 hover:text-blue-950 hover:bg-slate-100 transition-all duration-200"
+                      className="h-8 w-8 text-slate-400 hover:text-slate-950 hover:bg-slate-100 transition-all duration-200"
                       disabled={isPending}
                     >
                       <MoreHorizontal className="h-4 w-4" />
@@ -267,7 +267,7 @@ export function ProductTable({ products }: ProductTableProps) {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-44 rounded-lg">
                     <DropdownMenuItem
-                      className="flex items-center gap-2 cursor-pointer text-blue-700 focus:bg-blue-50 focus:text-blue-800 transition-all duration-200"
+                      className="flex items-center gap-2 cursor-pointer text-red-600 focus:bg-red-50 focus:text-blue-800 transition-all duration-200"
                       onClick={() => setSelectedProduct(product)}
                     >
                       <Eye className="w-3.5 h-3.5" />
@@ -348,7 +348,7 @@ export function ProductTable({ products }: ProductTableProps) {
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-blue-950 font-extrabold">Hapus Produk?</AlertDialogTitle>
+            <AlertDialogTitle className="text-slate-950 font-extrabold">Hapus Produk?</AlertDialogTitle>
             <AlertDialogDescription className="text-slate-500">
               Tindakan ini tidak dapat dibatalkan. Produk akan dihapus secara permanen dari database beserta semua data terkait.
             </AlertDialogDescription>

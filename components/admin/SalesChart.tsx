@@ -24,7 +24,7 @@ const chartConfig = {
   },
   industrial: {
     label: "Industrial",
-    color: "#172554", // text-blue-950
+    color: "#172554", // text-slate-950
   },
 } satisfies ChartConfig;
 
@@ -32,7 +32,7 @@ export function SalesChart({ data }: { data: ChartDataItem[] }) {
   return (
     <Card className="border-slate-200">
       <CardHeader>
-        <CardTitle className="text-blue-950 font-bold">Grafik Penjualan</CardTitle>
+        <CardTitle className="text-slate-950 font-bold">Grafik Penjualan</CardTitle>
         <CardDescription className="text-slate-500 font-medium">6 Bulan Terakhir</CardDescription>
       </CardHeader>
       <CardContent>

@@ -74,7 +74,7 @@ export function UserDetailsSheet({ userId, onClose }: { userId: string | null, o
     <Sheet open={!!userId} onOpenChange={(open) => !open && onClose()}>
       <SheetContent className="w-full sm:max-w-xl md:max-w-2xl p-0 flex flex-col h-full bg-[#fbfbfb]">
         <SheetHeader className="p-6 border-b border-slate-200 bg-white">
-          <SheetTitle className="text-xl font-bold text-blue-950 flex items-center gap-2">
+          <SheetTitle className="text-xl font-bold text-slate-950 flex items-center gap-2">
             Detail Pengguna
           </SheetTitle>
           <SheetDescription>
@@ -177,16 +177,16 @@ export function UserDetailsSheet({ userId, onClose }: { userId: string | null, o
               {user.role === "BUSINESS" && (
                 <TabsContent value="verification" className="mt-4 space-y-4">
                   {user.businessStatus === "PENDING" && (
-                    <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-start gap-3">
-                      <ShieldCheck className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+                    <div className="bg-red-50 border border-red-100 rounded-xl p-4 flex items-start gap-3">
+                      <ShieldCheck className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
                       <div>
-                        <h4 className="font-semibold text-blue-900 text-sm">Review Akun Bisnis</h4>
-                        <p className="text-blue-700 text-xs mt-1 mb-3">
+                        <h4 className="font-semibold text-red-700 text-sm">Review Akun Bisnis</h4>
+                        <p className="text-red-600 text-xs mt-1 mb-3">
                           Periksa dokumen legalitas di bawah. Setelah dokumen valid, Anda dapat menyetujui akun ini agar bisa bertransaksi B2B.
                         </p>
                         {!isRejecting ? (
                           <div className="flex gap-2">
-                            <Button size="sm" onClick={() => handleUpdateBusinessStatus("APPROVED")} className="bg-blue-600 hover:bg-blue-700">Setujui Akun</Button>
+                            <Button size="sm" onClick={() => handleUpdateBusinessStatus("APPROVED")} className="bg-red-600 hover:bg-blue-700">Setujui Akun</Button>
                             <Button size="sm" variant="outline" onClick={() => setIsRejecting(true)} className="text-red-600 border-red-200 hover:bg-red-50">Tolak Akun</Button>
                           </div>
                         ) : (
@@ -195,7 +195,7 @@ export function UserDetailsSheet({ userId, onClose }: { userId: string | null, o
                               placeholder="Alasan penolakan..."
                               value={rejectReason}
                               onChange={(e) => setRejectReason(e.target.value)}
-                              className="text-sm border-blue-200 bg-white"
+                              className="text-sm border-red-200 bg-white"
                             />
                             <div className="flex gap-2">
                               <Button size="sm" variant="destructive" onClick={() => handleUpdateBusinessStatus("REJECTED")}>Konfirmasi Tolak</Button>
@@ -270,7 +270,7 @@ export function UserDetailsSheet({ userId, onClose }: { userId: string | null, o
                       {user.orders.map((order: any) => (
                         <div key={order.id} className="p-3 bg-white border border-slate-200 rounded-lg flex items-center justify-between">
                           <div>
-                            <p className="text-sm font-semibold text-blue-900">{order.orderNumber}</p>
+                            <p className="text-sm font-semibold text-red-700">{order.orderNumber}</p>
                             <p className="text-xs text-slate-500">{format(new Date(order.createdAt), "dd MMM yyyy")}</p>
                           </div>
                           <Badge variant="outline">{order.status}</Badge>
@@ -292,7 +292,7 @@ export function UserDetailsSheet({ userId, onClose }: { userId: string | null, o
                         {user.quotes.map((quote: any) => (
                           <div key={quote.id} className="p-3 bg-white border border-slate-200 rounded-lg flex items-center justify-between">
                             <div>
-                              <p className="text-sm font-semibold text-blue-900">{quote.quoteNumber}</p>
+                              <p className="text-sm font-semibold text-red-700">{quote.quoteNumber}</p>
                               <p className="text-xs text-slate-500">{format(new Date(quote.createdAt), "dd MMM yyyy")}</p>
                             </div>
                             <Badge variant="outline">{quote.status}</Badge>

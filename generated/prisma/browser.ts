@@ -103,6 +103,11 @@ export type Notification = Prisma.NotificationModel
  */
 export type AuditLog = Prisma.AuditLogModel
 /**
+ * Model StockLog
+ * 
+ */
+export type StockLog = Prisma.StockLogModel
+/**
  * Model SiteSetting
  * 
  */

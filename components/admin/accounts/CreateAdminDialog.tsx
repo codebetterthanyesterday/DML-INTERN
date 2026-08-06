@@ -73,7 +73,7 @@ export function CreateAdminDialog() {
     <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>
         <Button 
-          className="bg-gradient-to-r from-blue-700 to-blue-900 hover:from-blue-800 hover:to-blue-950 text-white rounded-xl font-semibold shadow-lg shadow-blue-900/20 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 w-full sm:w-auto"
+          className="bg-gradient-to-r from-blue-700 to-blue-900 hover:from-blue-800 hover:to-blue-950 text-white rounded-xl font-semibold shadow-lg shadow-red-700/20 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 w-full sm:w-auto"
         >
           <UserPlus className="w-4 h-4 mr-2" />
           Tambah Admin
@@ -81,9 +81,9 @@ export function CreateAdminDialog() {
       </SheetTrigger>
       <SheetContent className="sm:max-w-md w-full p-0 border-l border-slate-200 flex flex-col h-full bg-white gap-0">
         <div className="relative overflow-hidden bg-slate-50/50 px-6 py-8 border-b border-slate-100 shrink-0">
-          <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-600/10 rounded-full blur-[40px] pointer-events-none" />
+          <div className="absolute -top-24 -right-24 w-48 h-48 bg-red-600/10 rounded-full blur-[40px] pointer-events-none" />
           <SheetHeader className="relative z-10 text-left space-y-0">
-            <div className="w-14 h-14 bg-white text-blue-600 rounded-2xl flex items-center justify-center mb-5 ring-1 ring-slate-200/60 shadow-sm group-hover:scale-105 transition-transform">
+            <div className="w-14 h-14 bg-white text-red-600 rounded-2xl flex items-center justify-center mb-5 ring-1 ring-slate-200/60 shadow-sm group-hover:scale-105 transition-transform">
               <ShieldCheck className="w-7 h-7" />
             </div>
             <SheetTitle className="text-2xl text-slate-900 font-extrabold tracking-tight">Buat Admin Baru</SheetTitle>
@@ -109,7 +109,7 @@ export function CreateAdminDialog() {
                       </div>
                       <Input
                         placeholder="Masukkan nama lengkap"
-                        className="pl-10 bg-slate-50/50 hover:bg-slate-50 border-slate-200/60 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-xl h-11 transition-all duration-300 shadow-sm placeholder:text-slate-400"
+                        className="pl-10 bg-slate-50/50 hover:bg-slate-50 border-slate-200/60 focus:bg-white focus:border-red-600 focus:ring-4 focus:ring-red-600/10 rounded-xl h-11 transition-all duration-300 shadow-sm placeholder:text-slate-400"
                         {...field}
                       />
                     </div>
@@ -133,7 +133,7 @@ export function CreateAdminDialog() {
                       <Input
                         type="email"
                         placeholder="contoh@dml.com"
-                        className="pl-10 bg-slate-50/50 hover:bg-slate-50 border-slate-200/60 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-xl h-11 transition-all duration-300 shadow-sm placeholder:text-slate-400"
+                        className="pl-10 bg-slate-50/50 hover:bg-slate-50 border-slate-200/60 focus:bg-white focus:border-red-600 focus:ring-4 focus:ring-red-600/10 rounded-xl h-11 transition-all duration-300 shadow-sm placeholder:text-slate-400"
                         {...field}
                       />
                     </div>
@@ -156,7 +156,7 @@ export function CreateAdminDialog() {
                       </div>
                       <Input
                         placeholder="08123456789"
-                        className="pl-10 bg-slate-50/50 hover:bg-slate-50 border-slate-200/60 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-xl h-11 transition-all duration-300 shadow-sm placeholder:text-slate-400"
+                        className="pl-10 bg-slate-50/50 hover:bg-slate-50 border-slate-200/60 focus:bg-white focus:border-red-600 focus:ring-4 focus:ring-red-600/10 rounded-xl h-11 transition-all duration-300 shadow-sm placeholder:text-slate-400"
                         {...field}
                       />
                     </div>
@@ -184,13 +184,13 @@ export function CreateAdminDialog() {
                       <Input
                         type={showPassword ? "text" : "password"}
                         placeholder="Minimal 8 karakter"
-                        className="pl-10 pr-10 bg-slate-50/50 hover:bg-slate-50 border-slate-200/60 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-xl h-11 transition-all duration-300 shadow-sm placeholder:text-slate-400"
+                        className="pl-10 pr-10 bg-slate-50/50 hover:bg-slate-50 border-slate-200/60 focus:bg-white focus:border-red-600 focus:ring-4 focus:ring-red-600/10 rounded-xl h-11 transition-all duration-300 shadow-sm placeholder:text-slate-400"
                         {...field}
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-blue-600 focus:outline-none transition-colors"
+                        className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-red-600 focus:outline-none transition-colors"
                       >
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
@@ -215,13 +215,13 @@ export function CreateAdminDialog() {
                       <Input
                         type={showConfirmPassword ? "text" : "password"}
                         placeholder="Ketik ulang password"
-                        className="pl-10 pr-10 bg-slate-50/50 hover:bg-slate-50 border-slate-200/60 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-xl h-11 transition-all duration-300 shadow-sm placeholder:text-slate-400"
+                        className="pl-10 pr-10 bg-slate-50/50 hover:bg-slate-50 border-slate-200/60 focus:bg-white focus:border-red-600 focus:ring-4 focus:ring-red-600/10 rounded-xl h-11 transition-all duration-300 shadow-sm placeholder:text-slate-400"
                         {...field}
                       />
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-blue-600 focus:outline-none transition-colors"
+                        className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-red-600 focus:outline-none transition-colors"
                       >
                         {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
@@ -241,7 +241,7 @@ export function CreateAdminDialog() {
                 className={`w-full h-12 rounded-xl font-semibold shadow-md transition-all duration-300 text-[15px] ${
                   isSuccess 
                     ? 'bg-emerald-500 hover:bg-emerald-600 focus:ring-emerald-500/20 text-white shadow-emerald-500/20' 
-                    : 'bg-blue-900 hover:bg-blue-950 focus:ring-blue-900/20 text-white shadow-blue-900/20 hover:-translate-y-0.5'
+                    : 'bg-blue-900 hover:bg-red-600 focus:ring-red-700/20 text-white shadow-red-700/20 hover:-translate-y-0.5'
                 }`}
               >
                 {isPending ? (

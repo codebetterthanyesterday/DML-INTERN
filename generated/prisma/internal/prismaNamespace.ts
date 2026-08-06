@@ -414,6 +414,7 @@ export const ModelName = {
   Review: 'Review',
   Notification: 'Notification',
   AuditLog: 'AuditLog',
+  StockLog: 'StockLog',
   SiteSetting: 'SiteSetting'
 } as const
 
@@ -430,7 +431,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "address" | "businessDocument" | "category" | "product" | "productImage" | "cart" | "cartItem" | "order" | "orderItem" | "quote" | "quoteItem" | "invoice" | "payment" | "review" | "notification" | "auditLog" | "siteSetting"
+    modelProps: "user" | "address" | "businessDocument" | "category" | "product" | "productImage" | "cart" | "cartItem" | "order" | "orderItem" | "quote" | "quoteItem" | "invoice" | "payment" | "review" | "notification" | "auditLog" | "stockLog" | "siteSetting"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1692,6 +1693,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    StockLog: {
+      payload: Prisma.$StockLogPayload<ExtArgs>
+      fields: Prisma.StockLogFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.StockLogFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockLogPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.StockLogFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockLogPayload>
+        }
+        findFirst: {
+          args: Prisma.StockLogFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockLogPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.StockLogFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockLogPayload>
+        }
+        findMany: {
+          args: Prisma.StockLogFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockLogPayload>[]
+        }
+        create: {
+          args: Prisma.StockLogCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockLogPayload>
+        }
+        createMany: {
+          args: Prisma.StockLogCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.StockLogCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockLogPayload>[]
+        }
+        delete: {
+          args: Prisma.StockLogDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockLogPayload>
+        }
+        update: {
+          args: Prisma.StockLogUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockLogPayload>
+        }
+        deleteMany: {
+          args: Prisma.StockLogDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.StockLogUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.StockLogUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockLogPayload>[]
+        }
+        upsert: {
+          args: Prisma.StockLogUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StockLogPayload>
+        }
+        aggregate: {
+          args: Prisma.StockLogAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateStockLog>
+        }
+        groupBy: {
+          args: Prisma.StockLogGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.StockLogGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.StockLogCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.StockLogCountAggregateOutputType> | number
+        }
+      }
+    }
     SiteSetting: {
       payload: Prisma.$SiteSettingPayload<ExtArgs>
       fields: Prisma.SiteSettingFieldRefs
@@ -2044,6 +2119,23 @@ export const AuditLogScalarFieldEnum = {
 export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
 
 
+export const StockLogScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  adminId: 'adminId',
+  type: 'type',
+  reason: 'reason',
+  quantityChange: 'quantityChange',
+  stockBefore: 'stockBefore',
+  stockAfter: 'stockAfter',
+  note: 'note',
+  referenceId: 'referenceId',
+  createdAt: 'createdAt'
+} as const
+
+export type StockLogScalarFieldEnum = (typeof StockLogScalarFieldEnum)[keyof typeof StockLogScalarFieldEnum]
+
+
 export const SiteSettingScalarFieldEnum = {
   id: 'id',
   key: 'key',
@@ -2383,6 +2475,34 @@ export type ListEnumAuditActionFieldRefInput<$PrismaModel> = FieldRefInputType<$
 
 
 /**
+ * Reference to a field of type 'StockMovementType'
+ */
+export type EnumStockMovementTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StockMovementType'>
+    
+
+
+/**
+ * Reference to a field of type 'StockMovementType[]'
+ */
+export type ListEnumStockMovementTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StockMovementType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'StockReason'
+ */
+export type EnumStockReasonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StockReason'>
+    
+
+
+/**
+ * Reference to a field of type 'StockReason[]'
+ */
+export type ListEnumStockReasonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StockReason[]'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -2563,6 +2683,7 @@ export type GlobalOmitConfig = {
   review?: Prisma.ReviewOmit
   notification?: Prisma.NotificationOmit
   auditLog?: Prisma.AuditLogOmit
+  stockLog?: Prisma.StockLogOmit
   siteSetting?: Prisma.SiteSettingOmit
 }
 

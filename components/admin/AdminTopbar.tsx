@@ -42,14 +42,14 @@ export function AdminTopbar({ user }: { user?: { name?: string | null; email?: s
                 type="search"
                 autoFocus
                 placeholder="Cari sesuatu..."
-                className="w-full appearance-none bg-slate-50 border-slate-200 text-sm focus:border-blue-900 focus:ring-blue-900 pl-8 shadow-none"
+                className="w-full appearance-none bg-slate-50 border-slate-200 text-sm focus:border-blue-900 focus:ring-red-700 pl-8 shadow-none"
               />
             </div>
           </form>
           <Button
             variant="ghost"
             size="icon"
-            className="shrink-0 text-slate-500 hover:text-blue-950"
+            className="shrink-0 text-slate-500 hover:text-slate-950"
             onClick={() => setIsSearchOpen(false)}
             aria-label="Tutup pencarian"
           >
@@ -63,7 +63,7 @@ export function AdminTopbar({ user }: { user?: { name?: string | null; email?: s
               <Button
                 variant="outline"
                 size="icon"
-                className="shrink-0 md:hidden text-slate-500 hover:text-blue-950 border-slate-200 focus-visible:ring-2"
+                className="shrink-0 md:hidden text-slate-500 hover:text-slate-950 border-slate-200 focus-visible:ring-2"
                 aria-label="Buka menu navigasi"
                 aria-expanded="false"
               >
@@ -84,7 +84,7 @@ export function AdminTopbar({ user }: { user?: { name?: string | null; email?: s
                 <Input
                   type="search"
                   placeholder="Cari sesuatu..."
-                  className="w-full appearance-none bg-slate-50 border-slate-200 text-sm focus:border-blue-900 focus:ring-blue-900 pl-8 shadow-none"
+                  className="w-full appearance-none bg-slate-50 border-slate-200 text-sm focus:border-blue-900 focus:ring-red-700 pl-8 shadow-none"
                 />
               </div>
             </form>
@@ -92,7 +92,7 @@ export function AdminTopbar({ user }: { user?: { name?: string | null; email?: s
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden text-slate-500 hover:text-blue-950 hover:bg-slate-100 focus-visible:ring-2"
+              className="md:hidden text-slate-500 hover:text-slate-950 hover:bg-slate-100 focus-visible:ring-2"
               onClick={() => setIsSearchOpen(true)}
               aria-label="Buka pencarian"
             >
@@ -113,12 +113,12 @@ export function AdminTopbar({ user }: { user?: { name?: string | null; email?: s
                 >
                   <Avatar className="h-9 w-9">
                     <AvatarImage src="/placeholder-user.jpg" alt={user?.name || "Admin"} />
-                    <AvatarFallback className="bg-blue-950 text-white font-bold text-xs">{initials}</AvatarFallback>
+                    <AvatarFallback className="bg-red-600 text-white font-bold text-xs">{initials}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48" collisionPadding={16}>
-                <DropdownMenuLabel className="text-blue-950">
+                <DropdownMenuLabel className="text-slate-950">
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium leading-none">{user?.name || "Akun Saya"}</p>
                     {user?.email && (

@@ -75,7 +75,7 @@ export function EditProfileForm({ initialData }: EditProfileFormProps) {
                       </div>
                       <Input
                         placeholder="Masukkan nama lengkap Anda"
-                        className="pl-10 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20"
+                        className="pl-10 border-slate-200 focus:border-red-600 focus:ring-red-600/20"
                         {...field}
                       />
                     </div>
@@ -98,7 +98,7 @@ export function EditProfileForm({ initialData }: EditProfileFormProps) {
                       </div>
                       <Input
                         placeholder="Contoh: 081234567890"
-                        className="pl-10 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20"
+                        className="pl-10 border-slate-200 focus:border-red-600 focus:ring-red-600/20"
                         {...field}
                       />
                     </div>
@@ -114,7 +114,7 @@ export function EditProfileForm({ initialData }: EditProfileFormProps) {
                 disabled={isPending || !form.formState.isDirty}
                 className={`min-w-[140px] transition-all duration-300 ${isSuccess
                     ? 'bg-green-600 hover:bg-green-700 focus:ring-green-500/20'
-                    : 'bg-blue-900 hover:bg-blue-950 focus:ring-blue-900/20'
+                    : 'bg-blue-900 hover:bg-red-600 focus:ring-red-700/20'
                   }`}
               >
                 {isPending ? (

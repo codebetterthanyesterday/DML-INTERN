@@ -28,12 +28,12 @@ async function RFQContent({ searchParams }: PageProps) {
       label: "Total RFQ",
       value: allStats.ALL ?? 0,
       icon: FileText,
-      color: "bg-[#fbfbfb] text-blue-950",
-      iconColor: "text-blue-600",
-      iconBg: "bg-blue-500/10 ring-1 ring-blue-500/20",
+      color: "bg-[#fbfbfb] text-slate-950",
+      iconColor: "text-red-600",
+      iconBg: "bg-red-500/10 ring-1 ring-red-600/20",
       accentBorder: "border-t-blue-600 border-t-4",
       subLabel: "Semua Pengajuan",
-      badgeBg: "bg-blue-50 text-blue-700 border-blue-100",
+      badgeBg: "bg-red-50 text-red-600 border-red-100",
     },
     {
       label: "Perlu Ditinjau",
@@ -124,7 +124,7 @@ export default async function AdminQuotesPage({ searchParams }: PageProps) {
     <div className="space-y-6 pb-8">
       {/* Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-blue-950">Kelola RFQ</h1>
+        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-950">Kelola RFQ</h1>
         <p className="text-slate-500 mt-1 font-medium text-sm sm:text-base">
           Tinjau pengajuan harga dari customer bisnis dan kirimkan penawaran yang kompetitif.
         </p>

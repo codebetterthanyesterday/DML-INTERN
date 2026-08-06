@@ -56,7 +56,7 @@ export function CategoryClient({ initialCategories }: CategoryClientProps) {
     <div className="flex flex-col space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-blue-950">Kelola Kategori</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-950">Kelola Kategori</h1>
           <p className="text-slate-500 mt-1 font-medium text-sm sm:text-base">
             Atur kategori produk, subkategori, dan representasi visualnya.
           </p>
@@ -70,10 +70,10 @@ export function CategoryClient({ initialCategories }: CategoryClientProps) {
       <div className="flex flex-col space-y-4">
         <div className="flex items-center justify-between gap-3">
           <div className="relative flex-1 max-w-sm group">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-red-600 transition-colors" />
             <Input
               placeholder="Cari kategori..."
-              className="pl-9 bg-slate-50/50 hover:bg-slate-50 border-slate-200/60 focus-visible:ring-4 focus-visible:ring-blue-500/15 focus-visible:border-blue-500 rounded-xl transition-all"
+              className="pl-9 bg-slate-50/50 hover:bg-slate-50 border-slate-200/60 focus-visible:ring-4 focus-visible:ring-red-600/15 focus-visible:border-red-600 rounded-xl transition-all"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -96,7 +96,7 @@ export function CategoryClient({ initialCategories }: CategoryClientProps) {
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetContent className="w-full sm:max-w-md overflow-y-auto">
           <SheetHeader className="mb-6">
-            <SheetTitle className="text-blue-950 font-extrabold">
+            <SheetTitle className="text-slate-950 font-extrabold">
               {selectedCategory ? "Edit Kategori" : "Tambah Kategori"}
             </SheetTitle>
             <SheetDescription className="text-slate-500">

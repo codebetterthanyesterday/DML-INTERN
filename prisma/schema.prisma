@@ -100,6 +100,22 @@ enum NotificationType {
   SYSTEM_ALERT
   BUSINESS_VERIFICATION
   LOW_STOCK_ALERT
+  STOCK_OPNAME_VARIANCE
+}
+
+enum StockMovementType {
+  STOCK_IN
+  STOCK_OUT
+  OPNAME
+}
+
+enum StockReason {
+  PURCHASE          // masuk: pembelian/restock dari supplier
+  RETURN_IN         // masuk: retur dari pelanggan
+  SALE              // keluar: terjual (order/manual)
+  DAMAGED           // keluar: rusak/kadaluarsa
+  ADJUSTMENT        // koreksi manual (masuk/keluar)
+  OPNAME_CORRECTION // koreksi hasil stock opname
 }
 
 enum AuditAction {
@@ -139,6 +155,7 @@ model User {
   reviews           Review[]
   notifications     Notification[]
   auditLogs         AuditLog[]
+  stockLogs         StockLog[]
 
   @@map("users")
 }
@@ -223,6 +240,7 @@ model Product {
   orderItems OrderItem[]
   quoteItems QuoteItem[]
   reviews    Review[]
+  stockLogs  StockLog[]
 
   @@index([categoryId])
   @@index([productType])
@@ -447,6 +465,32 @@ model AuditLog {
   @@index([adminId])
   @@index([targetId])
   @@map("audit_logs")
+}
+
+// ============================================
+// STOCK LOG (Pencatatan & Log Aktivitas Stok)
+// ============================================
+
+model StockLog {
+  id             String            @id @default(cuid())
+  productId      String
+  adminId        String
+  type           StockMovementType
+  reason         StockReason
+  quantityChange Int // signed: + untuk stock in, - untuk stock out, +/- untuk opname
+  stockBefore    Int
+  stockAfter     Int
+  note           String?
+  referenceId    String? // opsional: orderId, opname session id, dll
+  createdAt      DateTime          @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  admin   User    @relation(fields: [adminId], references: [id])
+
+  @@index([productId, createdAt])
+  @@index([type])
+  @@index([createdAt])
+  @@map("stock_logs")
 }
 
 // ============================================

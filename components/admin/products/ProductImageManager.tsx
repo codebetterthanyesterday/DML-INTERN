@@ -131,7 +131,7 @@ export function ProductImageManager({ initialImages = [], onUploadingChange }: P
     <div className="space-y-3">
       <input type="hidden" name="images" value={hiddenValue} />
 
-      <label className="relative flex flex-col items-center justify-center gap-1.5 p-6 rounded-lg border-2 border-dashed border-slate-200 hover:border-blue-300 hover:bg-blue-50/30 transition-colors cursor-pointer text-slate-400">
+      <label className="relative flex flex-col items-center justify-center gap-1.5 p-6 rounded-lg border-2 border-dashed border-slate-200 hover:border-blue-300 hover:bg-red-50/30 transition-colors cursor-pointer text-slate-400">
         <input
           type="file"
           multiple
@@ -165,7 +165,7 @@ export function ProductImageManager({ initialImages = [], onUploadingChange }: P
                   <img src={toPublicImageUrl(img.url) ?? ""} alt="" className="w-full h-full object-cover" />
                 ) : img.status === "uploading" ? (
                   <div className="w-full h-full flex items-center justify-center">
-                    <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />
+                    <Loader2 className="w-4 h-4 text-red-600 animate-spin" />
                   </div>
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
@@ -179,7 +179,7 @@ export function ProductImageManager({ initialImages = [], onUploadingChange }: P
                   <>
                     <p className="text-xs font-semibold text-slate-500">Mengupload... {img.progress}%</p>
                     <div className="mt-1 w-full h-1 rounded-full bg-slate-100 overflow-hidden">
-                      <div className="h-full bg-blue-500 transition-all" style={{ width: `${img.progress}%` }} />
+                      <div className="h-full bg-red-500 transition-all" style={{ width: `${img.progress}%` }} />
                     </div>
                   </>
                 )}
@@ -189,7 +189,7 @@ export function ProductImageManager({ initialImages = [], onUploadingChange }: P
                     <button
                       type="button"
                       onClick={() => retryImage(img.key)}
-                      className="text-xs font-bold text-blue-600 hover:underline shrink-0"
+                      className="text-xs font-bold text-red-600 hover:underline shrink-0"
                     >
                       Hapus
                     </button>
@@ -208,7 +208,7 @@ export function ProductImageManager({ initialImages = [], onUploadingChange }: P
                     type="button"
                     onClick={() => moveImage(img.key, "up")}
                     disabled={idx === 0}
-                    className="p-1 text-slate-400 hover:text-blue-950 disabled:opacity-25 disabled:pointer-events-none"
+                    className="p-1 text-slate-400 hover:text-slate-950 disabled:opacity-25 disabled:pointer-events-none"
                     aria-label="Pindah ke atas"
                   >
                     <ChevronUp className="w-4 h-4" />
@@ -217,7 +217,7 @@ export function ProductImageManager({ initialImages = [], onUploadingChange }: P
                     type="button"
                     onClick={() => moveImage(img.key, "down")}
                     disabled={idx === images.length - 1}
-                    className="p-1 text-slate-400 hover:text-blue-950 disabled:opacity-25 disabled:pointer-events-none"
+                    className="p-1 text-slate-400 hover:text-slate-950 disabled:opacity-25 disabled:pointer-events-none"
                     aria-label="Pindah ke bawah"
                   >
                     <ChevronDown className="w-4 h-4" />

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server"
 
 const ALLOWED_CONTENT_TYPES = ["image/jpeg", "image/png", "application/pdf"]
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024 // 5MB
-const ALLOWED_DOC_TYPES = ["NPWP", "SIUP"]
+const ALLOWED_DOC_TYPES = ["NPWP", "SIUP", "NIB"]
 
 // Mints short-lived, scoped upload tokens so business registration documents
 // can be sent directly from the browser to Vercel Blob (bypassing the

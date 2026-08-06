@@ -46,8 +46,8 @@ async function AccountsContent({ searchParams }: PageProps) {
       value: totalUsers,
       icon: Users,
       accentBorder: "border-t-blue-600",
-      iconBg: "bg-blue-500/10 text-blue-600 ring-1 ring-blue-500/20",
-      badgeBg: "bg-blue-50 text-blue-700 border-blue-100",
+      iconBg: "bg-red-500/10 text-red-600 ring-1 ring-red-600/20",
+      badgeBg: "bg-red-50 text-red-600 border-red-100",
     },
     {
       label: "Menunggu Verifikasi",
@@ -91,7 +91,7 @@ async function AccountsContent({ searchParams }: PageProps) {
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
                 <p className="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider truncate">{card.label}</p>
-                <p className="text-3xl font-black text-blue-950 tracking-tight mt-1">{card.value}</p>
+                <p className="text-3xl font-black text-slate-950 tracking-tight mt-1">{card.value}</p>
               </div>
               <div className={`p-3 rounded-xl ${card.iconBg} transition-transform group-hover:scale-110 shrink-0`}>
                 <card.icon className="w-5 h-5 shrink-0" />
@@ -132,7 +132,7 @@ export default async function AdminAccountsPage({ searchParams }: PageProps) {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-blue-950">Kelola Akun & Pengguna</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-950">Kelola Akun & Pengguna</h1>
           <p className="text-slate-500 mt-1 font-medium text-sm sm:text-base">
             Manajemen pengguna platform, verifikasi bisnis B2B, dan hak akses.
           </p>

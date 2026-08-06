@@ -73,7 +73,7 @@ export function ChangePasswordForm() {
                       <Input
                         type={showOldPassword ? "text" : "password"}
                         placeholder="••••••••"
-                        className="pl-10 pr-10 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20"
+                        className="pl-10 pr-10 border-slate-200 focus:border-red-600 focus:ring-red-600/20"
                         {...field}
                       />
                       <button
@@ -104,7 +104,7 @@ export function ChangePasswordForm() {
                       <Input
                         type={showNewPassword ? "text" : "password"}
                         placeholder="Minimal 8 karakter"
-                        className="pl-10 pr-10 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20"
+                        className="pl-10 pr-10 border-slate-200 focus:border-red-600 focus:ring-red-600/20"
                         {...field}
                       />
                       <button
@@ -135,7 +135,7 @@ export function ChangePasswordForm() {
                       <Input
                         type={showConfirmPassword ? "text" : "password"}
                         placeholder="Ketik ulang password baru"
-                        className="pl-10 pr-10 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20"
+                        className="pl-10 pr-10 border-slate-200 focus:border-red-600 focus:ring-red-600/20"
                         {...field}
                       />
                       <button
@@ -158,7 +158,7 @@ export function ChangePasswordForm() {
                 disabled={isPending}
                 className={`min-w-[140px] transition-all duration-300 ${isSuccess
                     ? 'bg-green-600 hover:bg-green-700 focus:ring-green-500/20'
-                    : 'bg-blue-900 hover:bg-blue-950 focus:ring-blue-900/20'
+                    : 'bg-blue-900 hover:bg-red-600 focus:ring-red-700/20'
                   }`}
               >
                 {isPending ? (

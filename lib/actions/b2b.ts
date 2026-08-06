@@ -176,13 +176,24 @@ export async function payInvoiceXendit(invoiceId: string) {
 
   const xenditInv = await XenditInvoice.createInvoice({ data: xenditInvoiceData });
 
-  await prisma.payment.create({
-    data: {
+  // An Invoice can only have one Payment row (invoiceId is unique), so upsert
+  // instead of create to support retries/switching payment methods.
+  await prisma.payment.upsert({
+    where: { invoiceId: invoice.id },
+    create: {
       invoiceId: invoice.id,
       method: PaymentMethod.GATEWAY,
       amount: invoice.amount,
       gatewayRef: xenditInv.id,
       paymentUrl: xenditInv.invoiceUrl
+    },
+    update: {
+      method: PaymentMethod.GATEWAY,
+      amount: invoice.amount,
+      gatewayRef: xenditInv.id,
+      paymentUrl: xenditInv.invoiceUrl,
+      status: "PENDING",
+      paidAt: null
     }
   });
 
@@ -215,12 +226,23 @@ export async function uploadManualPaymentProof(invoiceId: string, proofUrl: stri
       data: { paymentProofUrl: proofUrl }
     });
 
-    await tx.payment.create({
-      data: {
+    // An Invoice can only have one Payment row (invoiceId is unique), so upsert
+    // instead of create — a prior attempt (e.g. via Xendit) may already exist.
+    await tx.payment.upsert({
+      where: { invoiceId: invoice.id },
+      create: {
         invoiceId: invoice.id,
         method: PaymentMethod.BANK_TRANSFER,
         amount: invoice.amount,
         paymentUrl: proofUrl,
+      },
+      update: {
+        method: PaymentMethod.BANK_TRANSFER,
+        amount: invoice.amount,
+        paymentUrl: proofUrl,
+        gatewayRef: null,
+        status: "PENDING",
+        paidAt: null
       }
     });
   });

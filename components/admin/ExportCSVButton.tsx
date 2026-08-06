@@ -66,7 +66,7 @@ export function ExportCSVButton({ data }: { data: SummaryMetrics }) {
   return (
     <Button 
       onClick={handleExport}
-      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-sm"
+      className="bg-red-600 hover:bg-blue-700 text-white font-semibold shadow-sm"
     >
       <Download className="w-4 h-4 mr-2" />
       Export CSV

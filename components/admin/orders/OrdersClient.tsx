@@ -52,7 +52,7 @@ const STATUS_CONFIG: Record<
   },
   PROCESSING: {
     label: "Diproses",
-    color: "bg-blue-50 text-blue-700 border-blue-200",
+    color: "bg-red-50 text-red-600 border-red-200",
     icon: RefreshCw,
     next: [OrderStatus.SHIPPED, OrderStatus.CANCELLED],
   },
@@ -158,12 +158,12 @@ function OrderDetailPanel({
           <div className="flex items-center gap-2 mb-1">
             <span className="font-mono text-xs font-bold text-slate-400 uppercase tracking-widest">Pesanan</span>
           </div>
-          <h2 className="text-xl font-extrabold text-blue-950 tracking-tight">{order.orderNumber}</h2>
+          <h2 className="text-xl font-extrabold text-slate-950 tracking-tight">{order.orderNumber}</h2>
           <p className="text-xs text-slate-400 mt-0.5">{formattedDate} · {formattedTime}</p>
         </div>
         <button
           onClick={onClose}
-          className="rounded-lg p-2 text-slate-400 hover:text-blue-950 hover:bg-slate-100 transition-colors -mt-1 -mr-1 focus-visible:ring-2 focus-visible:ring-blue-950 focus-visible:outline-none"
+          className="rounded-lg p-2 text-slate-400 hover:text-slate-950 hover:bg-slate-100 transition-colors -mt-1 -mr-1 focus-visible:ring-2 focus-visible:ring-blue-950 focus-visible:outline-none"
           aria-label="Tutup panel detail"
         >
           <X className="w-4 h-4" />
@@ -194,7 +194,7 @@ function OrderDetailPanel({
             <span className="text-xs font-extrabold text-slate-500 uppercase tracking-widest">Pembeli</span>
           </div>
           <div className="px-4 py-3 space-y-1">
-            <p className="font-bold text-blue-950 text-sm">{order.user.name}</p>
+            <p className="font-bold text-slate-950 text-sm">{order.user.name}</p>
             <p className="text-xs text-slate-500 flex items-center gap-1.5">
               <Mail className="w-3 h-3 shrink-0" /> {order.user.email}
             </p>
@@ -213,7 +213,7 @@ function OrderDetailPanel({
             <span className="text-xs font-extrabold text-slate-500 uppercase tracking-widest">Alamat Pengiriman</span>
           </div>
           <div className="px-4 py-3 space-y-0.5">
-            <p className="font-bold text-blue-950 text-sm">{order.address.recipientName}</p>
+            <p className="font-bold text-slate-950 text-sm">{order.address.recipientName}</p>
             <p className="text-xs text-slate-500">{order.address.phone}</p>
             <p className="text-xs text-slate-600 leading-relaxed mt-1">{order.address.fullAddress}</p>
             <p className="text-xs text-slate-500">{order.address.city}, {order.address.province} {order.address.postalCode}</p>
@@ -230,7 +230,7 @@ function OrderDetailPanel({
             {order.items.map((item) => (
               <div key={item.id} className="px-4 py-3 flex items-center justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="text-sm font-bold text-blue-950 truncate">{item.product.name}</p>
+                  <p className="text-sm font-bold text-slate-950 truncate">{item.product.name}</p>
                   <p className="text-xs text-slate-400 font-mono mt-0.5">{item.product.sku}</p>
                 </div>
                 <div className="text-right shrink-0">
@@ -242,9 +242,9 @@ function OrderDetailPanel({
               </div>
             ))}
           </div>
-          <div className="px-4 py-3 bg-blue-950/[0.03] border-t border-slate-100 flex justify-between items-center">
+          <div className="px-4 py-3 bg-red-600/[0.03] border-t border-slate-100 flex justify-between items-center">
             <span className="text-sm font-bold text-slate-600">Total Pesanan</span>
-            <span className="text-base font-extrabold text-blue-950">
+            <span className="text-base font-extrabold text-slate-950">
               Rp {order.totalAmount.toLocaleString("id-ID")}
             </span>
           </div>
@@ -260,11 +260,11 @@ function OrderDetailPanel({
             <div className="px-4 py-3 space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-slate-500">Metode</span>
-                <span className="font-bold text-blue-950">{PAYMENT_METHOD_LABELS[order.payment.method] ?? order.payment.method}</span>
+                <span className="font-bold text-slate-950">{PAYMENT_METHOD_LABELS[order.payment.method] ?? order.payment.method}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-slate-500">Jumlah</span>
-                <span className="font-bold text-blue-950">Rp {order.payment.amount.toLocaleString("id-ID")}</span>
+                <span className="font-bold text-slate-950">Rp {order.payment.amount.toLocaleString("id-ID")}</span>
               </div>
               <div className="flex justify-between text-sm items-center">
                 <span className="text-slate-500">Status</span>
@@ -416,7 +416,7 @@ export function OrdersClient({
               className={`relative flex items-center gap-1.5 px-3 py-3.5 text-sm font-bold whitespace-nowrap transition-colors border-b-2 ${
                 currentStatus === tab.key
                   ? "border-red-600 text-red-600"
-                  : "border-transparent text-slate-400 hover:text-blue-950"
+                  : "border-transparent text-slate-400 hover:text-slate-950"
               }`}
             >
               {tab.label}
@@ -494,7 +494,7 @@ export function OrdersClient({
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className="font-mono text-xs font-extrabold text-blue-950">
+                        <span className="font-mono text-xs font-extrabold text-slate-950">
                           {order.orderNumber}
                         </span>
                         <StatusBadge status={order.status} />
@@ -509,7 +509,7 @@ export function OrdersClient({
                       </p>
                     </div>
                     <div className="flex flex-col items-end gap-1.5 shrink-0">
-                      <span className="text-sm font-extrabold text-blue-950">
+                      <span className="text-sm font-extrabold text-slate-950">
                         Rp {order.totalAmount.toLocaleString("id-ID")}
                       </span>
                       <PaymentBadge status={order.paymentStatus} />

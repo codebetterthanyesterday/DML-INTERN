@@ -74,7 +74,7 @@ export function ProductDetailsSheet({
   const typeBadgeColor = (type: string) => {
     switch (type) {
       case "RETAIL":
-        return "bg-blue-100 text-blue-700 border-blue-200";
+        return "bg-red-100 text-red-600 border-red-200";
       case "INDUSTRIAL":
         return "bg-red-100 text-red-700 border-red-200";
       case "BOTH":
@@ -121,7 +121,7 @@ export function ProductDetailsSheet({
             <div className="text-right shrink-0">
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Harga</p>
               {product.price ? (
-                <div className="text-xl font-extrabold text-blue-950">
+                <div className="text-xl font-extrabold text-slate-950">
                   Rp {Number(product.price).toLocaleString("id-ID")}
                 </div>
               ) : (
@@ -140,7 +140,7 @@ export function ProductDetailsSheet({
             {/* Image Gallery */}
             <section className="space-y-3">
               <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <ImageIcon className="w-4 h-4 text-blue-600" />
+                <ImageIcon className="w-4 h-4 text-red-600" />
                 Galeri Foto
               </h3>
               {product.images.length > 0 ? (
@@ -196,7 +196,7 @@ export function ProductDetailsSheet({
               </div>
               <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                 <div className="flex items-center gap-2 text-slate-500 mb-1">
-                  <Scale className="w-4 h-4 text-blue-500" />
+                  <Scale className="w-4 h-4 text-red-600" />
                   <span className="text-xs font-semibold uppercase tracking-wider">Berat</span>
                 </div>
                 <p className="font-semibold text-slate-900">{product.weight.toLocaleString("id-ID")} gram</p>
@@ -206,7 +206,7 @@ export function ProductDetailsSheet({
             {/* Description */}
             <section className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
               <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-2">
-                <AlignLeft className="w-4 h-4 text-blue-600" />
+                <AlignLeft className="w-4 h-4 text-red-600" />
                 Deskripsi Produk
               </h3>
               <div className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">
@@ -218,7 +218,7 @@ export function ProductDetailsSheet({
             {specifications && Object.keys(specifications).length > 0 && (
               <section className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                 <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-2">
-                  <CheckCircle2 className="w-4 h-4 text-blue-600" />
+                  <CheckCircle2 className="w-4 h-4 text-red-600" />
                   Spesifikasi Teknis
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">

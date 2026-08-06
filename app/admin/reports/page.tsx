@@ -161,7 +161,7 @@ export default async function AdminReportsPage({ searchParams }: PageProps) {
     <div className="space-y-6 pb-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-blue-950">Laporan & Analytics</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-950">Laporan & Analytics</h1>
           <p className="text-slate-500 mt-1 font-medium text-sm sm:text-base">Analisis performa penjualan Retail dan Industrial.</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
@@ -172,16 +172,16 @@ export default async function AdminReportsPage({ searchParams }: PageProps) {
 
       {/* Metrics Section */}
       <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3">
-        <Card className="hover:shadow-lg hover:shadow-blue-900/5 transition-all border-slate-200 group relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-110" />
+        <Card className="hover:shadow-lg hover:shadow-red-700/5 transition-all border-slate-200 group relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-red-50 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-110" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
             <CardTitle className="text-sm font-bold text-slate-600 uppercase tracking-wider">Total Penjualan Retail</CardTitle>
-            <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-700 shadow-sm">
+            <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center text-red-600 shadow-sm">
               <ShoppingCart className="h-5 w-5" />
             </div>
           </CardHeader>
           <CardContent className="relative z-10">
-            <div className="text-3xl font-extrabold text-blue-950">{formatCurrency(totalRetailSales)}</div>
+            <div className="text-3xl font-extrabold text-slate-950">{formatCurrency(totalRetailSales)}</div>
             <p className="text-xs font-semibold text-slate-500 mt-1">B2C Orders Paid</p>
           </CardContent>
         </Card>
@@ -195,7 +195,7 @@ export default async function AdminReportsPage({ searchParams }: PageProps) {
             </div>
           </CardHeader>
           <CardContent className="relative z-10">
-            <div className="text-3xl font-extrabold text-blue-950">{formatCurrency(totalApprovedRFQValue)}</div>
+            <div className="text-3xl font-extrabold text-slate-950">{formatCurrency(totalApprovedRFQValue)}</div>
             <p className="text-xs font-semibold text-slate-500 mt-1">B2B Invoices Paid</p>
           </CardContent>
         </Card>
@@ -209,7 +209,7 @@ export default async function AdminReportsPage({ searchParams }: PageProps) {
             </div>
           </CardHeader>
           <CardContent className="relative z-10">
-            <div className="text-2xl font-extrabold text-blue-950 truncate" title={bestSellingProduct}>{bestSellingProduct}</div>
+            <div className="text-2xl font-extrabold text-slate-950 truncate" title={bestSellingProduct}>{bestSellingProduct}</div>
             <p className="text-xs font-semibold text-slate-500 mt-1">Berdasarkan kuantitas terjual</p>
           </CardContent>
         </Card>
@@ -223,7 +223,7 @@ export default async function AdminReportsPage({ searchParams }: PageProps) {
       {/* Top 10 Products Table */}
       <Card className="border-slate-200 shadow-sm">
         <CardHeader>
-          <CardTitle className="text-blue-950 font-bold flex items-center gap-2">
+          <CardTitle className="text-slate-950 font-bold flex items-center gap-2">
             Tabel Top 10 Produk
           </CardTitle>
         </CardHeader>
@@ -243,9 +243,9 @@ export default async function AdminReportsPage({ searchParams }: PageProps) {
               <TableBody>
                 {topProducts.length > 0 ? (
                   topProducts.map((product, idx) => (
-                    <TableRow key={product.id} className="hover:bg-blue-50/30 transition-colors">
+                    <TableRow key={product.id} className="hover:bg-red-50/30 transition-colors">
                       <TableCell className="text-center font-semibold text-slate-400">{idx + 1}</TableCell>
-                      <TableCell className="font-bold text-blue-950">{product.name}</TableCell>
+                      <TableCell className="font-bold text-slate-950">{product.name}</TableCell>
                       <TableCell>
                         <Badge variant="outline" className={
                           product.type === "RETAIL" ? "bg-rose-50 text-rose-700 border-rose-200" :

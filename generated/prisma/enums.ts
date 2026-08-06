@@ -128,10 +128,32 @@ export const NotificationType = {
   PAYMENT_RECEIVED: 'PAYMENT_RECEIVED',
   SYSTEM_ALERT: 'SYSTEM_ALERT',
   BUSINESS_VERIFICATION: 'BUSINESS_VERIFICATION',
-  LOW_STOCK_ALERT: 'LOW_STOCK_ALERT'
+  LOW_STOCK_ALERT: 'LOW_STOCK_ALERT',
+  STOCK_OPNAME_VARIANCE: 'STOCK_OPNAME_VARIANCE'
 } as const
 
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
+
+
+export const StockMovementType = {
+  STOCK_IN: 'STOCK_IN',
+  STOCK_OUT: 'STOCK_OUT',
+  OPNAME: 'OPNAME'
+} as const
+
+export type StockMovementType = (typeof StockMovementType)[keyof typeof StockMovementType]
+
+
+export const StockReason = {
+  PURCHASE: 'PURCHASE',
+  RETURN_IN: 'RETURN_IN',
+  SALE: 'SALE',
+  DAMAGED: 'DAMAGED',
+  ADJUSTMENT: 'ADJUSTMENT',
+  OPNAME_CORRECTION: 'OPNAME_CORRECTION'
+} as const
+
+export type StockReason = (typeof StockReason)[keyof typeof StockReason]
 
 
 export const AuditAction = {

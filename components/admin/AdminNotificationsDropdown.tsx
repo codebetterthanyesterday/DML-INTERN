@@ -44,7 +44,7 @@ function formatTimeAgo(dateString: Date) {
 
 function getIconForType(type: NotificationType) {
   switch (type) {
-    case "NEW_ORDER":              return <Package      className="h-4 w-4 text-blue-600" />;
+    case "NEW_ORDER":              return <Package      className="h-4 w-4 text-red-600" />;
     case "NEW_QUOTE":              return <FileText     className="h-4 w-4 text-purple-600" />;
     case "PAYMENT_RECEIVED":       return <DollarSign   className="h-4 w-4 text-emerald-600" />;
     case "BUSINESS_VERIFICATION":  return <Building2    className="h-4 w-4 text-amber-600" />;
@@ -132,7 +132,7 @@ export function AdminNotificationsDropdown() {
         <Button
           variant="ghost"
           size="icon"
-          className="relative text-slate-500 hover:text-blue-950 hover:bg-slate-100 focus-visible:ring-2"
+          className="relative text-slate-500 hover:text-slate-950 hover:bg-slate-100 focus-visible:ring-2"
           aria-label="Notifikasi"
         >
           <Bell className="h-5 w-5" />
@@ -159,7 +159,7 @@ export function AdminNotificationsDropdown() {
             <Button
               variant="ghost"
               size="sm"
-              className="h-auto p-1 px-2 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+              className="h-auto p-1 px-2 text-xs text-red-600 hover:text-red-600 hover:bg-red-50"
               onClick={handleMarkAllAsRead}
             >
               Tandai semua dibaca
@@ -194,7 +194,7 @@ export function AdminNotificationsDropdown() {
                       onClick={() => handleNotificationClick(notification)}
                       className={cn(
                         "flex items-start gap-3 p-4 hover:bg-slate-50 transition-colors relative group",
-                        !notification.isRead ? "bg-blue-50/50" : ""
+                        !notification.isRead ? "bg-red-50/50" : ""
                       )}
                     >
                       <div className={cn(
@@ -216,13 +216,13 @@ export function AdminNotificationsDropdown() {
                         </span>
                       </div>
                       {!notification.isRead && (
-                        <div className="absolute right-4 top-4 flex h-2 w-2 rounded-full bg-blue-600" />
+                        <div className="absolute right-4 top-4 flex h-2 w-2 rounded-full bg-red-600" />
                       )}
                     </Link>
                   ) : (
                     <div className={cn(
                       "flex items-start gap-3 p-4 hover:bg-slate-50 transition-colors relative group",
-                      !notification.isRead ? "bg-blue-50/50" : ""
+                      !notification.isRead ? "bg-red-50/50" : ""
                     )}>
                       <div className={cn(
                         "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full ring-4 ring-white",
@@ -246,7 +246,7 @@ export function AdminNotificationsDropdown() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="absolute right-2 top-2 h-6 w-6 text-slate-400 hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="absolute right-2 top-2 h-6 w-6 text-slate-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
                           onClick={(e) => handleMarkAsRead(notification.id, e)}
                           title="Tandai dibaca"
                         >
@@ -267,7 +267,7 @@ export function AdminNotificationsDropdown() {
           <Link href="/admin/notifications" onClick={() => setIsOpen(false)}>
             <Button
               variant="ghost"
-              className="w-full text-xs font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 justify-center h-8"
+              className="w-full text-xs font-medium text-red-600 hover:text-red-600 hover:bg-red-50 justify-center h-8"
             >
               Lihat Semua Notifikasi
               <ExternalLink className="ml-2 h-3 w-3" />

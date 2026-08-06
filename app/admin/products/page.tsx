@@ -5,7 +5,7 @@ import { ProductTable } from "@/components/admin/products/ProductTable";
 import { ProductFilters } from "@/components/admin/products/ProductFilters";
 import { ImportProductsModal } from "@/components/admin/products/ImportProductsModal";
 import { Button } from "@/components/ui/button";
-import { Plus, Package, Store, Factory, Archive } from "lucide-react";
+import { Plus, Package, Store, Factory, Archive, ListChecks } from "lucide-react";
 
 export const metadata = {
   title: "Kelola Produk — DML Admin",
@@ -38,12 +38,18 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
       {/* Header Section */}
       <div className="flex flex-col gap-4 sm:gap-6 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex-1 min-w-0">
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-blue-950 leading-tight">Kelola Produk</h1>
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-950 leading-tight">Kelola Produk</h1>
           <p className="text-slate-600 mt-2 font-medium text-sm sm:text-base">
             Tambah, edit, dan kelola seluruh produk platform DML.
           </p>
         </div>
         <div className="flex flex-col xs:flex-row items-stretch xs:items-center gap-2 xs:gap-3 w-full sm:w-auto shrink-0">
+          <Link href="/admin/products/stock-log" className="w-full xs:w-auto">
+            <Button variant="outline" className="w-full xs:w-auto gap-2 shadow-sm border-slate-200 text-slate-700 font-semibold hover:bg-slate-50">
+              <ListChecks className="w-4 h-4 shrink-0" />
+              <span>Log Aktivitas Stok</span>
+            </Button>
+          </Link>
           <ImportProductsModal />
           <Link href="/admin/products/new" className="w-full xs:w-auto">
             <Button className="w-full xs:w-auto bg-red-600 hover:bg-red-700 text-white font-bold shadow-md shadow-red-600/20 gap-2 transition-all duration-200">
@@ -62,8 +68,8 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
             value: stats.total, 
             icon: Package,
             gradient: "from-blue-500 to-indigo-600",
-            bg: "bg-blue-50",
-            text: "text-blue-600",
+            bg: "bg-red-50",
+            text: "text-red-600",
             ring: "ring-blue-100/50"
           },
           { 
@@ -98,7 +104,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
           return (
             <div
               key={stat.label}
-              className="group relative overflow-hidden rounded-xl sm:rounded-2xl bg-white border border-slate-200 p-4 sm:p-5 shadow-sm hover:shadow-lg hover:shadow-blue-900/8 hover:-translate-y-0.5 transition-all duration-300 ease-out"
+              className="group relative overflow-hidden rounded-xl sm:rounded-2xl bg-white border border-slate-200 p-4 sm:p-5 shadow-sm hover:shadow-lg hover:shadow-red-700/8 hover:-translate-y-0.5 transition-all duration-300 ease-out"
             >
               <div className={`absolute inset-0 opacity-0 group-hover:opacity-5 bg-gradient-to-br ${stat.gradient} transition-opacity duration-300`} />
               

@@ -33,8 +33,8 @@ export default async function AdminNotificationsPage({
   return (
     <div className="flex flex-col gap-6 w-full max-w-5xl mx-auto">
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight text-blue-950 flex items-center gap-2">
-          <Bell className="h-8 w-8 text-blue-600" />
+        <h1 className="text-3xl font-bold tracking-tight text-slate-950 flex items-center gap-2">
+          <Bell className="h-8 w-8 text-red-600" />
           Pusat Notifikasi
         </h1>
         <p className="text-slate-500">

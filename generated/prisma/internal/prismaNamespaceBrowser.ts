@@ -68,6 +68,7 @@ export const ModelName = {
   Review: 'Review',
   Notification: 'Notification',
   AuditLog: 'AuditLog',
+  StockLog: 'StockLog',
   SiteSetting: 'SiteSetting'
 } as const
 
@@ -324,6 +325,23 @@ export const AuditLogScalarFieldEnum = {
 } as const
 
 export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
+
+
+export const StockLogScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  adminId: 'adminId',
+  type: 'type',
+  reason: 'reason',
+  quantityChange: 'quantityChange',
+  stockBefore: 'stockBefore',
+  stockAfter: 'stockAfter',
+  note: 'note',
+  referenceId: 'referenceId',
+  createdAt: 'createdAt'
+} as const
+
+export type StockLogScalarFieldEnum = (typeof StockLogScalarFieldEnum)[keyof typeof StockLogScalarFieldEnum]
 
 
 export const SiteSettingScalarFieldEnum = {

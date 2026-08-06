@@ -83,7 +83,7 @@ export function DateRangePicker({
               !date && "text-muted-foreground"
             )}
           >
-            <CalendarIcon className="mr-2 h-4 w-4 text-blue-600" />
+            <CalendarIcon className="mr-2 h-4 w-4 text-red-600" />
             {date?.from ? (
               date.to ? (
                 <>
@@ -98,7 +98,7 @@ export function DateRangePicker({
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto max-w-[calc(100vw-2rem)] p-0 flex flex-col sm:flex-row bg-white/95 backdrop-blur-md border-slate-200 shadow-xl shadow-blue-900/10 rounded-xl overflow-hidden" align="end">
+        <PopoverContent className="w-auto max-w-[calc(100vw-2rem)] p-0 flex flex-col sm:flex-row bg-white/95 backdrop-blur-md border-slate-200 shadow-xl shadow-red-700/10 rounded-xl overflow-hidden" align="end">
           <div className="flex flex-col gap-1 p-3 border-b sm:border-b-0 sm:border-r border-slate-100 bg-slate-50/50 sm:min-w-[160px]">
             <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-2">Preset</div>
             <div className="flex sm:flex-col gap-1 flex-wrap">
@@ -106,7 +106,7 @@ export function DateRangePicker({
               <Button
                 key={preset.label}
                 variant="ghost"
-                className="justify-start font-medium text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-700 w-auto sm:w-full"
+                className="justify-start font-medium text-sm text-slate-700 hover:bg-red-50 hover:text-red-600 w-auto sm:w-full"
                 onClick={() => {
                   preset.onClick();
                   setIsOpen(false);

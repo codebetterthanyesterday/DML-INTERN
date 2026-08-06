@@ -56,14 +56,14 @@ export function ProductForm({ action, categories, product, mode }: ProductFormPr
         <Button
           variant="outline"
           size="icon"
-          className="w-10 h-10 border-slate-200 text-slate-500 hover:text-blue-950 hover:border-blue-950 transition-all duration-200 shrink-0"
+          className="w-10 h-10 border-slate-200 text-slate-500 hover:text-slate-950 hover:border-blue-950 transition-all duration-200 shrink-0"
           onClick={() => router.push("/admin/products")}
           type="button"
         >
           <ArrowLeft className="w-4 h-4" />
         </Button>
         <div className="flex-1 min-w-0">
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-blue-950 leading-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-950 leading-tight">
             {mode === "create" ? "Tambah Produk Baru" : "Edit Produk"}
           </h1>
           <p className="text-slate-600 mt-1 font-medium text-sm sm:text-base line-clamp-2">
@@ -98,7 +98,7 @@ export function ProductForm({ action, categories, product, mode }: ProductFormPr
 
             {/* Basic Info Card */}
             <div className="bg-white rounded-lg sm:rounded-xl border border-slate-200 p-4 sm:p-6 shadow-sm space-y-4">
-              <h2 className="text-xs sm:text-sm font-extrabold text-blue-950 uppercase tracking-widest">Informasi Dasar</h2>
+              <h2 className="text-xs sm:text-sm font-extrabold text-slate-950 uppercase tracking-widest">Informasi Dasar</h2>
 
               <div className="space-y-1">
                 <Label htmlFor="name" className="text-sm font-bold text-slate-700">
@@ -160,7 +160,7 @@ export function ProductForm({ action, categories, product, mode }: ProductFormPr
 
             {/* Pricing & Stock Card */}
             <div className="bg-white rounded-lg sm:rounded-xl border border-slate-200 p-4 sm:p-6 shadow-sm space-y-4">
-              <h2 className="text-xs sm:text-sm font-extrabold text-blue-950 uppercase tracking-widest">Harga & Stok</h2>
+              <h2 className="text-xs sm:text-sm font-extrabold text-slate-950 uppercase tracking-widest">Harga & Stok</h2>
 
               <div className="space-y-2">
                 <Label className="text-sm font-bold text-slate-700">Tipe Produk <span className="text-red-500">*</span></Label>
@@ -174,7 +174,7 @@ export function ProductForm({ action, categories, product, mode }: ProductFormPr
                         defaultChecked={product?.productType === type.value || (!product && type.value === "RETAIL")}
                         className="peer sr-only"
                       />
-                      <div className="rounded-lg border-2 border-slate-200 p-3 text-sm transition-all peer-checked:border-blue-950 peer-checked:bg-blue-950 peer-checked:text-white group-hover:border-slate-300">
+                      <div className="rounded-lg border-2 border-slate-200 p-3 text-sm transition-all peer-checked:border-blue-950 peer-checked:bg-red-600 peer-checked:text-white group-hover:border-slate-300">
                         <div className="font-bold">{type.label}</div>
                         <div className="text-xs opacity-70 mt-0.5 leading-tight">{type.description}</div>
                       </div>
@@ -273,7 +273,7 @@ export function ProductForm({ action, categories, product, mode }: ProductFormPr
 
             {/* Specs Card */}
             <div className="bg-white rounded-lg sm:rounded-xl border border-slate-200 p-4 sm:p-6 shadow-sm space-y-4">
-              <h2 className="text-xs sm:text-sm font-extrabold text-blue-950 uppercase tracking-widest">Spesifikasi Teknis</h2>
+              <h2 className="text-xs sm:text-sm font-extrabold text-slate-950 uppercase tracking-widest">Spesifikasi Teknis</h2>
               <p className="text-xs text-slate-400 -mt-2">Isi yang relevan, kosongkan yang tidak berlaku.</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
@@ -302,7 +302,7 @@ export function ProductForm({ action, categories, product, mode }: ProductFormPr
 
             {/* Publish Card */}
             <div className="bg-white rounded-lg sm:rounded-xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-4">
-              <h2 className="text-xs sm:text-sm font-extrabold text-blue-950 uppercase tracking-widest">Publikasi</h2>
+              <h2 className="text-xs sm:text-sm font-extrabold text-slate-950 uppercase tracking-widest">Publikasi</h2>
               <div className="flex items-center justify-between gap-3">
                 <div className="flex-1">
                   <Label htmlFor="isActive" className="text-sm font-bold text-slate-700">Status Produk</Label>
@@ -339,7 +339,7 @@ export function ProductForm({ action, categories, product, mode }: ProductFormPr
 
             {/* Image Upload */}
             <div className="bg-white rounded-lg sm:rounded-xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-3">
-              <h2 className="text-xs sm:text-sm font-extrabold text-blue-950 uppercase tracking-widest">Gambar Produk</h2>
+              <h2 className="text-xs sm:text-sm font-extrabold text-slate-950 uppercase tracking-widest">Gambar Produk</h2>
               <ProductImageManager
                 initialImages={product?.images.map((img) => ({ url: img.url, displayOrder: img.displayOrder })) ?? []}
                 onUploadingChange={(uploading) => {

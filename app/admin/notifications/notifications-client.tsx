@@ -42,7 +42,7 @@ function formatTimeAgo(dateString: Date) {
 
 function getIconForType(type: NotificationType) {
   switch (type) {
-    case "NEW_ORDER":         return <Package    className="h-5 w-5 text-blue-600" />;
+    case "NEW_ORDER":         return <Package    className="h-5 w-5 text-red-600" />;
     case "NEW_QUOTE":         return <FileText   className="h-5 w-5 text-purple-600" />;
     case "PAYMENT_RECEIVED":  return <DollarSign className="h-5 w-5 text-emerald-600" />;
     case "BUSINESS_VERIFICATION": return <Building2  className="h-5 w-5 text-amber-600" />;
@@ -55,7 +55,7 @@ function getIconForType(type: NotificationType) {
 function getIconBg(type: NotificationType, unread: boolean) {
   if (!unread) return "bg-slate-100";
   switch (type) {
-    case "NEW_ORDER":         return "bg-blue-50";
+    case "NEW_ORDER":         return "bg-red-50";
     case "NEW_QUOTE":         return "bg-purple-50";
     case "PAYMENT_RECEIVED":  return "bg-emerald-50";
     case "BUSINESS_VERIFICATION": return "bg-amber-50";
@@ -67,7 +67,7 @@ function getIconBg(type: NotificationType, unread: boolean) {
 
 function getDotColor(type: NotificationType) {
   switch (type) {
-    case "NEW_ORDER":         return "bg-blue-600";
+    case "NEW_ORDER":         return "bg-red-600";
     case "NEW_QUOTE":         return "bg-purple-600";
     case "PAYMENT_RECEIVED":  return "bg-emerald-600";
     case "BUSINESS_VERIFICATION": return "bg-amber-500";
@@ -187,7 +187,7 @@ export function NotificationsClient({
               className={cn(
                 "shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap",
                 activeFilter === tab.value
-                  ? "bg-blue-600 text-white shadow-sm"
+                  ? "bg-red-600 text-white shadow-sm"
                   : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
               )}
             >
@@ -206,7 +206,7 @@ export function NotificationsClient({
               <Button
                 variant="outline"
                 size="sm"
-                className="text-xs bg-white text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200"
+                className="text-xs bg-white text-red-600 hover:text-red-600 hover:bg-red-50 border-red-200"
                 onClick={handleMarkAllAsRead}
                 disabled={isPending}
               >
@@ -282,7 +282,7 @@ export function NotificationsClient({
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7 text-slate-400 hover:text-blue-600 hover:bg-blue-50 bg-white shadow-sm"
+                        className="h-7 w-7 text-slate-400 hover:text-red-600 hover:bg-red-50 bg-white shadow-sm"
                         onClick={(e) => handleMarkAsRead(n.id, e)}
                         title="Tandai dibaca"
                       >
@@ -311,7 +311,7 @@ export function NotificationsClient({
                       onClick={() => { if (!n.isRead) handleMarkAsRead(n.id); }}
                       className={cn(
                         "flex items-start gap-4 p-4 sm:p-5 hover:bg-slate-50/80 transition-colors",
-                        !n.isRead ? "bg-blue-50/20" : ""
+                        !n.isRead ? "bg-red-50/20" : ""
                       )}
                     >
                       {content}
@@ -319,7 +319,7 @@ export function NotificationsClient({
                   ) : (
                     <div className={cn(
                       "flex items-start gap-4 p-4 sm:p-5 hover:bg-slate-50/80 transition-colors",
-                      !n.isRead ? "bg-blue-50/20" : ""
+                      !n.isRead ? "bg-red-50/20" : ""
                     )}>
                       {content}
                     </div>

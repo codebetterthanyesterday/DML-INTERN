@@ -37,7 +37,7 @@ export function ProfileHeader({ user, stats }: ProfileHeaderProps) {
           <div className="rounded-full bg-white p-1.5 shadow-xl ring-1 ring-slate-900/5">
             <Avatar className="h-24 w-24 sm:h-32 sm:w-32 border-4 border-white shadow-inner">
               <AvatarImage src="/placeholder-user.jpg" alt={user.name} />
-              <AvatarFallback className="bg-slate-100 text-blue-950 font-bold text-3xl sm:text-5xl">
+              <AvatarFallback className="bg-slate-100 text-slate-950 font-bold text-3xl sm:text-5xl">
                 {initials}
               </AvatarFallback>
             </Avatar>
@@ -49,7 +49,7 @@ export function ProfileHeader({ user, stats }: ProfileHeaderProps) {
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
                 {user.name}
               </h1>
-              <span className="inline-flex items-center justify-center rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-800 border border-blue-200 shadow-sm w-fit mx-auto sm:mx-0">
+              <span className="inline-flex items-center justify-center rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-blue-800 border border-red-200 shadow-sm w-fit mx-auto sm:mx-0">
                 <ShieldCheck className="w-3 h-3 mr-1" />
                 {user.role}
               </span>
@@ -66,7 +66,7 @@ export function ProfileHeader({ user, stats }: ProfileHeaderProps) {
                 Bergabung sejak {format(new Date(user.createdAt), "dd MMM yyyy", { locale: id })}
               </div>
               <div className="hidden sm:block h-1 w-1 rounded-full bg-slate-300" />
-              <div className="flex items-center gap-1.5 text-blue-600">
+              <div className="flex items-center gap-1.5 text-red-600">
                 <Activity className="h-4 w-4" />
                 {stats.totalActions} Aktivitas Tercatat
               </div>

@@ -50,7 +50,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.
   },
   REVIEWED: {
     label: "Sedang Ditinjau",
-    color: "bg-blue-50 text-blue-700 border-blue-200",
+    color: "bg-red-50 text-red-600 border-red-200",
     icon: Eye,
   },
   QUOTED: {
@@ -186,11 +186,11 @@ function QuotePricingForm({
                   </div>
                 )}
                 <div className="min-w-0 flex-1">
-                  <p className="font-bold text-blue-950 text-sm truncate">{item.product.name}</p>
+                  <p className="font-bold text-slate-950 text-sm truncate">{item.product.name}</p>
                   <p className="text-xs text-slate-400 font-mono mt-0.5">{item.product.sku}</p>
                   <p className="text-xs text-slate-500 mt-1">
                     Qty diminta:{" "}
-                    <span className="font-extrabold text-blue-950">
+                    <span className="font-extrabold text-slate-950">
                       {item.qtyRequested.toLocaleString("id-ID")} {item.product.unit}
                     </span>
                   </p>
@@ -223,7 +223,7 @@ function QuotePricingForm({
                 {prices[item.id] && parseFloat(prices[item.id]) > 0 && (
                   <div className="text-right shrink-0">
                     <p className="text-xs text-slate-500">Total</p>
-                    <p className="text-sm font-extrabold text-blue-950">
+                    <p className="text-sm font-extrabold text-slate-950">
                       Rp {(parseFloat(prices[item.id]) * item.qtyRequested).toLocaleString("id-ID")}
                     </p>
                   </div>
@@ -235,9 +235,9 @@ function QuotePricingForm({
 
         {/* Estimated total */}
         {totalQuoted > 0 && (
-          <div className="px-4 py-3 bg-blue-950/[0.03] border-t border-slate-100 flex justify-between items-center">
+          <div className="px-4 py-3 bg-red-600/[0.03] border-t border-slate-100 flex justify-between items-center">
             <span className="text-sm font-bold text-slate-600">Estimasi Total Penawaran</span>
-            <span className="text-base font-extrabold text-blue-950">
+            <span className="text-base font-extrabold text-slate-950">
               Rp {totalQuoted.toLocaleString("id-ID")}
             </span>
           </div>
@@ -275,7 +275,7 @@ function QuotePricingForm({
             type="button"
             onClick={handleSubmit}
             disabled={isPending || !allPricesFilled}
-            className="flex-2 bg-blue-950 hover:bg-blue-900 text-white font-bold shadow-md shadow-blue-950/20 flex-1"
+            className="flex-2 bg-red-600 hover:bg-red-700 text-white font-bold shadow-md shadow-blue-950/20 flex-1"
           >
             {isPending ? (
               <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -291,7 +291,7 @@ function QuotePricingForm({
       <AlertDialog open={rejectOpen} onOpenChange={setRejectOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-blue-950 font-extrabold">Tolak Pengajuan RFQ?</AlertDialogTitle>
+            <AlertDialogTitle className="text-slate-950 font-extrabold">Tolak Pengajuan RFQ?</AlertDialogTitle>
             <AlertDialogDescription className="text-slate-500">
               Pengajuan <strong>{quote.quoteNumber}</strong> dari <strong>{quote.user.name}</strong> akan ditolak.
               Customer akan mendapatkan notifikasi. Pastikan catatan sudah terisi sebelum menolak.
@@ -336,12 +336,12 @@ function RFQDetailPanel({
           <div className="flex items-center gap-2 mb-1">
             <span className="font-mono text-xs font-bold text-slate-400 uppercase tracking-widest">RFQ</span>
           </div>
-          <h2 className="text-xl font-extrabold text-blue-950 tracking-tight">{quote.quoteNumber}</h2>
+          <h2 className="text-xl font-extrabold text-slate-950 tracking-tight">{quote.quoteNumber}</h2>
           <p className="text-xs text-slate-400 mt-0.5">{formattedDate} · {formattedTime}</p>
         </div>
         <button
           onClick={onClose}
-          className="rounded-lg p-2 text-slate-400 hover:text-blue-950 hover:bg-slate-100 transition-colors -mt-1 -mr-1 focus-visible:ring-2 focus-visible:ring-blue-950 focus-visible:outline-none"
+          className="rounded-lg p-2 text-slate-400 hover:text-slate-950 hover:bg-slate-100 transition-colors -mt-1 -mr-1 focus-visible:ring-2 focus-visible:ring-blue-950 focus-visible:outline-none"
           aria-label="Tutup panel detail"
         >
           <X className="w-4 h-4" />
@@ -371,7 +371,7 @@ function RFQDetailPanel({
             <span className="text-xs font-extrabold text-slate-500 uppercase tracking-widest">Customer</span>
           </div>
           <div className="px-4 py-3 space-y-1">
-            <p className="font-bold text-blue-950 text-sm">{quote.user.name}</p>
+            <p className="font-bold text-slate-950 text-sm">{quote.user.name}</p>
             {quote.user.companyName && (
               <p className="text-xs text-slate-500 flex items-center gap-1.5">
                 <Building2 className="w-3 h-3 shrink-0" /> {quote.user.companyName}
@@ -406,11 +406,11 @@ function RFQDetailPanel({
             <div className="px-4 py-3 space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-slate-500">Nomor Invoice</span>
-                <span className="font-mono font-bold text-blue-950 text-xs">{quote.invoice.invoiceNumber}</span>
+                <span className="font-mono font-bold text-slate-950 text-xs">{quote.invoice.invoiceNumber}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-slate-500">Jumlah</span>
-                <span className="font-extrabold text-blue-950">Rp {quote.invoice.amount.toLocaleString("id-ID")}</span>
+                <span className="font-extrabold text-slate-950">Rp {quote.invoice.amount.toLocaleString("id-ID")}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-slate-500">Jatuh Tempo</span>
@@ -503,7 +503,7 @@ export function RFQClient({
               className={`relative flex items-center gap-1.5 px-3 py-3.5 text-sm font-bold whitespace-nowrap transition-colors border-b-2 ${
                 currentStatus === tab.key
                   ? "border-red-600 text-red-600"
-                  : "border-transparent text-slate-400 hover:text-blue-950"
+                  : "border-transparent text-slate-400 hover:text-slate-950"
               }`}
             >
               {tab.label}
@@ -569,7 +569,7 @@ export function RFQClient({
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className="font-mono text-xs font-extrabold text-blue-950">
+                        <span className="font-mono text-xs font-extrabold text-slate-950">
                           {quote.quoteNumber}
                         </span>
                         {isPendingReview && (

@@ -129,12 +129,12 @@ function VerificationDetailPanel({
           <div className="flex items-center gap-2 mb-1">
             <span className="font-mono text-xs font-bold text-slate-400 uppercase tracking-widest">Pengajuan B2B</span>
           </div>
-          <h2 className="text-xl font-extrabold text-blue-950 tracking-tight">{verification.companyName}</h2>
+          <h2 className="text-xl font-extrabold text-slate-950 tracking-tight">{verification.companyName}</h2>
           <p className="text-xs text-slate-400 mt-0.5">Diajukan: {formattedDate} · {formattedTime}</p>
         </div>
         <button
           onClick={onClose}
-          className="rounded-lg p-2 text-slate-400 hover:text-blue-950 hover:bg-slate-100 transition-colors -mt-1 -mr-1 focus-visible:ring-2 focus-visible:ring-blue-950 focus-visible:outline-none"
+          className="rounded-lg p-2 text-slate-400 hover:text-slate-950 hover:bg-slate-100 transition-colors -mt-1 -mr-1 focus-visible:ring-2 focus-visible:ring-blue-950 focus-visible:outline-none"
           aria-label="Tutup panel detail"
         >
           <X className="w-4 h-4" />
@@ -167,7 +167,7 @@ function VerificationDetailPanel({
           </div>
           <div className="px-4 py-3 space-y-2">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-blue-950">{verification.name}</span>
+              <span className="text-sm font-bold text-slate-950">{verification.name}</span>
             </div>
             <div className="flex flex-col gap-1.5">
               <p className="text-xs text-slate-500 flex items-center gap-1.5">
@@ -191,11 +191,11 @@ function VerificationDetailPanel({
           <div className="px-4 py-3 space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-slate-500">Nama Perusahaan</span>
-              <span className="font-bold text-blue-950">{verification.companyName}</span>
+              <span className="font-bold text-slate-950">{verification.companyName}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-slate-500">NPWP</span>
-              <span className="font-mono font-bold text-blue-950 text-xs">{verification.npwp ?? "-"}</span>
+              <span className="font-mono font-bold text-slate-950 text-xs">{verification.npwp ?? "-"}</span>
             </div>
           </div>
         </div>
@@ -218,8 +218,8 @@ function VerificationDetailPanel({
                 return (
                   <div key={doc.id} className="p-4">
                     <div className="flex items-center gap-2 mb-3">
-                      <DocIcon className="w-4 h-4 text-blue-950" />
-                      <span className="text-sm font-bold text-blue-950">{docConf.label}</span>
+                      <DocIcon className="w-4 h-4 text-slate-950" />
+                      <span className="text-sm font-bold text-slate-950">{docConf.label}</span>
                     </div>
                     {/* Fake Document Preview / Placeholder for low fidelity -> high fidelity */}
                     <div className="w-full h-40 bg-slate-100 rounded-lg border border-slate-200 flex flex-col items-center justify-center gap-2 overflow-hidden relative group">
@@ -235,7 +235,7 @@ function VerificationDetailPanel({
                         </>
                       )}
                       {doc.fileUrl && (
-                        <div className="absolute inset-0 bg-blue-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <div className="absolute inset-0 bg-red-600/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                           <a href={`/api/admin/documents?url=${encodeURIComponent(doc.fileUrl)}`} target="_blank" rel="noopener noreferrer">
                             <Button variant="secondary" size="sm" className="font-bold">Lihat Dokumen</Button>
                           </a>
@@ -280,7 +280,7 @@ function VerificationDetailPanel({
       <AlertDialog open={rejectOpen} onOpenChange={setRejectOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-blue-950 font-extrabold">Tolak Verifikasi B2B?</AlertDialogTitle>
+            <AlertDialogTitle className="text-slate-950 font-extrabold">Tolak Verifikasi B2B?</AlertDialogTitle>
             <AlertDialogDescription className="text-slate-500">
               Pengajuan dari <strong>{verification.companyName}</strong> akan ditolak.
               Mereka harus mengajukan ulang dokumen yang benar.
@@ -303,7 +303,7 @@ function VerificationDetailPanel({
       <AlertDialog open={approveOpen} onOpenChange={setApproveOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-blue-950 font-extrabold">Setujui Akun B2B?</AlertDialogTitle>
+            <AlertDialogTitle className="text-slate-950 font-extrabold">Setujui Akun B2B?</AlertDialogTitle>
             <AlertDialogDescription className="text-slate-500">
               Pengguna ini akan diberikan peran <strong>BUSINESS</strong> dan dapat mulai melihat harga grosir serta mengajukan RFQ.
             </AlertDialogDescription>
@@ -386,7 +386,7 @@ export function VerificationClient({
               className={`relative flex items-center gap-1.5 px-3 py-3.5 text-sm font-bold whitespace-nowrap transition-colors border-b-2 ${
                 currentStatus === tab.key
                   ? "border-red-600 text-red-600"
-                  : "border-transparent text-slate-400 hover:text-blue-950"
+                  : "border-transparent text-slate-400 hover:text-slate-950"
               }`}
             >
               {tab.label}
@@ -451,7 +451,7 @@ export function VerificationClient({
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className="font-bold text-sm text-blue-950 truncate">
+                        <span className="font-bold text-sm text-slate-950 truncate">
                           {item.companyName}
                         </span>
                         {isPendingReview && (

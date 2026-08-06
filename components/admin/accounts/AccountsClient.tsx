@@ -145,16 +145,16 @@ export function AccountsClient({ initialUsers, currentRole, currentStatus, curre
         <div className="relative w-full sm:w-96 flex group">
           <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
             {isPending ? (
-              <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />
+              <Loader2 className="w-4 h-4 text-red-600 animate-spin" />
             ) : (
-              <Search className="w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+              <Search className="w-4 h-4 text-slate-400 group-focus-within:text-red-600 transition-colors" />
             )}
           </div>
           <Input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Cari nama, email, perusahaan..."
-            className="pl-10 pr-4 py-2 h-10 bg-slate-50/50 hover:bg-slate-50 border-slate-200/60 focus-visible:ring-4 focus-visible:ring-blue-500/15 focus-visible:border-blue-500 rounded-xl transition-all duration-300 w-full shadow-sm text-[15px]"
+            className="pl-10 pr-4 py-2 h-10 bg-slate-50/50 hover:bg-slate-50 border-slate-200/60 focus-visible:ring-4 focus-visible:ring-red-600/15 focus-visible:border-red-600 rounded-xl transition-all duration-300 w-full shadow-sm text-[15px]"
           />
         </div>
 
@@ -316,7 +316,7 @@ export function AccountsClient({ initialUsers, currentRole, currentStatus, curre
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           {user.role !== "ADMIN" && (
-                            <DropdownMenuItem onClick={() => onMakeAdminClick(user)} className="text-blue-600 focus:text-blue-600 focus:bg-blue-50">
+                            <DropdownMenuItem onClick={() => onMakeAdminClick(user)} className="text-red-600 focus:text-red-600 focus:bg-red-50">
                               <Crown className="w-4 h-4 mr-2" /> Jadikan Admin
                             </DropdownMenuItem>
                           )}
@@ -360,7 +360,7 @@ export function AccountsClient({ initialUsers, currentRole, currentStatus, curre
             <div className="absolute -top-32 -right-32 w-64 h-64 bg-emerald-500/10 rounded-full blur-[64px] pointer-events-none" />
           )}
           {confirmAction.type === 'make-admin' && (
-            <div className="absolute -top-32 -right-32 w-64 h-64 bg-blue-500/10 rounded-full blur-[64px] pointer-events-none" />
+            <div className="absolute -top-32 -right-32 w-64 h-64 bg-red-500/10 rounded-full blur-[64px] pointer-events-none" />
           )}
           
           <div className="p-8 pb-6 relative z-10">
@@ -385,9 +385,9 @@ export function AccountsClient({ initialUsers, currentRole, currentStatus, curre
                   </div>
                 )}
                 {confirmAction.type === 'make-admin' && (
-                  <div className="w-16 h-16 rounded-[20px] bg-blue-50 flex items-center justify-center ring-8 ring-blue-50/50 mb-3 relative group overflow-hidden">
-                    <div className="absolute inset-0 bg-blue-500/10 rounded-[20px] animate-pulse" />
-                    <Crown className="w-8 h-8 text-blue-500 relative z-10 group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-300" />
+                  <div className="w-16 h-16 rounded-[20px] bg-red-50 flex items-center justify-center ring-8 ring-blue-50/50 mb-3 relative group overflow-hidden">
+                    <div className="absolute inset-0 bg-red-500/10 rounded-[20px] animate-pulse" />
+                    <Crown className="w-8 h-8 text-red-600 relative z-10 group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-300" />
                   </div>
                 )}
               </div>
@@ -441,13 +441,13 @@ export function AccountsClient({ initialUsers, currentRole, currentStatus, curre
                       <p>
                         Anda akan memberikan hak akses <strong>Admin</strong> kepada <strong className="text-slate-900 font-semibold">{confirmAction.userName}</strong>. Pengguna ini akan memiliki kendali penuh atas platform.
                       </p>
-                      <div className="p-4 bg-blue-50/50 rounded-xl border border-blue-100">
-                        <p className="text-sm text-slate-600 mb-2 font-medium">Ketik <strong className="text-blue-600 select-none">ADMIN</strong> untuk mengonfirmasi:</p>
+                      <div className="p-4 bg-red-50/50 rounded-xl border border-red-100">
+                        <p className="text-sm text-slate-600 mb-2 font-medium">Ketik <strong className="text-red-600 select-none">ADMIN</strong> untuk mengonfirmasi:</p>
                         <Input 
                           value={confirmAction.inputValue}
                           onChange={(e) => setConfirmAction(prev => ({ ...prev, inputValue: e.target.value }))}
                           placeholder="ADMIN"
-                          className="bg-white border-blue-200 focus-visible:ring-blue-500 placeholder:text-slate-300"
+                          className="bg-white border-red-200 focus-visible:ring-red-600 placeholder:text-slate-300"
                         />
                       </div>
                     </div>
@@ -482,7 +482,7 @@ export function AccountsClient({ initialUsers, currentRole, currentStatus, curre
                   : confirmAction.type === 'suspend'
                   ? 'bg-amber-500 hover:bg-amber-600 hover:shadow-amber-500/25 text-white ring-1 ring-amber-500/50 focus:ring-amber-500 disabled:opacity-50 disabled:hover:bg-amber-500'
                   : confirmAction.type === 'make-admin'
-                  ? 'bg-blue-600 hover:bg-blue-700 hover:shadow-blue-600/25 text-white ring-1 ring-blue-600/50 focus:ring-blue-600 disabled:opacity-50 disabled:hover:bg-blue-600'
+                  ? 'bg-red-600 hover:bg-blue-700 hover:shadow-red-600/25 text-white ring-1 ring-blue-600/50 focus:ring-blue-600 disabled:opacity-50 disabled:hover:bg-red-600'
                   : 'bg-emerald-500 hover:bg-emerald-600 hover:shadow-emerald-500/25 text-white ring-1 ring-emerald-500/50 focus:ring-emerald-500'
               }`}
             >

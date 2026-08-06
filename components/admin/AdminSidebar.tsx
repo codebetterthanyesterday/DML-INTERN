@@ -39,7 +39,7 @@ export function AdminSidebar() {
           <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm overflow-hidden border border-slate-100 p-0.5">
             <Image src={logoImg} alt="DML Admin Logo" width={40} height={40} className="object-contain w-full h-full rounded-full" />
           </div>
-          <span className="text-lg font-extrabold text-blue-950 tracking-tight">DML Admin</span>
+          <span className="text-lg font-extrabold text-slate-950 tracking-tight">DML Admin</span>
         </Link>
       </div>
       <div className="flex flex-1 flex-col overflow-y-auto pt-6 px-4 pb-4">
@@ -54,14 +54,14 @@ export function AdminSidebar() {
                   "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-blue-950 focus-visible:outline-none",
                   isActive
                     ? "bg-red-50 text-red-700"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-blue-950"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-950"
                 )}
                 aria-current={isActive ? "page" : undefined}
               >
                 <item.icon
                   className={cn(
                     "h-5 w-5 shrink-0 transition-colors",
-                    isActive ? "text-red-600" : "text-slate-400 group-hover:text-blue-950"
+                    isActive ? "text-red-600" : "text-slate-400 group-hover:text-slate-950"
                   )}
                   aria-hidden="true"
                 />
@@ -77,11 +77,11 @@ export function AdminSidebar() {
               "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-blue-950 focus-visible:outline-none",
               pathname === "/admin/settings"
                 ? "bg-red-50 text-red-700"
-                : "text-slate-600 hover:bg-slate-50 hover:text-blue-950"
+                : "text-slate-600 hover:bg-slate-50 hover:text-slate-950"
             )}
             aria-current={pathname === "/admin/settings" ? "page" : undefined}
           >
-            <Settings className="h-5 w-5 shrink-0 text-slate-400 group-hover:text-blue-950" aria-hidden="true" />
+            <Settings className="h-5 w-5 shrink-0 text-slate-400 group-hover:text-slate-950" aria-hidden="true" />
             Pengaturan
           </Link>
         </div>

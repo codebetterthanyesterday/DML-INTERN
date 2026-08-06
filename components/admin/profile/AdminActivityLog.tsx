@@ -25,7 +25,7 @@ function getActionDetails(action: AuditAction) {
     case "USER_REJECTED":
       return { icon: UserX, color: "text-red-500", bg: "bg-red-50", label: "Menolak User" };
     case "DOCUMENT_VERIFIED":
-      return { icon: FileCheck, color: "text-blue-500", bg: "bg-blue-50", label: "Verifikasi Dokumen" };
+      return { icon: FileCheck, color: "text-red-600", bg: "bg-red-50", label: "Verifikasi Dokumen" };
     case "DOCUMENT_REJECTED":
       return { icon: FileX, color: "text-red-500", bg: "bg-red-50", label: "Tolak Dokumen" };
     case "USER_SUSPENDED":
