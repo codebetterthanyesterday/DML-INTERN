@@ -72,6 +72,11 @@ export type Product = Prisma.ProductModel
  */
 export type ProductImage = Prisma.ProductImageModel
 /**
+ * Model ProductTier
+ * 
+ */
+export type ProductTier = Prisma.ProductTierModel
+/**
  * Model Cart
  * 
  */

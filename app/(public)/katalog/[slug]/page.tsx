@@ -16,6 +16,9 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       images: {
         orderBy: { displayOrder: "asc" }
       },
+      tiers: {
+        orderBy: { minQty: "asc" }
+      },
       reviews: {
         include: { user: true },
         orderBy: { createdAt: "desc" }
@@ -50,6 +53,11 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     rating: Number(averageRating.toFixed(1)),
     reviewsCount: dbProduct._count.reviews,
     images: dbProduct.images.map((img: any) => toPublicImageUrl(img.url)).filter((url: string | null): url is string => !!url),
+    tiers: dbProduct.tiers.map((t: any) => ({
+      minQty: t.minQty,
+      maxQty: t.maxQty,
+      pricePerUnit: Number(t.pricePerUnit)
+    })),
     reviews: dbProduct.reviews.map((rev: any) => ({
       id: rev.id,
       user: rev.user.name || "Anonymous",

@@ -26,6 +26,8 @@ export default async function CartPage() {
               id: true,
               name: true,
               price: true,
+              unit: true,
+              tiers: { orderBy: { minQty: 'asc' } },
               images: {
                 select: { url: true },
                 take: 1,
@@ -47,6 +49,12 @@ export default async function CartPage() {
       id: item.product.id,
       name: item.product.name,
       price: item.product.price ? item.product.price.toNumber() : null,
+      unit: item.product.unit,
+      tiers: item.product.tiers.map((t: any) => ({
+        minQty: t.minQty,
+        maxQty: t.maxQty,
+        pricePerUnit: Number(t.pricePerUnit)
+      })),
       images: item.product.images
     }
   })) || []

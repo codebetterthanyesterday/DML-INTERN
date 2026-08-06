@@ -46,7 +46,11 @@ export async function createCheckoutSession({
       include: {
         items: {
           include: {
-            product: true
+            product: {
+              include: {
+                tiers: true
+              }
+            }
           }
         }
       }
@@ -56,10 +60,18 @@ export async function createCheckoutSession({
       return { success: false, error: "Keranjang kosong" }
     }
 
+    const calcUnitPrice = (item: any) => {
+      let unitPrice = item.product.price ? Number(item.product.price) : 0
+      if (item.product.tiers && item.product.tiers.length > 0) {
+        const activeTier = item.product.tiers.find((t: any) => item.qty >= t.minQty && (t.maxQty === null || item.qty <= t.maxQty))
+        if (activeTier) unitPrice = Number(activeTier.pricePerUnit)
+      }
+      return unitPrice
+    }
+
     // Calculate total amount
     const subtotal = cart.items.reduce((acc, item) => {
-      const price = item.product.price ? Number(item.product.price) : 0
-      return acc + (price * item.qty)
+      return acc + (calcUnitPrice(item) * item.qty)
     }, 0)
 
     const totalAmount = subtotal + shippingFee
@@ -82,7 +94,7 @@ export async function createCheckoutSession({
             create: cart.items.map(item => ({
               productId: item.productId,
               qty: item.qty,
-              priceAtOrder: item.product.price || 0
+              priceAtOrder: calcUnitPrice(item)
             }))
           }
         }

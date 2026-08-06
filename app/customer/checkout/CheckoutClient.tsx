@@ -127,10 +127,18 @@ export function CheckoutClient({ addresses, cartItems }: CheckoutClientProps) {
     })
   }, [selectedAddress, cartItems])
 
+  const calcUnitPrice = (item: any) => {
+    let unitPrice = item.product.price ? Number(item.product.price) : 0
+    if (item.product.tiers && item.product.tiers.length > 0) {
+      const activeTier = item.product.tiers.find((t: any) => item.qty >= t.minQty && (t.maxQty === null || item.qty <= t.maxQty))
+      if (activeTier) unitPrice = activeTier.pricePerUnit
+    }
+    return unitPrice
+  }
+
   // Calculation
   const subtotal = cartItems.reduce((acc, item) => {
-    const price = item.product.price ? Number(item.product.price) : 0;
-    return acc + (item.qty * price);
+    return acc + (item.qty * calcUnitPrice(item));
   }, 0)
   const shippingCost = shippingMethods.find(s => s.id === shipping)?.price || 0
   const discount = promoApplied ? 50000 : 0
@@ -372,7 +380,7 @@ export function CheckoutClient({ addresses, cartItems }: CheckoutClientProps) {
                     <span className="font-bold text-sm text-slate-900">Produk yang Dibeli</span>
                   </div>
                   {cartItems.map((item, idx) => {
-                    const price = item.product.price ? Number(item.product.price) : 0;
+                    const price = calcUnitPrice(item);
                     return (
                       <div key={idx} className="flex justify-between items-start gap-4 text-sm">
                         <div className="flex-1">

@@ -16,7 +16,13 @@ interface CartItemData {
   product: {
     id: string
     name: string
-    price: any // Using any to handle Prisma Decimal on client side, will cast to Number
+    price: number | null
+    unit: string
+    tiers: Array<{
+      minQty: number
+      maxQty: number | null
+      pricePerUnit: number
+    }>
     images: { url: string }[]
   }
 }
@@ -64,11 +70,17 @@ export function CartPageClient({ initialItems }: CartPageClientProps) {
     })
   }
 
-  // Calculate subtotal only for items that have a price (skip INDUSTRIAL custom prices if any slip through)
-  const subtotal = items.reduce((acc, item) => {
-    const price = item.product.price ? Number(item.product.price) : 0
-    return acc + price * item.qty
-  }, 0)
+  const calcUnitPrice = (item: CartItemData) => {
+    let unitPrice = item.product.price ? Number(item.product.price) : 0
+    if (item.product.tiers && item.product.tiers.length > 0) {
+      const activeTier = item.product.tiers.find(t => item.qty >= t.minQty && (t.maxQty === null || item.qty <= t.maxQty))
+      if (activeTier) unitPrice = activeTier.pricePerUnit
+    }
+    return unitPrice
+  }
+
+  // Calculate subtotal handling tiered pricing
+  const subtotal = items.reduce((acc, item) => acc + calcUnitPrice(item) * item.qty, 0)
   const isCartEmpty = items.length === 0
 
   return (
@@ -104,7 +116,8 @@ export function CartPageClient({ initialItems }: CartPageClientProps) {
           <div className="lg:col-span-2 space-y-4">
             {items.map((item) => {
               const image = item.product.images?.[0]?.url
-              const price = item.product.price ? Number(item.product.price) : 0
+              const unitPrice = calcUnitPrice(item)
+              const hasDiscount = item.product.price && unitPrice < Number(item.product.price)
 
               return (
                 <Card key={item.id} className="overflow-hidden shadow-sm border-slate-200">
@@ -126,9 +139,16 @@ export function CartPageClient({ initialItems }: CartPageClientProps) {
                       <h3 className="text-base sm:text-lg font-bold text-slate-900 line-clamp-2 leading-snug mb-1">
                         {item.product.name}
                       </h3>
-                      <p className="text-xl font-extrabold text-blue-950">
-                        Rp {price.toLocaleString("id-ID")}
-                      </p>
+                      <div className="flex flex-wrap items-baseline gap-2">
+                        <p className="text-xl font-extrabold text-blue-950">
+                          Rp {unitPrice.toLocaleString("id-ID")}
+                        </p>
+                        {hasDiscount && (
+                          <p className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                            Harga Grosir
+                          </p>
+                        )}
+                      </div>
                     </div>
 
                     {/* Actions */}

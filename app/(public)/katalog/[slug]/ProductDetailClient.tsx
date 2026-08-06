@@ -34,6 +34,11 @@ export interface ProductDetailProps {
   rating: number
   reviewsCount: number
   images: string[]
+  tiers: Array<{
+    minQty: number
+    maxQty: number | null
+    pricePerUnit: number
+  }>
   reviews: Array<{
     id: string
     user: string
@@ -78,6 +83,10 @@ export function ProductDetailClient({ product, session }: ProductDetailClientPro
 
   // Treat BOTH as RETAIL for UI purposes (displaying price and cart button)
   const isRetail = product.type === "RETAIL" || product.type === "BOTH"
+
+  const activeTier = product.tiers?.find(t => qty >= t.minQty && (t.maxQty === null || qty <= t.maxQty))
+  const currentPrice = activeTier ? activeTier.pricePerUnit : product.price
+  const hasTiers = product.tiers && product.tiers.length > 0
 
   return (
     <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
@@ -182,12 +191,43 @@ export function ProductDetailClient({ product, session }: ProductDetailClientPro
             <div className="bg-slate-50 border border-slate-100 rounded-2xl p-5 sm:p-6 mb-8">
               {isRetail ? (
                 <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
-                  <div>
-                    <span className="block text-xs font-semibold text-slate-500 uppercase mb-1">Harga Satuan</span>
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-extrabold text-blue-950">Rp {product.price?.toLocaleString("id-ID")}</span>
-                      <span className="text-sm font-semibold text-slate-500">/{product.unit}</span>
+                  <div className="space-y-3">
+                    <div>
+                      <span className="block text-xs font-semibold text-slate-500 uppercase mb-1">
+                        {activeTier ? `Harga Grosir (${qty} ${product.unit})` : "Harga Satuan"}
+                      </span>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-extrabold text-blue-950">
+                          Rp {currentPrice?.toLocaleString("id-ID")}
+                        </span>
+                        <span className="text-sm font-semibold text-slate-500">/{product.unit}</span>
+                      </div>
+                      {activeTier && product.price && currentPrice && currentPrice < product.price && (
+                        <div className="text-xs font-bold text-emerald-600 mt-1">
+                          Hemat Rp {(product.price - currentPrice).toLocaleString("id-ID")} per {product.unit}!
+                        </div>
+                      )}
                     </div>
+                    
+                    {hasTiers && (
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {product.tiers.map((t, idx) => {
+                          const isCurrent = activeTier?.minQty === t.minQty;
+                          return (
+                            <div 
+                              key={idx} 
+                              className={`text-[10px] font-bold px-2 py-0.5 rounded-full border transition-colors ${
+                                isCurrent 
+                                  ? "bg-blue-950 text-white border-blue-950" 
+                                  : "bg-white text-slate-500 border-slate-200"
+                              }`}
+                            >
+                              ≥ {t.minQty}: Rp {t.pricePerUnit.toLocaleString("id-ID")}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex items-center gap-4 w-full sm:w-auto">

@@ -57,6 +57,7 @@ export const ModelName = {
   Category: 'Category',
   Product: 'Product',
   ProductImage: 'ProductImage',
+  ProductTier: 'ProductTier',
   Cart: 'Cart',
   CartItem: 'CartItem',
   Order: 'Order',
@@ -180,6 +181,17 @@ export const ProductImageScalarFieldEnum = {
 } as const
 
 export type ProductImageScalarFieldEnum = (typeof ProductImageScalarFieldEnum)[keyof typeof ProductImageScalarFieldEnum]
+
+
+export const ProductTierScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  minQty: 'minQty',
+  maxQty: 'maxQty',
+  pricePerUnit: 'pricePerUnit'
+} as const
+
+export type ProductTierScalarFieldEnum = (typeof ProductTierScalarFieldEnum)[keyof typeof ProductTierScalarFieldEnum]
 
 
 export const CartScalarFieldEnum = {

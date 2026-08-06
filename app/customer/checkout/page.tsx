@@ -25,7 +25,11 @@ export default async function CheckoutPage() {
     include: {
       items: {
         include: {
-          product: true
+          product: {
+            include: {
+              tiers: { orderBy: { minQty: 'asc' } }
+            }
+          }
         }
       }
     }
@@ -41,7 +45,12 @@ export default async function CheckoutPage() {
     ...item,
     product: {
       ...item.product,
-      price: item.product.price ? item.product.price.toNumber() : 0
+      price: item.product.price ? item.product.price.toNumber() : 0,
+      tiers: item.product.tiers.map(t => ({
+        minQty: t.minQty,
+        maxQty: t.maxQty,
+        pricePerUnit: Number(t.pricePerUnit)
+      }))
     }
   }))
 
