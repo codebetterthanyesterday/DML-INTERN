@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useCallback } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,6 @@ import {
   Search,
   FileText,
   X,
-  ArrowLeft,
   User,
   Mail,
   Phone,
@@ -36,9 +35,11 @@ import {
   ChevronRight,
   Loader2,
   AlertCircle,
+  Tag,
+  RefreshCw,
 } from "lucide-react";
 import type { SerializedQuote, SerializedQuoteItem } from "@/lib/actions/quotes";
-import { submitQuoteOffer, rejectQuote } from "@/lib/actions/quotes";
+import { submitQuoteOffer, rejectQuote, getQuoteById } from "@/lib/actions/quotes";
 
 // ─── Status config ────────────────────────────────────────────────────────────
 
@@ -94,7 +95,7 @@ function QuotePricingForm({
   onSuccess,
 }: {
   quote: SerializedQuote;
-  onSuccess: () => void;
+  onSuccess: (updatedQuote: SerializedQuote) => void;
 }) {
   const [isPending, startTransition] = useTransition();
   const [prices, setPrices] = useState<Record<string, string>>(() => {
@@ -107,6 +108,7 @@ function QuotePricingForm({
   const [adminNotes, setAdminNotes] = useState(quote.adminNotes ?? "");
   const [rejectOpen, setRejectOpen] = useState(false);
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; msg: string } | null>(null);
+  const router = useRouter();
 
   const totalQuoted = quote.items.reduce((sum, item) => {
     const p = parseFloat(prices[item.id] ?? "0");
@@ -127,8 +129,12 @@ function QuotePricingForm({
     startTransition(async () => {
       const res = await submitQuoteOffer(quote.id, itemPrices, adminNotes);
       if (res.success) {
-        setFeedback({ type: "success", msg: "Penawaran berhasil dikirim ke customer." });
-        setTimeout(onSuccess, 1200);
+        setFeedback({ type: "success", msg: "✅ Penawaran berhasil dikirim ke customer." });
+        // Refresh the RSC layer so the list reflects the new status
+        router.refresh();
+        // Fetch the updated quote to pass back for optimistic state
+        const updated = await getQuoteById(quote.id);
+        setTimeout(() => onSuccess(updated ?? quote), 1400);
       } else {
         setFeedback({ type: "error", msg: res.error ?? "Terjadi kesalahan." });
       }
@@ -141,7 +147,9 @@ function QuotePricingForm({
       if (res.success) {
         setFeedback({ type: "success", msg: "Pengajuan berhasil ditolak." });
         setRejectOpen(false);
-        setTimeout(onSuccess, 1200);
+        router.refresh();
+        const updated = await getQuoteById(quote.id);
+        setTimeout(() => onSuccess(updated ?? quote), 1400);
       } else {
         setFeedback({ type: "error", msg: res.error ?? "Terjadi kesalahan." });
         setRejectOpen(false);
@@ -282,7 +290,7 @@ function QuotePricingForm({
             ) : (
               <Send className="w-4 h-4 mr-2" />
             )}
-            Kirim Penawaran
+            {isPending ? "Memproses..." : "Kirim Penawaran"}
           </Button>
         </div>
       )}
@@ -316,17 +324,28 @@ function QuotePricingForm({
 // ─── Detail Panel ─────────────────────────────────────────────────────────────
 
 function RFQDetailPanel({
-  quote,
+  quote: initialQuote,
   onClose,
 }: {
   quote: SerializedQuote;
   onClose: () => void;
 }) {
+  const [quote, setQuote] = useState<SerializedQuote>(initialQuote);
+
   const createdAt = new Date(quote.createdAt);
   const formattedDate = createdAt.toLocaleDateString("id-ID", {
     day: "numeric", month: "long", year: "numeric",
   });
   const formattedTime = createdAt.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+
+  // Quoted total (shown when QUOTED/ACCEPTED)
+  const quotedTotal = quote.items.reduce((sum, item) => {
+    return sum + (item.quotedPrice ? item.quotedPrice * item.qtyRequested : 0);
+  }, 0);
+
+  const handleSuccess = useCallback((updatedQuote: SerializedQuote) => {
+    setQuote(updatedQuote);
+  }, []);
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -396,6 +415,19 @@ function RFQDetailPanel({
           </div>
         )}
 
+        {/* Quoted total summary (if QUOTED or ACCEPTED) */}
+        {(quote.status === "QUOTED" || quote.status === "ACCEPTED") && quotedTotal > 0 && (
+          <div className="rounded-xl border border-purple-200 bg-purple-50 px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Tag className="w-4 h-4 text-purple-600" />
+              <p className="text-xs font-extrabold text-purple-700 uppercase tracking-widest">Total Penawaran</p>
+            </div>
+            <p className="text-base font-extrabold text-purple-900">
+              Rp {quotedTotal.toLocaleString("id-ID")}
+            </p>
+          </div>
+        )}
+
         {/* Invoice (if exists) */}
         {quote.invoice && (
           <div className="rounded-xl border border-slate-200 overflow-hidden">
@@ -431,7 +463,7 @@ function RFQDetailPanel({
         )}
 
         {/* Pricing Form */}
-        <QuotePricingForm quote={quote} onSuccess={onClose} />
+        <QuotePricingForm quote={quote} onSuccess={handleSuccess} />
       </div>
     </div>
   );
@@ -556,6 +588,13 @@ export function RFQClient({
               const createdAt = new Date(quote.createdAt);
               const totalItems = quote.items.reduce((s, i) => s + i.qtyRequested, 0);
               const isPendingReview = quote.status === "PENDING" || quote.status === "REVIEWED";
+              const isQuoted = quote.status === "QUOTED";
+
+              // Compute quoted total for the row (shown in QUOTED / ACCEPTED status)
+              const rowQuotedTotal = quote.items.reduce((sum, item) => {
+                return sum + (item.quotedPrice ? item.quotedPrice * item.qtyRequested : 0);
+              }, 0);
+
               return (
                 <button
                   key={quote.id}
@@ -567,7 +606,7 @@ export function RFQClient({
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <span className="font-mono text-xs font-extrabold text-slate-950">
                           {quote.quoteNumber}
@@ -575,6 +614,11 @@ export function RFQClient({
                         {isPendingReview && (
                           <span className="inline-flex items-center rounded-full bg-amber-100 text-amber-700 text-[10px] font-extrabold px-1.5 py-0.5">
                             Perlu Tindakan
+                          </span>
+                        )}
+                        {isQuoted && (
+                          <span className="inline-flex items-center rounded-full bg-purple-100 text-purple-700 text-[10px] font-extrabold px-1.5 py-0.5">
+                            Menunggu Customer
                           </span>
                         )}
                       </div>
@@ -587,11 +631,24 @@ export function RFQClient({
                         {" · "}
                         {quote.items.length} produk · {totalItems.toLocaleString("id-ID")} unit
                       </p>
+                      {/* Quoted total for QUOTED/ACCEPTED rows */}
+                      {rowQuotedTotal > 0 && (quote.status === "QUOTED" || quote.status === "ACCEPTED") && (
+                        <p className="text-xs font-extrabold text-purple-700 mt-1">
+                          Rp {rowQuotedTotal.toLocaleString("id-ID")}
+                        </p>
+                      )}
                     </div>
-                    <div className="shrink-0">
+                    <div className="shrink-0 flex flex-col items-end gap-1">
                       <StatusBadge status={quote.status} />
+                      {quote.invoice && (
+                        <span className={`text-[10px] font-bold rounded-full border px-2 py-0.5 ${
+                          INVOICE_STATUS[quote.invoice.status]?.color ?? "bg-slate-100 text-slate-600 border-slate-200"
+                        }`}>
+                          {INVOICE_STATUS[quote.invoice.status]?.label ?? quote.invoice.status}
+                        </span>
+                      )}
                       {isSelected && (
-                        <div className="mt-2 flex items-center gap-1 text-xs text-red-500 font-bold justify-end">
+                        <div className="flex items-center gap-1 text-xs text-red-500 font-bold">
                           <ChevronRight className="w-3.5 h-3.5" />
                           Detail
                         </div>

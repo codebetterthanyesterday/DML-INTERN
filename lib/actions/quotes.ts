@@ -4,6 +4,10 @@ import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { QuoteStatus } from "@prisma/client";
 import { toPublicImageUrl } from "@/lib/blob";
+import {
+  createAdminNotification,
+  createUserNotification,
+} from "@/lib/actions/notifications";
 
 // ─── Serialized types (plain objects safe for Client Components) ──────────────
 
@@ -160,6 +164,32 @@ export async function getAdminQuotes(
   return { quotes: rawQuotes.map(serializeQuote), total, stats };
 }
 
+// Fetch a single quote by id (admin view – used for Sheet refresh after action)
+export async function getQuoteById(quoteId: string): Promise<SerializedQuote | null> {
+  const raw = await prisma.quote.findUnique({
+    where: { id: quoteId },
+    include: {
+      user: { select: { id: true, name: true, email: true, phone: true, companyName: true } },
+      items: {
+        include: {
+          product: {
+            select: {
+              name: true,
+              sku: true,
+              unit: true,
+              images: { select: { url: true }, orderBy: { displayOrder: "asc" }, take: 1 },
+            },
+          },
+        },
+      },
+      invoice: true,
+    },
+  });
+  if (!raw) return null;
+  // Cast to the shape rawFetchQuotes returns (same include)
+  return serializeQuote(raw as Parameters<typeof serializeQuote>[0]);
+}
+
 // Submit a price quote (sets prices per item + admin notes, sets status to QUOTED)
 export async function submitQuoteOffer(
   quoteId: string,
@@ -167,6 +197,12 @@ export async function submitQuoteOffer(
   adminNotes: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    // Fetch quote before update to get user info for notification
+    const quoteBeforeUpdate = await prisma.quote.findUnique({
+      where: { id: quoteId },
+      include: { user: { select: { id: true, name: true, companyName: true } } },
+    });
+
     await prisma.$transaction([
       ...itemPrices.map(({ itemId, quotedPrice }) =>
         prisma.quoteItem.update({
@@ -179,7 +215,33 @@ export async function submitQuoteOffer(
         data: { status: QuoteStatus.QUOTED, adminNotes: adminNotes || null },
       }),
     ]);
+
+    // Revalidate both admin and business routes
     revalidatePath("/admin/quotes");
+    if (quoteBeforeUpdate) {
+      revalidatePath(`/business/rfq/${quoteId}`);
+      revalidatePath("/business/rfq");
+
+      // Notify the customer
+      const customerName =
+        quoteBeforeUpdate.user.companyName ?? quoteBeforeUpdate.user.name;
+      createUserNotification({
+        userId: quoteBeforeUpdate.user.id,
+        type: "NEW_QUOTE",
+        title: "Penawaran Harga Tersedia",
+        message: `Admin telah mengirimkan penawaran harga untuk pengajuan RFQ Anda. Silakan login untuk melihat dan merespons penawaran.`,
+        linkUrl: `/business/rfq/${quoteId}`,
+      }).catch(() => {});
+
+      // Audit log for admins
+      createAdminNotification({
+        type: "NEW_QUOTE",
+        title: "Penawaran Dikirim",
+        message: `Penawaran harga untuk RFQ dari ${customerName} berhasil dikirimkan.`,
+        linkUrl: `/admin/quotes`,
+      }).catch(() => {});
+    }
+
     return { success: true };
   } catch {
     return { success: false, error: "Gagal mengirim penawaran harga." };
@@ -192,11 +254,44 @@ export async function rejectQuote(
   adminNotes: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    // Fetch quote before update to get user info for notification
+    const quoteBeforeUpdate = await prisma.quote.findUnique({
+      where: { id: quoteId },
+      include: { user: { select: { id: true, name: true, companyName: true } } },
+    });
+
     await prisma.quote.update({
       where: { id: quoteId },
       data: { status: QuoteStatus.REJECTED, adminNotes: adminNotes || null },
     });
+
+    // Revalidate both admin and business routes
     revalidatePath("/admin/quotes");
+    if (quoteBeforeUpdate) {
+      revalidatePath(`/business/rfq/${quoteId}`);
+      revalidatePath("/business/rfq");
+
+      const customerName =
+        quoteBeforeUpdate.user.companyName ?? quoteBeforeUpdate.user.name;
+
+      // Notify the customer
+      createUserNotification({
+        userId: quoteBeforeUpdate.user.id,
+        type: "NEW_QUOTE",
+        title: "Pengajuan RFQ Tidak Dapat Diproses",
+        message: `Pengajuan RFQ Anda tidak dapat diproses pada saat ini. Silakan login untuk melihat keterangan dari admin.`,
+        linkUrl: `/business/rfq/${quoteId}`,
+      }).catch(() => {});
+
+      // Audit log for admins
+      createAdminNotification({
+        type: "NEW_QUOTE",
+        title: "RFQ Ditolak",
+        message: `Pengajuan RFQ dari ${customerName} telah ditolak.`,
+        linkUrl: `/admin/quotes`,
+      }).catch(() => {});
+    }
+
     return { success: true };
   } catch {
     return { success: false, error: "Gagal menolak pengajuan." };

@@ -19,6 +19,8 @@ interface ExportPDFButtonProps {
   segmentLabel: string;
 }
 
+
+
 export function ExportPDFButton({ transactions, periodLabel, segmentLabel }: ExportPDFButtonProps) {
   const [loading, setLoading] = useState(false);
 

@@ -162,6 +162,37 @@ export async function createAdminNotification({
   }
 }
 
+// Send a notification to a specific user (e.g., B2B customer)
+export async function createUserNotification({
+  userId,
+  type,
+  title,
+  message,
+  linkUrl,
+}: {
+  userId: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  linkUrl?: string;
+}) {
+  try {
+    await prisma.notification.create({
+      data: {
+        type,
+        title,
+        message,
+        linkUrl,
+        userId,
+      },
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Error creating user notification:", error);
+    return { success: false, error: "Failed to create user notification" };
+  }
+}
+
 export async function deleteNotification(id: string) {
   try {
     const session = await auth();
