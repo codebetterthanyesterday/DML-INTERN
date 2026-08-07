@@ -5,19 +5,34 @@ import Image from "next/image";
 import logoImg from "../../public/logo.png";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 import {
   LayoutDashboard,
   Users,
   Settings,
+  BarChart3,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 
 const navigation = [
   { name: "Dashboard", href: "/superadmin", icon: LayoutDashboard },
+  { 
+    name: "Laporan", 
+    icon: BarChart3,
+    subItems: [
+      { name: "Pendapatan", href: "/superadmin/reports/revenue" },
+      { name: "Performa B2B", href: "/superadmin/reports/b2b" },
+    ]
+  },
   { name: "Kelola Admin", href: "/superadmin/admins", icon: Users },
 ];
 
 export function SuperAdminSidebar() {
   const pathname = usePathname();
+  // Keep "Laporan" expanded by default if we are on a report page
+  const isReportPage = pathname.startsWith("/superadmin/reports");
+  const [openLaporan, setOpenLaporan] = useState(isReportPage);
 
   return (
     <div className="flex h-full flex-col bg-white border-r border-slate-200 shadow-sm">
@@ -32,11 +47,66 @@ export function SuperAdminSidebar() {
       <div className="flex flex-1 flex-col overflow-y-auto pt-6 px-4 pb-4">
         <nav className="flex-1 space-y-1">
           {navigation.map((item) => {
-            const isActive = pathname === item.href || (item.href !== "/superadmin" && pathname.startsWith(item.href));
+            if (item.subItems) {
+              const isActive = item.subItems.some(sub => pathname === sub.href || pathname.startsWith(sub.href));
+              
+              return (
+                <div key={item.name} className="space-y-1">
+                  <button
+                    onClick={() => setOpenLaporan(!openLaporan)}
+                    className={cn(
+                      "w-full group flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-indigo-950 focus-visible:outline-none",
+                      isActive
+                        ? "bg-indigo-50 text-indigo-700"
+                        : "text-slate-600 hover:bg-slate-50 hover:text-indigo-950"
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <item.icon
+                        className={cn(
+                          "h-5 w-5 shrink-0 transition-colors",
+                          isActive ? "text-indigo-600" : "text-slate-400 group-hover:text-indigo-950"
+                        )}
+                        aria-hidden="true"
+                      />
+                      {item.name}
+                    </div>
+                    {openLaporan ? (
+                      <ChevronDown className="h-4 w-4 text-slate-400" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4 text-slate-400" />
+                    )}
+                  </button>
+                  {openLaporan && (
+                    <div className="pl-11 pr-2 space-y-1 pt-1">
+                      {item.subItems.map((sub) => {
+                        const isSubActive = pathname === sub.href || pathname.startsWith(sub.href);
+                        return (
+                          <Link
+                            key={sub.name}
+                            href={sub.href}
+                            className={cn(
+                              "group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                              isSubActive
+                                ? "text-indigo-700 bg-indigo-50/50"
+                                : "text-slate-500 hover:text-indigo-950 hover:bg-slate-50"
+                            )}
+                          >
+                            {sub.name}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
+            const isActive = pathname === item.href || (item.href !== "/superadmin" && pathname.startsWith(item.href as string));
             return (
               <Link
                 key={item.name}
-                href={item.href}
+                href={item.href as string}
                 className={cn(
                   "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-indigo-950 focus-visible:outline-none",
                   isActive
