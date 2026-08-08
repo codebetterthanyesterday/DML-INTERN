@@ -73,6 +73,8 @@ enum QuoteStatus {
   QUOTED
   ACCEPTED
   REJECTED
+  WAITING_SUPERADMIN_APPROVAL // Harga sudah diisi admin, menunggu approval Super Admin
+  SUPERADMIN_REVISION         // Super Admin meminta admin merevisi harga
 }
 
 enum InvoiceStatus {
@@ -127,6 +129,8 @@ enum AuditAction {
   ROLE_CHANGED
   DOCUMENT_VERIFIED
   DOCUMENT_REJECTED
+  QUOTE_APPROVED_SUPERADMIN   // Super Admin menyetujui quotation nilai besar
+  QUOTE_REJECTED_SUPERADMIN   // Super Admin menolak/meminta revisi quotation
 }
 
 // ============================================
@@ -350,14 +354,18 @@ model OrderItem {
 // ============================================
 
 model Quote {
-  id            String      @id @default(cuid())
-  userId        String
-  quoteNumber   String      @unique
-  status        QuoteStatus @default(PENDING)
-  customerNotes String?
-  adminNotes    String?
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  id                    String      @id @default(cuid())
+  userId                String
+  quoteNumber           String      @unique
+  status                QuoteStatus @default(PENDING)
+  customerNotes         String?
+  adminNotes            String?
+  superAdminNotes       String?     // Catatan dari Super Admin (approval/revisi)
+  superAdminId          String?     // ID Super Admin yang mereview
+  superAdminReviewedAt  DateTime?   // Waktu Super Admin melakukan review
+  totalQuotedValue      Decimal?    @db.Decimal(14, 2) // Cache total nilai penawaran
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
 
   user    User        @relation(fields: [userId], references: [id])
   items   QuoteItem[]

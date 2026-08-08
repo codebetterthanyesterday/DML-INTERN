@@ -8,6 +8,7 @@ import {
   createAdminNotification,
   createUserNotification,
 } from "@/lib/actions/notifications";
+import { HIGH_VALUE_THRESHOLD } from "@/lib/constants/approval";
 
 // ─── Serialized types (plain objects safe for Client Components) ──────────────
 
@@ -34,6 +35,10 @@ export type SerializedQuote = {
   status: string;
   customerNotes: string | null;
   adminNotes: string | null;
+  superAdminNotes: string | null;
+  superAdminId: string | null;
+  superAdminReviewedAt: string | null;
+  totalQuotedValue: number | null;
   createdAt: string;
   updatedAt: string;
   user: { id: string; name: string; email: string; phone: string | null; companyName: string | null };
@@ -52,6 +57,10 @@ function serializeQuote(q: RawQuote): SerializedQuote {
     status: q.status,
     customerNotes: q.customerNotes,
     adminNotes: q.adminNotes,
+    superAdminNotes: q.superAdminNotes ?? null,
+    superAdminId: q.superAdminId ?? null,
+    superAdminReviewedAt: q.superAdminReviewedAt ? q.superAdminReviewedAt.toISOString() : null,
+    totalQuotedValue: q.totalQuotedValue ? q.totalQuotedValue.toNumber() : null,
     createdAt: q.createdAt.toISOString(),
     updatedAt: q.updatedAt.toISOString(),
     user: {
@@ -190,18 +199,33 @@ export async function getQuoteById(quoteId: string): Promise<SerializedQuote | n
   return serializeQuote(raw as Parameters<typeof serializeQuote>[0]);
 }
 
-// Submit a price quote (sets prices per item + admin notes, sets status to QUOTED)
+// Submit a price quote (sets prices per item + admin notes)
+// If total > HIGH_VALUE_THRESHOLD, routes to WAITING_SUPERADMIN_APPROVAL
 export async function submitQuoteOffer(
   quoteId: string,
   itemPrices: { itemId: string; quotedPrice: number }[],
   adminNotes: string
-): Promise<{ success: boolean; error?: string }> {
+): Promise<{ success: boolean; error?: string; requiresSuperAdmin?: boolean }> {
   try {
     // Fetch quote before update to get user info for notification
     const quoteBeforeUpdate = await prisma.quote.findUnique({
       where: { id: quoteId },
-      include: { user: { select: { id: true, name: true, companyName: true } } },
+      include: {
+        user: { select: { id: true, name: true, companyName: true } },
+        items: { select: { id: true, qtyRequested: true } },
+      },
     });
+
+    // Calculate total quoted value for threshold check
+    const totalValue = itemPrices.reduce((sum, { itemId, quotedPrice }) => {
+      const item = quoteBeforeUpdate?.items.find((i) => i.id === itemId);
+      return sum + (item ? item.qtyRequested * quotedPrice : 0);
+    }, 0);
+
+    const requiresSuperAdmin = totalValue >= HIGH_VALUE_THRESHOLD;
+    const newStatus = requiresSuperAdmin
+      ? QuoteStatus.WAITING_SUPERADMIN_APPROVAL
+      : QuoteStatus.QUOTED;
 
     await prisma.$transaction([
       ...itemPrices.map(({ itemId, quotedPrice }) =>
@@ -212,41 +236,60 @@ export async function submitQuoteOffer(
       ),
       prisma.quote.update({
         where: { id: quoteId },
-        data: { status: QuoteStatus.QUOTED, adminNotes: adminNotes || null },
+        data: {
+          status: newStatus,
+          adminNotes: adminNotes || null,
+          totalQuotedValue: totalValue,
+          // Reset superadmin review fields when admin resubmits
+          superAdminNotes: null,
+          superAdminId: null,
+          superAdminReviewedAt: null,
+        },
       }),
     ]);
 
-    // Revalidate both admin and business routes
     revalidatePath("/admin/quotes");
-    if (quoteBeforeUpdate) {
-      revalidatePath(`/business/rfq/${quoteId}`);
-      revalidatePath("/business/rfq");
+    revalidatePath("/superadmin/approvals");
 
-      // Notify the customer
+    if (quoteBeforeUpdate) {
       const customerName =
         quoteBeforeUpdate.user.companyName ?? quoteBeforeUpdate.user.name;
-      createUserNotification({
-        userId: quoteBeforeUpdate.user.id,
-        type: "NEW_QUOTE",
-        title: "Penawaran Harga Tersedia",
-        message: `Admin telah mengirimkan penawaran harga untuk pengajuan RFQ Anda. Silakan login untuk melihat dan merespons penawaran.`,
-        linkUrl: `/business/rfq/${quoteId}`,
-      }).catch(() => {});
 
-      // Audit log for admins
-      createAdminNotification({
-        type: "NEW_QUOTE",
-        title: "Penawaran Dikirim",
-        message: `Penawaran harga untuk RFQ dari ${customerName} berhasil dikirimkan.`,
-        linkUrl: `/admin/quotes`,
-      }).catch(() => {});
+      if (requiresSuperAdmin) {
+        // Notify Super Admin that a high-value quote needs approval
+        createAdminNotification({
+          type: "NEW_QUOTE",
+          title: "🔔 Persetujuan Diperlukan — Quotation Nilai Besar",
+          message: `Admin telah menetapkan harga untuk RFQ dari ${customerName} dengan total Rp ${totalValue.toLocaleString("id-ID")}. Nilai ini melebihi batas dan memerlukan persetujuan Super Admin.`,
+          linkUrl: `/superadmin/approvals`,
+        }).catch(() => {});
+      } else {
+        revalidatePath(`/business/rfq/${quoteId}`);
+        revalidatePath("/business/rfq");
+        // Notify the customer directly
+        createUserNotification({
+          userId: quoteBeforeUpdate.user.id,
+          type: "NEW_QUOTE",
+          title: "Penawaran Harga Tersedia",
+          message: `Admin telah mengirimkan penawaran harga untuk pengajuan RFQ Anda. Silakan login untuk melihat dan merespons penawaran.`,
+          linkUrl: `/business/rfq/${quoteId}`,
+        }).catch(() => {});
+
+        createAdminNotification({
+          type: "NEW_QUOTE",
+          title: "Penawaran Dikirim",
+          message: `Penawaran harga untuk RFQ dari ${customerName} berhasil dikirimkan.`,
+          linkUrl: `/admin/quotes`,
+        }).catch(() => {});
+      }
     }
 
-    return { success: true };
+    return { success: true, requiresSuperAdmin };
   } catch {
     return { success: false, error: "Gagal mengirim penawaran harga." };
   }
 }
+
 
 // Reject a quote
 export async function rejectQuote(
@@ -295,5 +338,150 @@ export async function rejectQuote(
     return { success: true };
   } catch {
     return { success: false, error: "Gagal menolak pengajuan." };
+  }
+}
+
+// ─── Super Admin API ──────────────────────────────────────────────────────────
+
+// Fetch quotes pending Super Admin approval
+export async function getSuperAdminPendingApprovals(
+  q = "",
+  page = 1,
+  pageSize = 20
+): Promise<{ quotes: SerializedQuote[]; total: number }> {
+  const where = {
+    status: QuoteStatus.WAITING_SUPERADMIN_APPROVAL,
+    ...(q
+      ? {
+          OR: [
+            { quoteNumber: { contains: q, mode: "insensitive" as const } },
+            { user: { name: { contains: q, mode: "insensitive" as const } } },
+            { user: { companyName: { contains: q, mode: "insensitive" as const } } },
+          ],
+        }
+      : {}),
+  };
+
+  const [rawQuotes, total] = await Promise.all([
+    prisma.quote.findMany({
+      where,
+      orderBy: { updatedAt: "desc" },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      include: {
+        user: { select: { id: true, name: true, email: true, phone: true, companyName: true } },
+        items: {
+          include: {
+            product: {
+              select: {
+                name: true,
+                sku: true,
+                unit: true,
+                images: { select: { url: true }, orderBy: { displayOrder: "asc" }, take: 1 },
+              },
+            },
+          },
+        },
+        invoice: true,
+      },
+    }),
+    prisma.quote.count({ where }),
+  ]);
+
+  return { quotes: rawQuotes.map(serializeQuote), total };
+}
+
+// Super Admin approves a high-value quotation — releases it to customer
+export async function approveQuoteBySuperadmin(
+  quoteId: string,
+  superAdminNotes: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const quoteBeforeUpdate = await prisma.quote.findUnique({
+      where: { id: quoteId },
+      include: {
+        user: { select: { id: true, name: true, companyName: true } },
+      },
+    });
+    if (!quoteBeforeUpdate) return { success: false, error: "RFQ tidak ditemukan." };
+
+    await prisma.quote.update({
+      where: { id: quoteId },
+      data: {
+        status: QuoteStatus.QUOTED,
+        superAdminNotes: superAdminNotes || null,
+        superAdminReviewedAt: new Date(),
+      },
+    });
+
+    revalidatePath("/superadmin/approvals");
+    revalidatePath("/admin/quotes");
+    revalidatePath(`/business/rfq/${quoteId}`);
+    revalidatePath("/business/rfq");
+
+    const customerName = quoteBeforeUpdate.user.companyName ?? quoteBeforeUpdate.user.name;
+
+    // Notify customer
+    createUserNotification({
+      userId: quoteBeforeUpdate.user.id,
+      type: "NEW_QUOTE",
+      title: "Penawaran Harga Telah Disetujui",
+      message: `Penawaran harga untuk RFQ Anda telah disetujui dan siap untuk dilihat. Silakan login untuk merespons penawaran.`,
+      linkUrl: `/business/rfq/${quoteId}`,
+    }).catch(() => {});
+
+    // Notify admin team
+    createAdminNotification({
+      type: "NEW_QUOTE",
+      title: "✅ Quotation Disetujui Super Admin",
+      message: `Super Admin telah menyetujui penawaran RFQ dari ${customerName} (Rp ${quoteBeforeUpdate.totalQuotedValue?.toLocaleString("id-ID") ?? "-"}). Penawaran telah dikirim ke customer.`,
+      linkUrl: `/admin/quotes`,
+    }).catch(() => {});
+
+    return { success: true };
+  } catch {
+    return { success: false, error: "Gagal menyetujui penawaran." };
+  }
+}
+
+// Super Admin rejects/returns a high-value quotation for admin revision
+export async function rejectQuoteBySuperadmin(
+  quoteId: string,
+  superAdminNotes: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const quoteBeforeUpdate = await prisma.quote.findUnique({
+      where: { id: quoteId },
+      include: {
+        user: { select: { id: true, name: true, companyName: true } },
+      },
+    });
+    if (!quoteBeforeUpdate) return { success: false, error: "RFQ tidak ditemukan." };
+
+    await prisma.quote.update({
+      where: { id: quoteId },
+      data: {
+        status: QuoteStatus.SUPERADMIN_REVISION,
+        superAdminNotes: superAdminNotes || null,
+        superAdminReviewedAt: new Date(),
+      },
+    });
+
+    revalidatePath("/superadmin/approvals");
+    revalidatePath("/admin/quotes");
+
+    const customerName = quoteBeforeUpdate.user.companyName ?? quoteBeforeUpdate.user.name;
+
+    // Notify admin team to revise
+    createAdminNotification({
+      type: "NEW_QUOTE",
+      title: "⚠️ Quotation Perlu Direvisi",
+      message: `Super Admin mengembalikan penawaran RFQ dari ${customerName} untuk direvisi. Silakan tinjau catatan Super Admin dan sesuaikan harga.`,
+      linkUrl: `/admin/quotes`,
+    }).catch(() => {});
+
+    return { success: true };
+  } catch {
+    return { success: false, error: "Gagal mengembalikan penawaran untuk revisi." };
   }
 }

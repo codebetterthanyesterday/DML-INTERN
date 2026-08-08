@@ -13,6 +13,7 @@ import {
   BarChart3,
   ChevronDown,
   ChevronRight,
+  ShieldCheck,
 } from "lucide-react";
 
 const navigation = [
@@ -26,6 +27,7 @@ const navigation = [
     ]
   },
   { name: "Kelola Admin", href: "/superadmin/admins", icon: Users },
+  { name: "Persetujuan RFQ", href: "/superadmin/approvals", icon: ShieldCheck, highlight: true },
 ];
 
 export function SuperAdminSidebar() {
@@ -103,14 +105,19 @@ export function SuperAdminSidebar() {
             }
 
             const isActive = pathname === item.href || (item.href !== "/superadmin" && pathname.startsWith(item.href as string));
+            const isHighlight = (item as { highlight?: boolean }).highlight;
             return (
               <Link
                 key={item.name}
                 href={item.href as string}
                 className={cn(
-                  "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-indigo-950 focus-visible:outline-none",
+                  "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all duration-150 focus-visible:ring-2 focus-visible:ring-indigo-950 focus-visible:outline-none",
                   isActive
-                    ? "bg-indigo-50 text-indigo-700"
+                    ? isHighlight
+                      ? "bg-red-50 text-red-700 ring-1 ring-red-200/80"
+                      : "bg-indigo-50 text-indigo-700"
+                    : isHighlight
+                    ? "text-red-600 hover:bg-red-50 hover:text-red-700"
                     : "text-slate-600 hover:bg-slate-50 hover:text-indigo-950"
                 )}
                 aria-current={isActive ? "page" : undefined}
@@ -118,13 +125,21 @@ export function SuperAdminSidebar() {
                 <item.icon
                   className={cn(
                     "h-5 w-5 shrink-0 transition-colors",
-                    isActive ? "text-indigo-600" : "text-slate-400 group-hover:text-indigo-950"
+                    isActive
+                      ? isHighlight ? "text-red-600" : "text-indigo-600"
+                      : isHighlight
+                      ? "text-red-500 group-hover:text-red-600"
+                      : "text-slate-400 group-hover:text-indigo-950"
                   )}
                   aria-hidden="true"
                 />
-                {item.name}
+                <span className="flex-1">{item.name}</span>
+                {isHighlight && (
+                  <span className="inline-flex h-2 w-2 rounded-full bg-red-500 animate-pulse" aria-hidden="true" />
+                )}
               </Link>
             );
+
           })}
         </nav>
         <div className="mt-auto pt-6">

@@ -69,6 +69,16 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.
     color: "bg-red-50 text-red-700 border-red-200",
     icon: XCircle,
   },
+  WAITING_SUPERADMIN_APPROVAL: {
+    label: "Menunggu Super Admin",
+    color: "bg-blue-50 text-blue-700 border-blue-200",
+    icon: RefreshCw,
+  },
+  SUPERADMIN_REVISION: {
+    label: "Perlu Revisi Harga",
+    color: "bg-orange-50 text-orange-700 border-orange-200",
+    icon: AlertCircle,
+  },
 };
 
 const INVOICE_STATUS: Record<string, { label: string; color: string }> = {
@@ -129,7 +139,14 @@ function QuotePricingForm({
     startTransition(async () => {
       const res = await submitQuoteOffer(quote.id, itemPrices, adminNotes);
       if (res.success) {
-        setFeedback({ type: "success", msg: "✅ Penawaran berhasil dikirim ke customer." });
+        if (res.requiresSuperAdmin) {
+          setFeedback({
+            type: "success",
+            msg: "⏳ Nilai penawaran melebihi batas. Penawaran diteruskan ke Super Admin untuk disetujui.",
+          });
+        } else {
+          setFeedback({ type: "success", msg: "✅ Penawaran berhasil dikirim ke customer." });
+        }
         // Refresh the RSC layer so the list reflects the new status
         router.refresh();
         // Fetch the updated quote to pass back for optimistic state
@@ -157,7 +174,7 @@ function QuotePricingForm({
     });
   };
 
-  const isEditable = quote.status === "PENDING" || quote.status === "REVIEWED";
+  const isEditable = quote.status === "PENDING" || quote.status === "REVIEWED" || quote.status === "SUPERADMIN_REVISION";
 
   return (
     <div className="space-y-4">
@@ -462,6 +479,38 @@ function RFQDetailPanel({
           </div>
         )}
 
+        {/* Waiting for Superadmin Banner */}
+        {quote.status === "WAITING_SUPERADMIN_APPROVAL" && (
+          <div className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3.5 flex items-start gap-3">
+            <RefreshCw className="w-4 h-4 text-blue-600 shrink-0 mt-0.5 animate-spin" />
+            <div>
+              <p className="text-xs font-extrabold text-blue-700 uppercase tracking-widest mb-1">Menunggu Persetujuan Super Admin</p>
+              <p className="text-sm text-blue-800 leading-relaxed">
+                Nilai penawaran melebihi threshold. Super Admin sedang meninjau penawaran ini sebelum dikirim ke customer.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Superadmin Revision Banner */}
+        {quote.status === "SUPERADMIN_REVISION" && (
+          <div className="rounded-xl border border-orange-200 bg-orange-50 px-4 py-3.5">
+            <p className="text-xs font-extrabold text-orange-700 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+              <AlertCircle className="w-3.5 h-3.5" />
+              Super Admin Meminta Revisi
+            </p>
+            <p className="text-sm text-orange-900 leading-relaxed mb-2">
+              Penawaran dikembalikan untuk direvisi. Perbaiki harga dan kirim ulang.
+            </p>
+            {quote.superAdminNotes && (
+              <div className="rounded-lg bg-orange-100/70 border border-orange-200 px-3 py-2.5">
+                <p className="text-xs font-bold text-orange-600 mb-1">Catatan dari Super Admin:</p>
+                <p className="text-sm text-orange-900 italic leading-relaxed">&ldquo;{quote.superAdminNotes}&rdquo;</p>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Pricing Form */}
         <QuotePricingForm quote={quote} onSuccess={handleSuccess} />
       </div>
@@ -509,6 +558,8 @@ export function RFQClient({
     { key: "ALL", label: "Semua" },
     { key: "PENDING", label: "Menunggu" },
     { key: "REVIEWED", label: "Ditinjau" },
+    { key: "WAITING_SUPERADMIN_APPROVAL", label: "Menunggu SA" },
+    { key: "SUPERADMIN_REVISION", label: "Perlu Revisi" },
     { key: "QUOTED", label: "Penawaran Dikirim" },
     { key: "ACCEPTED", label: "Diterima" },
     { key: "REJECTED", label: "Ditolak" },

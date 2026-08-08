@@ -2117,6 +2117,10 @@ export const QuoteScalarFieldEnum = {
   status: 'status',
   customerNotes: 'customerNotes',
   adminNotes: 'adminNotes',
+  superAdminNotes: 'superAdminNotes',
+  superAdminId: 'superAdminId',
+  superAdminReviewedAt: 'superAdminReviewedAt',
+  totalQuotedValue: 'totalQuotedValue',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
