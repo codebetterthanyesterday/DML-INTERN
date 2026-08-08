@@ -34,6 +34,7 @@ import {
   Mail,
   ArrowLeft,
 } from "lucide-react";
+import { toast } from "react-hot-toast";
 import type { SerializedOrder } from "@/lib/actions/orders";
 import { updateOrderStatus } from "@/lib/actions/orders";
 import { OrderStatus } from "@prisma/client/browser";
@@ -51,7 +52,7 @@ const STATUS_CONFIG: Record<
     next: [OrderStatus.PROCESSING, OrderStatus.CANCELLED],
   },
   PROCESSING: {
-    label: "Diproses",
+    label: "Diproses / Dikemas",
     color: "bg-red-50 text-red-600 border-red-200",
     icon: RefreshCw,
     next: [OrderStatus.SHIPPED, OrderStatus.CANCELLED],
@@ -125,21 +126,20 @@ function OrderDetailPanel({
   const [isPending, startTransition] = useTransition();
   const [selectedStatus, setSelectedStatus] = useState<OrderStatus>(order.status as OrderStatus);
   const [trackingNumber, setTrackingNumber] = useState<string>("");
-  const [feedback, setFeedback] = useState<{ type: "success" | "error"; msg: string } | null>(null);
 
   const cfg = STATUS_CONFIG[order.status];
   const nextStatuses = cfg?.next ?? [];
 
   const handleStatusUpdate = () => {
     if (selectedStatus === order.status) return;
-    setFeedback(null);
+    
     startTransition(async () => {
       const result = await updateOrderStatus(order.id, selectedStatus, trackingNumber);
       if (result.success) {
-        setFeedback({ type: "success", msg: "Status berhasil diperbarui." });
+        toast.success("Status pesanan berhasil diperbarui!");
         setTrackingNumber(""); // reset
       } else {
-        setFeedback({ type: "error", msg: result.error ?? "Terjadi kesalahan." });
+        toast.error(result.error ?? "Terjadi kesalahan.");
       }
     });
   };
@@ -292,13 +292,6 @@ function OrderDetailPanel({
       {/* Update Status Footer */}
       {nextStatuses.length > 0 && (
         <div className="shrink-0 border-t border-slate-100 px-6 py-4 bg-white">
-          {feedback && (
-            <div className={`mb-3 rounded-lg px-3 py-2 text-xs font-semibold ${
-              feedback.type === "success" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
-            }`}>
-              {feedback.msg}
-            </div>
-          )}
           <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Update Status</p>
           <div className="flex flex-col gap-3">
             <div className="flex gap-2">
@@ -390,7 +383,7 @@ export function OrdersClient({
   const STATUS_TABS = [
     { key: "ALL", label: "Semua" },
     { key: "PENDING", label: "Baru" },
-    { key: "PROCESSING", label: "Diproses" },
+    { key: "PROCESSING", label: "Diproses / Dikemas" },
     { key: "SHIPPED", label: "Dikirim" },
     { key: "COMPLETED", label: "Selesai" },
     { key: "CANCELLED", label: "Dibatalkan" },

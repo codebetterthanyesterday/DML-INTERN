@@ -183,16 +183,55 @@ export async function updateOrderStatus(
   trackingNumber?: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    await prisma.order.update({
-      where: { id: orderId },
-      data: { 
-        status: newStatus,
-        ...(trackingNumber ? { trackingNumber } : {})
-      },
+    await prisma.$transaction(async (tx) => {
+      const order = await tx.order.findUnique({
+        where: { id: orderId },
+      });
+
+      if (!order) {
+        throw new Error("Pesanan tidak ditemukan.");
+      }
+
+      await tx.order.update({
+        where: { id: orderId },
+        data: { 
+          status: newStatus,
+          ...(trackingNumber ? { trackingNumber } : {})
+        },
+      });
+
+      let title = "Status Pesanan Diperbarui";
+      let message = `Status pesanan #${order.orderNumber} Anda telah diperbarui menjadi ${newStatus}.`;
+
+      if (newStatus === "PROCESSING") {
+        title = "Pesanan Sedang Diproses / Dikemas";
+        message = `Pesanan #${order.orderNumber} Anda sedang kami siapkan dan kemas.`;
+      } else if (newStatus === "SHIPPED") {
+        title = "Pesanan Telah Dikirim";
+        message = `Pesanan #${order.orderNumber} Anda telah dikirim. ${trackingNumber ? `Nomor Resi: ${trackingNumber}` : ""}`;
+      } else if (newStatus === "COMPLETED") {
+        title = "Pesanan Selesai";
+        message = `Pesanan #${order.orderNumber} Anda telah selesai. Terima kasih telah berbelanja di DML!`;
+      } else if (newStatus === "CANCELLED") {
+        title = "Pesanan Dibatalkan";
+        message = `Pesanan #${order.orderNumber} Anda telah dibatalkan.`;
+      }
+
+      await tx.notification.create({
+        data: {
+          userId: order.userId,
+          title,
+          message,
+          type: "SYSTEM_ALERT",
+          linkUrl: `/customer/orders/${order.id}`,
+        }
+      });
     });
+
     revalidatePath("/admin/orders");
     return { success: true };
-  } catch {
-    return { success: false, error: "Gagal memperbarui status pesanan." };
+  } catch (error: any) {
+    console.error("updateOrderStatus Error:", error);
+    return { success: false, error: error.message || "Gagal memperbarui status pesanan." };
   }
 }
