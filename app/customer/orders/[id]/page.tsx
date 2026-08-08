@@ -11,6 +11,7 @@ import {
   Truck,
   Wallet,
   XCircle,
+  AlertCircle,
 } from "lucide-react";
 import { OrderStatus } from "@prisma/client";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ import { Separator } from "@/components/ui/separator";
 import { getCustomerOrder } from "@/lib/data/customer-orders";
 import { cn } from "@/lib/utils";
 import { CopyTrackingButton } from "./copy-tracking-button";
+import { ComplaintSubmissionForm } from "./components/ComplaintSubmissionForm";
 
 const STEPS = [
   { status: OrderStatus.PENDING, label: "Pesanan dibuat", icon: Clock },
@@ -52,18 +54,32 @@ export default async function OrderDetailsPage({
   return (
     <div className="w-full bg-slate-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        <div className="mb-7 flex items-start gap-3">
-          <Button variant="outline" size="icon" className="mt-1 rounded-full bg-white" asChild>
-            <Link href="/customer/orders" aria-label="Kembali ke riwayat pesanan">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <div>
-            <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-red-600">Detail Pesanan</p>
-            <h1 className="mt-1 text-2xl sm:text-3xl font-black tracking-tight text-slate-950">{order.orderNumber}</h1>
-            <p className="mt-1 text-sm text-slate-500">
-              Dibuat {new Date(order.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
-            </p>
+        <div className="mb-7 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <Button variant="outline" size="icon" className="mt-1 rounded-full bg-white" asChild>
+              <Link href="/customer/orders" aria-label="Kembali ke riwayat pesanan">
+                <ArrowLeft className="h-4 w-4" />
+              </Link>
+            </Button>
+            <div>
+              <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-red-600">Detail Pesanan</p>
+              <h1 className="mt-1 text-2xl sm:text-3xl font-black tracking-tight text-slate-950">{order.orderNumber}</h1>
+              <p className="mt-1 text-sm text-slate-500">
+                Dibuat {new Date(order.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+              </p>
+            </div>
+          </div>
+          <div className="flex-shrink-0 sm:mt-1 ml-12 sm:ml-0">
+            {order.complaint ? (
+              <div className="inline-flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm">
+                <AlertCircle className="h-4 w-4 text-amber-600" />
+                <span className="font-bold text-amber-800">
+                  Komplain: {order.complaint.status === "PENDING" ? "Menunggu" : order.complaint.status === "REVIEWING" ? "Sedang Direview" : order.complaint.status === "APPROVED" ? "Disetujui" : "Ditolak"}
+                </span>
+              </div>
+            ) : (
+              <ComplaintSubmissionForm orderId={order.id} orderStatus={order.status} />
+            )}
           </div>
         </div>
 

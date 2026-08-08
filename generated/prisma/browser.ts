@@ -127,3 +127,13 @@ export type SiteSetting = Prisma.SiteSettingModel
  * 
  */
 export type Voucher = Prisma.VoucherModel
+/**
+ * Model Complaint
+ * 
+ */
+export type Complaint = Prisma.ComplaintModel
+/**
+ * Model ComplaintItem
+ * 
+ */
+export type ComplaintItem = Prisma.ComplaintItemModel

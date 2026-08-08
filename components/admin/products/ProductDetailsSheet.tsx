@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Package,
   Tag,
@@ -134,7 +133,7 @@ export function ProductDetailsSheet({
         </SheetHeader>
 
         {/* Scrollable Content */}
-        <ScrollArea className="flex-1 px-6">
+        <div className="flex-1 overflow-y-auto min-h-0 px-6">
           <div className="py-6 space-y-8">
 
             {/* Image Gallery */}
@@ -247,7 +246,7 @@ export function ProductDetailsSheet({
             {/* Bottom padding for scroll */}
             <div className="h-6"></div>
           </div>
-        </ScrollArea>
+        </div>
       </SheetContent>
     </Sheet>
   );

@@ -19,6 +19,7 @@ import {
   Tag,
   Wallet,
   Gift,
+  Undo2,
 } from "lucide-react";
 
 const navigation = [
@@ -32,6 +33,7 @@ const navigation = [
   { name: "Akun & Pengguna", href: "/admin/accounts", icon: Users },
   { name: "Verifikasi Akun", href: "/admin/verifications", icon: ShieldCheck },
   { name: "Verifikasi Pembayaran", href: "/admin/payments", icon: Wallet },
+  { name: "Keluhan & Pengajuan", href: "/admin/complaints", icon: Undo2 },
   { name: "Laporan", href: "/admin/reports", icon: BarChart3 },
 ];
 

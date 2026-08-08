@@ -196,3 +196,24 @@ export const QuoteLogAction = {
 } as const
 
 export type QuoteLogAction = (typeof QuoteLogAction)[keyof typeof QuoteLogAction]
+
+
+export const ComplaintType = {
+  CANCELLATION: 'CANCELLATION',
+  RETURN: 'RETURN',
+  REFUND: 'REFUND'
+} as const
+
+export type ComplaintType = (typeof ComplaintType)[keyof typeof ComplaintType]
+
+
+export const ComplaintStatus = {
+  PENDING: 'PENDING',
+  REVIEWING: 'REVIEWING',
+  REVIEWED: 'REVIEWED',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  RESOLVED: 'RESOLVED'
+} as const
+
+export type ComplaintStatus = (typeof ComplaintStatus)[keyof typeof ComplaintStatus]

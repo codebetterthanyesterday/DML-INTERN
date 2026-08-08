@@ -151,6 +151,21 @@ enum QuoteLogAction {
   ADMIN_REJECTED
 }
 
+enum ComplaintType {
+  CANCELLATION
+  RETURN
+  REFUND
+}
+
+enum ComplaintStatus {
+  PENDING
+  REVIEWING
+  REVIEWED
+  APPROVED
+  REJECTED
+  RESOLVED
+}
+
 // ============================================
 // USER & AKUN BISNIS
 // ============================================
@@ -178,6 +193,7 @@ model User {
   notifications     Notification[]
   auditLogs         AuditLog[]
   stockLogs         StockLog[]
+  complaints        Complaint[]
 
   @@map("users")
 }
@@ -256,14 +272,15 @@ model Product {
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
 
-  category   Category       @relation(fields: [categoryId], references: [id])
-  images     ProductImage[]
-  tiers      ProductTier[]
-  cartItems  CartItem[]
-  orderItems OrderItem[]
-  quoteItems QuoteItem[]
-  reviews    Review[]
-  stockLogs  StockLog[]
+  category       Category        @relation(fields: [categoryId], references: [id])
+  images         ProductImage[]
+  tiers          ProductTier[]
+  cartItems      CartItem[]
+  orderItems     OrderItem[]
+  quoteItems     QuoteItem[]
+  reviews        Review[]
+  stockLogs      StockLog[]
+  complaintItems ComplaintItem[]
 
   @@index([categoryId])
   @@index([productType])
@@ -348,11 +365,12 @@ model Order {
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
 
-  user    User        @relation(fields: [userId], references: [id])
-  address Address     @relation(fields: [addressId], references: [id])
-  items   OrderItem[]
-  payment Payment?
-  voucher Voucher?    @relation(fields: [voucherCode], references: [code])
+  user       User        @relation(fields: [userId], references: [id])
+  address    Address     @relation(fields: [addressId], references: [id])
+  items      OrderItem[]
+  payment    Payment?
+  voucher    Voucher?    @relation(fields: [voucherCode], references: [code])
+  complaints Complaint[]
 
   @@index([userId])
   @@index([status])
@@ -597,4 +615,42 @@ model Voucher {
 
   @@index([code])
   @@map("vouchers")
+}
+
+// ============================================
+// COMPLAINTS (PEMBATALAN, RETUR, REFUND)
+// ============================================
+
+model Complaint {
+  id          String          @id @default(cuid())
+  orderId     String
+  userId      String
+  type        ComplaintType
+  status      ComplaintStatus @default(PENDING)
+  reason      String
+  description String?         @db.Text
+  proofUrl    String?
+  adminNotes  String?         @db.Text
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  order Order           @relation(fields: [orderId], references: [id])
+  user  User            @relation(fields: [userId], references: [id])
+  items ComplaintItem[]
+
+  @@index([orderId])
+  @@index([userId])
+  @@map("complaints")
+}
+
+model ComplaintItem {
+  id          String @id @default(cuid())
+  complaintId String
+  productId   String
+  qty         Int
+
+  complaint Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  product   Product   @relation(fields: [productId], references: [id])
+
+  @@map("complaint_items")
 }

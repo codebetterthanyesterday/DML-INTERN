@@ -132,6 +132,16 @@ export async function getCustomerOrder(orderId: string) {
           product: { select: { name: true, sku: true, unit: true } },
         },
       },
+      complaints: {
+        orderBy: { createdAt: "desc" },
+        take: 1,
+        select: {
+          id: true,
+          type: true,
+          status: true,
+          createdAt: true,
+        }
+      },
     },
   });
 
@@ -156,6 +166,10 @@ export async function getCustomerOrder(orderId: string) {
         ...item,
         priceAtOrder: item.priceAtOrder.toNumber(),
       })),
+      complaint: order.complaints.length > 0 ? {
+        ...order.complaints[0],
+        createdAt: order.complaints[0].createdAt.toISOString(),
+      } : null,
     },
   };
 }
