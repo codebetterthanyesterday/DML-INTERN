@@ -73,6 +73,8 @@ enum QuoteStatus {
   QUOTED
   ACCEPTED
   REJECTED
+  EXPIRED
+  ADMIN_REJECTED                     // Penawaran sudah melewati batas waktu berlaku
   WAITING_SUPERADMIN_APPROVAL // Harga sudah diisi admin, menunggu approval Super Admin
   SUPERADMIN_REVISION         // Super Admin meminta admin merevisi harga
 }
@@ -131,6 +133,17 @@ enum AuditAction {
   DOCUMENT_REJECTED
   QUOTE_APPROVED_SUPERADMIN   // Super Admin menyetujui quotation nilai besar
   QUOTE_REJECTED_SUPERADMIN   // Super Admin menolak/meminta revisi quotation
+}
+
+enum QuoteLogAction {
+  CREATED
+  OFFER_SUBMITTED
+  SUPERADMIN_REVISION_REQUESTED
+  SUPERADMIN_APPROVED
+  CUSTOMER_REJECTED
+  CUSTOMER_ACCEPTED
+  EXPIRED
+  ADMIN_REJECTED
 }
 
 // ============================================
@@ -364,15 +377,18 @@ model Quote {
   superAdminId          String?     // ID Super Admin yang mereview
   superAdminReviewedAt  DateTime?   // Waktu Super Admin melakukan review
   totalQuotedValue      Decimal?    @db.Decimal(14, 2) // Cache total nilai penawaran
+  expiresAt             DateTime?   // Batas waktu berlakunya penawaran (diset Admin)
   createdAt             DateTime    @default(now())
   updatedAt             DateTime    @updatedAt
 
   user    User        @relation(fields: [userId], references: [id])
   items   QuoteItem[]
+  logs    QuoteLog[]
   invoice Invoice?
 
   @@index([userId])
   @@index([status])
+  @@index([expiresAt])
   @@map("quotes")
 }
 
@@ -389,6 +405,23 @@ model QuoteItem {
 
   @@index([quoteId])
   @@map("quote_items")
+}
+
+model QuoteLog {
+  id          String         @id @default(cuid())
+  quoteId     String
+  action      QuoteLogAction
+  actorId     String?
+  actorName   String?
+  actorRole   Role?
+  notes       String?        @db.Text
+  totalValue  Decimal?       @db.Decimal(14, 2)
+  createdAt   DateTime       @default(now())
+
+  quote       Quote          @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+
+  @@index([quoteId])
+  @@map("quote_logs")
 }
 
 model Invoice {

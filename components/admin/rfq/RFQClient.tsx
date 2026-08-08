@@ -37,8 +37,13 @@ import {
   AlertCircle,
   Tag,
   RefreshCw,
+  CalendarDays,
+  Timer,
+  CalendarX2,
+  Flame,
+  History,
 } from "lucide-react";
-import type { SerializedQuote, SerializedQuoteItem } from "@/lib/actions/quotes";
+import type { SerializedQuote, SerializedQuoteItem, SerializedQuoteLog } from "@/lib/actions/quotes";
 import { submitQuoteOffer, rejectQuote, getQuoteById } from "@/lib/actions/quotes";
 
 // ─── Status config ────────────────────────────────────────────────────────────
@@ -69,6 +74,11 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.
     color: "bg-red-50 text-red-700 border-red-200",
     icon: XCircle,
   },
+  EXPIRED: {
+    label: "Kedaluwarsa",
+    color: "bg-slate-100 text-slate-500 border-slate-300",
+    icon: CalendarX2,
+  },
   WAITING_SUPERADMIN_APPROVAL: {
     label: "Menunggu Super Admin",
     color: "bg-blue-50 text-blue-700 border-blue-200",
@@ -98,6 +108,177 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
+// ─── Expiry Date Picker ────────────────────────────────────────────────────────
+
+const EXPIRY_PRESETS = [
+  { label: "7 Hari",  days: 7 },
+  { label: "14 Hari", days: 14 },
+  { label: "30 Hari", days: 30 },
+];
+
+function toLocalDateInputValue(date: Date): string {
+  // Returns YYYY-MM-DD in local timezone (for <input type="date">)
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function ExpiryDatePicker({
+  value,
+  onChange,
+  disabled,
+}: {
+  value: string; // ISO or empty
+  onChange: (iso: string) => void;
+  disabled?: boolean;
+}) {
+  const today = new Date();
+  const minDate = toLocalDateInputValue(new Date(today.getTime() + 24 * 60 * 60 * 1000)); // min: tomorrow
+
+  const handlePreset = (days: number) => {
+    const d = new Date();
+    d.setDate(d.getDate() + days);
+    // Set to end of day (23:59:59) for a full last-day experience
+    d.setHours(23, 59, 59, 999);
+    onChange(d.toISOString());
+  };
+
+  const displayValue = value ? toLocalDateInputValue(new Date(value)) : "";
+
+  return (
+    <div className="space-y-2.5">
+      <div className="flex items-center gap-2">
+        <CalendarDays className="w-3.5 h-3.5 text-slate-400" />
+        <span className="text-xs font-extrabold text-slate-500 uppercase tracking-widest">Masa Berlaku Penawaran</span>
+        {value && (
+          <button
+            type="button"
+            onClick={() => onChange("")}
+            className="ml-auto text-[10px] font-bold text-slate-400 hover:text-red-500 transition-colors"
+            disabled={disabled}
+          >
+            Hapus
+          </button>
+        )}
+      </div>
+
+      {/* Preset chips */}
+      <div className="flex gap-1.5 flex-wrap">
+        {EXPIRY_PRESETS.map((preset) => {
+          const presetDate = new Date();
+          presetDate.setDate(presetDate.getDate() + preset.days);
+          presetDate.setHours(23, 59, 59, 999);
+          const isActive = value && Math.abs(new Date(value).getTime() - presetDate.getTime()) < 60_000;
+          return (
+            <button
+              key={preset.days}
+              type="button"
+              onClick={() => handlePreset(preset.days)}
+              disabled={disabled}
+              className={`px-3 py-1 rounded-lg text-xs font-extrabold border transition-all duration-150 ${
+                isActive
+                  ? "bg-red-600 text-white border-red-600 shadow-sm"
+                  : "bg-white text-slate-600 border-slate-200 hover:border-red-400 hover:text-red-600"
+              } disabled:opacity-50`}
+            >
+              {preset.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Custom date input */}
+      <div className="relative">
+        <CalendarDays className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
+        <input
+          type="date"
+          value={displayValue}
+          min={minDate}
+          onChange={(e) => {
+            if (!e.target.value) { onChange(""); return; }
+            // Parse as local date, end of day
+            const [y, mo, d] = e.target.value.split("-").map(Number);
+            const date = new Date(y, mo - 1, d, 23, 59, 59, 999);
+            onChange(date.toISOString());
+          }}
+          disabled={disabled}
+          className="w-full pl-9 pr-3 py-2 text-sm font-semibold border border-slate-200 rounded-lg bg-white hover:border-slate-300 focus:border-red-500 focus:ring-1 focus:ring-red-200 focus:outline-none transition-colors disabled:opacity-50 disabled:bg-slate-50"
+        />
+      </div>
+
+      {/* Preview */}
+      {value && (
+        <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+          <Timer className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+          <p className="text-xs font-semibold text-amber-800">
+            Berlaku hingga:{" "}
+            <strong>
+              {new Date(value).toLocaleDateString("id-ID", {
+                weekday: "long", day: "numeric", month: "long", year: "numeric",
+              })}
+            </strong>
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Expiry Info Display (read-only) ─────────────────────────────────────────
+
+function ExpiryInfoDisplay({ expiresAt }: { expiresAt: string }) {
+  const expDate = new Date(expiresAt);
+  const now = new Date();
+  
+  const expDateMidnight = new Date(expDate);
+  expDateMidnight.setHours(0, 0, 0, 0);
+  const nowMidnight = new Date(now);
+  nowMidnight.setHours(0, 0, 0, 0);
+  
+  const daysLeft = Math.round((expDateMidnight.getTime() - nowMidnight.getTime()) / 86400000);
+  const isExpired = expDate.getTime() <= now.getTime();
+  const isUrgent = !isExpired && daysLeft <= 2;
+
+  return (
+    <div className={`flex items-center gap-2.5 rounded-xl border px-4 py-3 ${
+      isExpired
+        ? "bg-slate-100 border-slate-300 text-slate-500"
+        : isUrgent
+        ? "bg-red-50 border-red-200"
+        : "bg-amber-50 border-amber-200"
+    }`}>
+      {isExpired ? (
+        <CalendarX2 className="w-4 h-4 text-slate-400 shrink-0" />
+      ) : isUrgent ? (
+        <Flame className="w-4 h-4 text-red-500 shrink-0" />
+      ) : (
+        <Timer className="w-4 h-4 text-amber-600 shrink-0" />
+      )}
+      <div className="min-w-0">
+        <p className={`text-xs font-extrabold uppercase tracking-widest mb-0.5 ${
+          isExpired ? "text-slate-400" : isUrgent ? "text-red-700" : "text-amber-700"
+        }`}>
+          {isExpired ? "Penawaran Kedaluwarsa" : isUrgent ? "Segera Berakhir!" : "Masa Berlaku Penawaran"}
+        </p>
+        <p className={`text-sm font-semibold ${
+          isExpired ? "text-slate-500" : isUrgent ? "text-red-800" : "text-amber-900"
+        }`}>
+          {expDate.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+          {!isExpired && (
+            <span className="ml-1.5 text-xs font-bold opacity-70">
+              ({daysLeft === 0 ? "berakhir hari ini" : daysLeft === 1 ? "besok" : `${daysLeft} hari lagi`})
+            </span>
+          )}
+          {isExpired && (
+            <span className="ml-1.5 text-xs font-bold text-slate-400">(sudah berakhir)</span>
+          )}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 // ─── Pricing Form ─────────────────────────────────────────────────────────────
 
 function QuotePricingForm({
@@ -116,6 +297,8 @@ function QuotePricingForm({
     return init;
   });
   const [adminNotes, setAdminNotes] = useState(quote.adminNotes ?? "");
+  // Expiry: pre-fill if already set (e.g. on revision), otherwise empty
+  const [expiresAtIso, setExpiresAtIso] = useState<string>(quote.expiresAt ?? "");
   const [rejectOpen, setRejectOpen] = useState(false);
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; msg: string } | null>(null);
   const router = useRouter();
@@ -136,8 +319,9 @@ function QuotePricingForm({
       itemId: item.id,
       quotedPrice: parseFloat(prices[item.id] ?? "0"),
     }));
+    const expiresAtDate = expiresAtIso ? new Date(expiresAtIso) : null;
     startTransition(async () => {
-      const res = await submitQuoteOffer(quote.id, itemPrices, adminNotes);
+      const res = await submitQuoteOffer(quote.id, itemPrices, adminNotes, expiresAtDate);
       if (res.success) {
         if (res.requiresSuperAdmin) {
           setFeedback({
@@ -282,6 +466,22 @@ function QuotePricingForm({
           className="border-slate-200 focus:border-blue-900 min-h-[90px] resize-y text-sm disabled:opacity-60"
         />
       </div>
+
+      {/* Expiry Date Picker */}
+      {isEditable && (
+        <div className="rounded-xl border border-slate-200 bg-slate-50/60 px-4 py-4">
+          <ExpiryDatePicker
+            value={expiresAtIso}
+            onChange={setExpiresAtIso}
+            disabled={isPending}
+          />
+        </div>
+      )}
+
+      {/* Show current expiry for non-editable (read-only) */}
+      {!isEditable && quote.expiresAt && (
+        <ExpiryInfoDisplay expiresAt={quote.expiresAt} />
+      )}
 
       {/* Actions */}
       {isEditable && (
@@ -513,6 +713,75 @@ function RFQDetailPanel({
 
         {/* Pricing Form */}
         <QuotePricingForm quote={quote} onSuccess={handleSuccess} />
+
+        {/* Negotiation History */}
+        {quote.logs && quote.logs.length > 0 && (
+          <QuoteNegotiationHistory logs={quote.logs} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Negotiation History Timeline ──────────────────────────────────────────────
+
+function QuoteNegotiationHistory({ logs }: { logs: SerializedQuoteLog[] }) {
+  const LOG_MAPPING: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
+    CREATED: { label: "RFQ Diajukan", icon: <FileText className="w-3.5 h-3.5" />, color: "text-blue-600 bg-blue-100 border-blue-200" },
+    OFFER_SUBMITTED: { label: "Penawaran Harga Dikirim", icon: <Send className="w-3.5 h-3.5" />, color: "text-indigo-600 bg-indigo-100 border-indigo-200" },
+    SUPERADMIN_REVISION_REQUESTED: { label: "Revisi Super Admin", icon: <RefreshCw className="w-3.5 h-3.5" />, color: "text-orange-600 bg-orange-100 border-orange-200" },
+    SUPERADMIN_APPROVED: { label: "Disetujui Super Admin", icon: <CheckCircle2 className="w-3.5 h-3.5" />, color: "text-emerald-600 bg-emerald-100 border-emerald-200" },
+    CUSTOMER_REJECTED: { label: "Ditolak Customer", icon: <XCircle className="w-3.5 h-3.5" />, color: "text-red-600 bg-red-100 border-red-200" },
+    CUSTOMER_ACCEPTED: { label: "Disetujui Customer", icon: <CheckCircle2 className="w-3.5 h-3.5" />, color: "text-green-600 bg-green-100 border-green-200" },
+    ADMIN_REJECTED: { label: "Ditolak Admin", icon: <XCircle className="w-3.5 h-3.5" />, color: "text-red-600 bg-red-100 border-red-200" },
+    EXPIRED: { label: "Penawaran Kedaluwarsa", icon: <CalendarX2 className="w-3.5 h-3.5" />, color: "text-slate-600 bg-slate-100 border-slate-200" },
+  };
+
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white overflow-hidden mt-6 shadow-sm">
+      <div className="px-4 py-3 bg-slate-50 border-b border-slate-100 flex items-center gap-2">
+        <History className="w-4 h-4 text-slate-500" />
+        <span className="text-xs font-extrabold text-slate-700 uppercase tracking-widest">Riwayat Negosiasi</span>
+      </div>
+      <div className="p-5">
+        <div className="relative border-l-2 border-slate-100 ml-3 space-y-6">
+          {logs.map((log) => {
+            const mapping = LOG_MAPPING[log.action] || { label: log.action, icon: <History className="w-3.5 h-3.5" />, color: "text-slate-600 bg-slate-100 border-slate-200" };
+            return (
+              <div key={log.id} className="relative pl-6 group">
+                <div className={`absolute -left-[13px] top-0 p-1.5 rounded-full border-2 border-white ${mapping.color} shadow-sm group-hover:scale-110 transition-transform`}>
+                  {mapping.icon}
+                </div>
+                <div className="flex flex-col gap-1.5 -mt-0.5">
+                  <div className="flex flex-wrap justify-between items-start gap-2">
+                    <div>
+                      <p className="text-sm font-bold text-slate-900">{mapping.label}</p>
+                      <p className="text-xs text-slate-500 font-medium mt-0.5 flex items-center gap-1.5">
+                        <User className="w-3 h-3" /> {log.actorName || "Sistem"} 
+                        {log.actorRole && <span className="opacity-70">({log.actorRole})</span>}
+                      </p>
+                    </div>
+                    <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded-md border border-slate-100 whitespace-nowrap">
+                      {new Date(log.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                  {log.totalValue && (
+                    <div className="mt-1 flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-50 w-fit px-2 py-1 rounded border border-slate-100">
+                      <Tag className="w-3 h-3 text-slate-400" /> 
+                      Rp {log.totalValue.toLocaleString("id-ID")}
+                    </div>
+                  )}
+                  {log.notes && (
+                    <div className="mt-1.5 bg-blue-50/50 p-3 rounded-lg border border-blue-100/50 text-sm text-slate-700 italic relative">
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-200 rounded-l-lg"></div>
+                      &ldquo;{log.notes}&rdquo;
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
@@ -563,6 +832,7 @@ export function RFQClient({
     { key: "QUOTED", label: "Penawaran Dikirim" },
     { key: "ACCEPTED", label: "Diterima" },
     { key: "REJECTED", label: "Ditolak" },
+    { key: "EXPIRED", label: "Kedaluwarsa" },
   ];
 
   const totalPages = Math.ceil(total / pageSize);
@@ -682,6 +952,27 @@ export function RFQClient({
                         {" · "}
                         {quote.items.length} produk · {totalItems.toLocaleString("id-ID")} unit
                       </p>
+                      {/* Expiry info pill for QUOTED/EXPIRED rows */}
+                      {quote.expiresAt && (quote.status === "QUOTED" || quote.status === "EXPIRED") && (() => {
+                        const exp = new Date(quote.expiresAt!);
+                        const expired = exp < new Date();
+                        
+                        const expMidnight = new Date(exp);
+                        expMidnight.setHours(0, 0, 0, 0);
+                        const nowMidnight = new Date();
+                        nowMidnight.setHours(0, 0, 0, 0);
+                        
+                        const daysLeft = Math.round((expMidnight.getTime() - nowMidnight.getTime()) / 86_400_000);
+                        
+                        return (
+                          <p className={`text-[10px] font-extrabold mt-0.5 flex items-center gap-1 ${
+                            expired ? "text-slate-400" : daysLeft <= 2 ? "text-red-600" : "text-amber-600"
+                          }`}>
+                            {expired ? <CalendarX2 className="w-2.5 h-2.5" /> : <Timer className="w-2.5 h-2.5" />}
+                            {expired ? "Kedaluwarsa" : daysLeft === 0 ? "Hari ini terakhir" : `Berlaku ${daysLeft}h lagi`}
+                          </p>
+                        );
+                      })()}
                       {/* Quoted total for QUOTED/ACCEPTED rows */}
                       {rowQuotedTotal > 0 && (quote.status === "QUOTED" || quote.status === "ACCEPTED") && (
                         <p className="text-xs font-extrabold text-purple-700 mt-1">

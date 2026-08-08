@@ -410,6 +410,7 @@ export const ModelName = {
   OrderItem: 'OrderItem',
   Quote: 'Quote',
   QuoteItem: 'QuoteItem',
+  QuoteLog: 'QuoteLog',
   Invoice: 'Invoice',
   Payment: 'Payment',
   Review: 'Review',
@@ -432,7 +433,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "address" | "businessDocument" | "category" | "product" | "productImage" | "productTier" | "cart" | "cartItem" | "order" | "orderItem" | "quote" | "quoteItem" | "invoice" | "payment" | "review" | "notification" | "auditLog" | "stockLog" | "siteSetting"
+    modelProps: "user" | "address" | "businessDocument" | "category" | "product" | "productImage" | "productTier" | "cart" | "cartItem" | "order" | "orderItem" | "quote" | "quoteItem" | "quoteLog" | "invoice" | "payment" | "review" | "notification" | "auditLog" | "stockLog" | "siteSetting"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1398,6 +1399,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    QuoteLog: {
+      payload: Prisma.$QuoteLogPayload<ExtArgs>
+      fields: Prisma.QuoteLogFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.QuoteLogFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteLogPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.QuoteLogFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteLogPayload>
+        }
+        findFirst: {
+          args: Prisma.QuoteLogFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteLogPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.QuoteLogFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteLogPayload>
+        }
+        findMany: {
+          args: Prisma.QuoteLogFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteLogPayload>[]
+        }
+        create: {
+          args: Prisma.QuoteLogCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteLogPayload>
+        }
+        createMany: {
+          args: Prisma.QuoteLogCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.QuoteLogCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteLogPayload>[]
+        }
+        delete: {
+          args: Prisma.QuoteLogDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteLogPayload>
+        }
+        update: {
+          args: Prisma.QuoteLogUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteLogPayload>
+        }
+        deleteMany: {
+          args: Prisma.QuoteLogDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.QuoteLogUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.QuoteLogUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteLogPayload>[]
+        }
+        upsert: {
+          args: Prisma.QuoteLogUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteLogPayload>
+        }
+        aggregate: {
+          args: Prisma.QuoteLogAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateQuoteLog>
+        }
+        groupBy: {
+          args: Prisma.QuoteLogGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.QuoteLogGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.QuoteLogCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.QuoteLogCountAggregateOutputType> | number
+        }
+      }
+    }
     Invoice: {
       payload: Prisma.$InvoicePayload<ExtArgs>
       fields: Prisma.InvoiceFieldRefs
@@ -2121,6 +2196,7 @@ export const QuoteScalarFieldEnum = {
   superAdminId: 'superAdminId',
   superAdminReviewedAt: 'superAdminReviewedAt',
   totalQuotedValue: 'totalQuotedValue',
+  expiresAt: 'expiresAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -2138,6 +2214,21 @@ export const QuoteItemScalarFieldEnum = {
 } as const
 
 export type QuoteItemScalarFieldEnum = (typeof QuoteItemScalarFieldEnum)[keyof typeof QuoteItemScalarFieldEnum]
+
+
+export const QuoteLogScalarFieldEnum = {
+  id: 'id',
+  quoteId: 'quoteId',
+  action: 'action',
+  actorId: 'actorId',
+  actorName: 'actorName',
+  actorRole: 'actorRole',
+  notes: 'notes',
+  totalValue: 'totalValue',
+  createdAt: 'createdAt'
+} as const
+
+export type QuoteLogScalarFieldEnum = (typeof QuoteLogScalarFieldEnum)[keyof typeof QuoteLogScalarFieldEnum]
 
 
 export const InvoiceScalarFieldEnum = {
@@ -2495,6 +2586,20 @@ export type ListEnumQuoteStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$
 
 
 /**
+ * Reference to a field of type 'QuoteLogAction'
+ */
+export type EnumQuoteLogActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QuoteLogAction'>
+    
+
+
+/**
+ * Reference to a field of type 'QuoteLogAction[]'
+ */
+export type ListEnumQuoteLogActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QuoteLogAction[]'>
+    
+
+
+/**
  * Reference to a field of type 'InvoiceStatus'
  */
 export type EnumInvoiceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InvoiceStatus'>
@@ -2769,6 +2874,7 @@ export type GlobalOmitConfig = {
   orderItem?: Prisma.OrderItemOmit
   quote?: Prisma.QuoteOmit
   quoteItem?: Prisma.QuoteItemOmit
+  quoteLog?: Prisma.QuoteLogOmit
   invoice?: Prisma.InvoiceOmit
   payment?: Prisma.PaymentOmit
   review?: Prisma.ReviewOmit

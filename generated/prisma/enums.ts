@@ -90,6 +90,8 @@ export const QuoteStatus = {
   QUOTED: 'QUOTED',
   ACCEPTED: 'ACCEPTED',
   REJECTED: 'REJECTED',
+  EXPIRED: 'EXPIRED',
+  ADMIN_REJECTED: 'ADMIN_REJECTED',
   WAITING_SUPERADMIN_APPROVAL: 'WAITING_SUPERADMIN_APPROVAL',
   SUPERADMIN_REVISION: 'SUPERADMIN_REVISION'
 } as const
@@ -172,3 +174,17 @@ export const AuditAction = {
 } as const
 
 export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction]
+
+
+export const QuoteLogAction = {
+  CREATED: 'CREATED',
+  OFFER_SUBMITTED: 'OFFER_SUBMITTED',
+  SUPERADMIN_REVISION_REQUESTED: 'SUPERADMIN_REVISION_REQUESTED',
+  SUPERADMIN_APPROVED: 'SUPERADMIN_APPROVED',
+  CUSTOMER_REJECTED: 'CUSTOMER_REJECTED',
+  CUSTOMER_ACCEPTED: 'CUSTOMER_ACCEPTED',
+  EXPIRED: 'EXPIRED',
+  ADMIN_REJECTED: 'ADMIN_REJECTED'
+} as const
+
+export type QuoteLogAction = (typeof QuoteLogAction)[keyof typeof QuoteLogAction]

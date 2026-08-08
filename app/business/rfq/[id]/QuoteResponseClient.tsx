@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
 
-export default function QuoteResponseClient({ quoteId }: { quoteId: string }) {
+export default function QuoteResponseClient({ quoteId, isExpired }: { quoteId: string; isExpired?: boolean }) {
   const [notes, setNotes]           = useState("");
   const [isLoading, setIsLoading]   = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -71,18 +71,18 @@ export default function QuoteResponseClient({ quoteId }: { quoteId: string }) {
   return (
     <div className="space-y-4">
       <Textarea
-        placeholder="Catatan tambahan untuk admin (opsional)"
+        placeholder={isExpired ? "Penawaran sudah kedaluwarsa" : "Catatan tambahan untuk admin (opsional)"}
         className="min-h-[100px] text-sm"
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
-        disabled={isLoading}
+        disabled={isLoading || isExpired}
       />
 
       <div className="flex flex-col sm:flex-row gap-3">
         <Button
           className="flex-1 bg-emerald-600 hover:bg-emerald-700 font-bold"
           onClick={() => handleActionClick("ACCEPT")}
-          disabled={isLoading}
+          disabled={isLoading || isExpired}
         >
           {isLoading && pendingAction === "ACCEPT" ? (
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -95,7 +95,7 @@ export default function QuoteResponseClient({ quoteId }: { quoteId: string }) {
           variant="outline"
           className="flex-1 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
           onClick={() => handleActionClick("REJECT")}
-          disabled={isLoading}
+          disabled={isLoading || isExpired}
         >
           {isLoading && pendingAction === "REJECT" ? (
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />

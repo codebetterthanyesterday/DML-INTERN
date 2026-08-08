@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, MessageSquare, CheckCircle2, Clock, Eye, Send, XCircle, ReceiptText, Tag } from "lucide-react";
+import { ArrowLeft, MessageSquare, CheckCircle2, Clock, Eye, Send, XCircle, ReceiptText, Tag, CalendarX2, Timer, Flame, RefreshCw, AlertCircle, History, FileText, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -20,15 +20,18 @@ const TIMELINE_STEPS = [
 ];
 
 const STATUS_ORDER: Record<string, number> = {
-  PENDING: 0, REVIEWED: 1, QUOTED: 2, ACCEPTED: 3, REJECTED: 3,
+  PENDING: 0, REVIEWED: 1, WAITING_SUPERADMIN_APPROVAL: 1, SUPERADMIN_REVISION: 1, QUOTED: 2, EXPIRED: 2, ACCEPTED: 3, REJECTED: 3,
 };
 
 const statusConfig: Record<string, { label: string; className: string }> = {
   PENDING:  { label: "Menunggu Review",  className: "bg-amber-50 text-amber-700 border-amber-200" },
   REVIEWED: { label: "Sedang Direview", className: "bg-blue-50 text-blue-700 border-blue-200" },
+  WAITING_SUPERADMIN_APPROVAL: { label: "Menunggu Persetujuan", className: "bg-orange-50 text-orange-700 border-orange-200" },
+  SUPERADMIN_REVISION: { label: "Perlu Revisi", className: "bg-red-50 text-red-700 border-red-200" },
   QUOTED:   { label: "Ditawarkan",      className: "bg-indigo-50 text-indigo-700 border-indigo-200" },
   ACCEPTED: { label: "Disetujui",       className: "bg-emerald-50 text-emerald-700 border-emerald-200" },
   REJECTED: { label: "Ditolak",         className: "bg-red-50 text-red-700 border-red-200" },
+  EXPIRED:  { label: "Kedaluwarsa",     className: "bg-slate-100 text-slate-500 border-slate-300" },
 };
 
 const invoiceStatusConfig: Record<string, { label: string; className: string }> = {
@@ -54,6 +57,7 @@ export default async function RFQDetailPage(props: { params: Promise<{ id: strin
         include: { product: true },
       },
       invoice: true,
+      logs: { orderBy: { createdAt: "desc" } }
     },
   });
 
@@ -64,6 +68,28 @@ export default async function RFQDetailPage(props: { params: Promise<{ id: strin
   const isQuoted   = quote.status === "QUOTED";
   const isAccepted = quote.status === "ACCEPTED";
   const isRejected = quote.status === "REJECTED";
+  const isExpiredStatus = quote.status === "EXPIRED";
+
+  let isExpired = isExpiredStatus;
+  let daysLeft = 0;
+  let isUrgent = false;
+
+  if (quote.expiresAt) {
+    const expDate = new Date(quote.expiresAt);
+    const now = new Date();
+    const msLeft = expDate.getTime() - now.getTime();
+    if (msLeft <= 0) {
+      isExpired = true;
+    } else {
+      const expDateMidnight = new Date(expDate);
+      expDateMidnight.setHours(0, 0, 0, 0);
+      const nowMidnight = new Date(now);
+      nowMidnight.setHours(0, 0, 0, 0);
+      
+      daysLeft = Math.round((expDateMidnight.getTime() - nowMidnight.getTime()) / (1000 * 60 * 60 * 24));
+      isUrgent = daysLeft <= 2;
+    }
+  }
 
   const config = statusConfig[quote.status] ?? { label: quote.status, className: "bg-slate-50 text-slate-700" };
 
@@ -153,6 +179,38 @@ export default async function RFQDetailPage(props: { params: Promise<{ id: strin
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Left: Items */}
         <div className="md:col-span-2 space-y-6">
+          {/* Expiry Banner */}
+          {quote.expiresAt && (isQuoted || isExpired) && (
+            <div className={`flex items-center gap-3 p-4 rounded-xl border shadow-sm ${
+              isExpired
+                ? "bg-slate-100 border-slate-300"
+                : isUrgent
+                ? "bg-red-50 border-red-200"
+                : "bg-amber-50 border-amber-200"
+            }`}>
+              <div className={`p-2 rounded-full shrink-0 ${
+                isExpired ? "bg-slate-200 text-slate-500" : isUrgent ? "bg-red-100 text-red-600" : "bg-amber-100 text-amber-600"
+              }`}>
+                {isExpired ? <CalendarX2 className="w-5 h-5" /> : isUrgent ? <Flame className="w-5 h-5" /> : <Timer className="w-5 h-5" />}
+              </div>
+              <div className="min-w-0">
+                <p className={`text-xs font-extrabold uppercase tracking-widest mb-0.5 ${
+                  isExpired ? "text-slate-500" : isUrgent ? "text-red-700" : "text-amber-700"
+                }`}>
+                  {isExpired ? "Penawaran Kedaluwarsa" : isUrgent ? "Segera Berakhir!" : "Batas Waktu Penawaran"}
+                </p>
+                <p className={`text-sm font-semibold ${
+                  isExpired ? "text-slate-600" : isUrgent ? "text-red-800" : "text-amber-900"
+                }`}>
+                  {isExpired 
+                    ? "Penawaran ini sudah tidak berlaku dan tidak dapat diproses lebih lanjut."
+                    : `Berlaku hingga ${new Date(quote.expiresAt).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })} (${daysLeft === 0 ? "berakhir hari ini" : daysLeft === 1 ? "besok" : `${daysLeft} hari lagi`})`
+                  }
+                </p>
+              </div>
+            </div>
+          )}
+
           <Card>
             <CardHeader>
               <CardTitle>Rincian Item</CardTitle>
@@ -214,6 +272,11 @@ export default async function RFQDetailPage(props: { params: Promise<{ id: strin
               </>
             )}
           </Card>
+
+          {/* Negotiation History */}
+          {quote.logs && quote.logs.length > 0 && (
+            <QuoteNegotiationHistory logs={quote.logs} />
+          )}
         </div>
 
         {/* Right: Admin Response + Invoice + Action */}
@@ -235,14 +298,14 @@ export default async function RFQDetailPage(props: { params: Promise<{ id: strin
               )}
             </CardContent>
 
-            {/* Customer response buttons — only when QUOTED */}
-            {isQuoted && (
+            {/* Customer response buttons — only when QUOTED or EXPIRED */}
+            {(isQuoted || isExpiredStatus) && (
               <>
                 <Separator />
                 <CardFooter className="pt-6 flex flex-col gap-4">
                   <div className="w-full">
                     <h4 className="text-sm font-semibold text-slate-900 mb-3">Respon Anda:</h4>
-                    <QuoteResponseClient quoteId={quote.id} />
+                    <QuoteResponseClient quoteId={quote.id} isExpired={isExpired} />
                   </div>
                 </CardFooter>
               </>
@@ -296,5 +359,70 @@ export default async function RFQDetailPage(props: { params: Promise<{ id: strin
         </div>
       </div>
     </div>
+  );
+}
+
+// ─── Negotiation History Timeline ──────────────────────────────────────────────
+
+function QuoteNegotiationHistory({ logs }: { logs: any[] }) {
+  const LOG_MAPPING: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
+    CREATED: { label: "RFQ Diajukan", icon: <FileText className="w-4 h-4" />, color: "text-blue-600 bg-blue-100 border-blue-200" },
+    OFFER_SUBMITTED: { label: "Penawaran Harga Dikirim", icon: <Send className="w-4 h-4" />, color: "text-indigo-600 bg-indigo-100 border-indigo-200" },
+    SUPERADMIN_REVISION_REQUESTED: { label: "Revisi Super Admin", icon: <RefreshCw className="w-4 h-4" />, color: "text-orange-600 bg-orange-100 border-orange-200" },
+    SUPERADMIN_APPROVED: { label: "Disetujui Super Admin", icon: <CheckCircle2 className="w-4 h-4" />, color: "text-emerald-600 bg-emerald-100 border-emerald-200" },
+    CUSTOMER_REJECTED: { label: "Ditolak", icon: <XCircle className="w-4 h-4" />, color: "text-red-600 bg-red-100 border-red-200" },
+    CUSTOMER_ACCEPTED: { label: "Disetujui", icon: <CheckCircle2 className="w-4 h-4" />, color: "text-green-600 bg-green-100 border-green-200" },
+    ADMIN_REJECTED: { label: "Ditolak Admin", icon: <XCircle className="w-4 h-4" />, color: "text-red-600 bg-red-100 border-red-200" },
+    EXPIRED: { label: "Kedaluwarsa", icon: <CalendarX2 className="w-4 h-4" />, color: "text-slate-600 bg-slate-100 border-slate-200" },
+  };
+
+  return (
+    <Card className="shadow-sm">
+      <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-4">
+        <CardTitle className="text-sm font-extrabold text-slate-700 flex items-center gap-2 uppercase tracking-widest">
+          <History className="w-4 h-4 text-slate-400" />
+          Riwayat Negosiasi
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="pt-6">
+        <div className="relative border-l-2 border-slate-100 ml-3 space-y-6">
+          {logs.map((log) => {
+            const mapping = LOG_MAPPING[log.action] || { label: log.action, icon: <History className="w-4 h-4" />, color: "text-slate-600 bg-slate-100 border-slate-200" };
+            return (
+              <div key={log.id} className="relative pl-6 group">
+                <div className={`absolute -left-[14px] top-0 p-1.5 rounded-full border-2 border-white ${mapping.color} shadow-sm group-hover:scale-110 transition-transform`}>
+                  {mapping.icon}
+                </div>
+                <div className="flex flex-col gap-1.5 -mt-1">
+                  <div className="flex flex-wrap justify-between items-start gap-2">
+                    <div>
+                      <p className="text-sm font-bold text-slate-900">{mapping.label}</p>
+                      <p className="text-xs text-slate-500 font-medium mt-0.5 flex items-center gap-1.5">
+                        <User className="w-3 h-3" /> {log.actorName || "Sistem"}
+                      </p>
+                    </div>
+                    <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded-md border border-slate-100 whitespace-nowrap">
+                      {new Date(log.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                  {log.totalValue && (
+                    <div className="mt-1 flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-50 w-fit px-2 py-1 rounded border border-slate-100">
+                      <Tag className="w-3 h-3 text-slate-400" /> 
+                      Rp {Number(log.totalValue).toLocaleString("id-ID")}
+                    </div>
+                  )}
+                  {log.notes && (
+                    <div className="mt-1.5 bg-blue-50/50 p-3 rounded-lg border border-blue-100/50 text-sm text-slate-700 italic relative">
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-200 rounded-l-lg"></div>
+                      &ldquo;{log.notes}&rdquo;
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

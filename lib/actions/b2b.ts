@@ -5,7 +5,7 @@ import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { Invoice as XenditInvoice } from "@/lib/xendit";
-import { PaymentMethod } from "@prisma/client";
+import { PaymentMethod, QuoteLogAction } from "@prisma/client";
 import { createAdminNotification } from "@/lib/actions/notifications";
 
 export async function submitRfq(
@@ -52,6 +52,15 @@ export async function submitRfq(
           qtyRequested: item.qtyRequested,
           notes: item.notes,
         }))
+      },
+      logs: {
+        create: {
+          action: QuoteLogAction.CREATED,
+          actorId: session.user.id,
+          actorName: user?.companyName ?? user?.name ?? "Customer B2B",
+          actorRole: "CUSTOMER",
+          notes: customerNotes || null,
+        }
       }
     }
   });
@@ -88,12 +97,42 @@ export async function respondToQuote(quoteId: string, action: 'ACCEPT' | 'REJECT
     throw new Error("Hanya penawaran (QUOTED) yang bisa direspon.");
   }
 
+  // Check expiry — if expiresAt has passed, mark as EXPIRED and reject the action
+  if (action === "ACCEPT" && quote.expiresAt && new Date(quote.expiresAt) < new Date()) {
+    await prisma.quote.update({
+      where: { id: quoteId },
+      data: { 
+        status: "EXPIRED",
+        logs: {
+          create: {
+            action: QuoteLogAction.EXPIRED,
+            actorId: session.user.id,
+            actorName: session.user.name,
+            actorRole: session.user.role,
+            notes: "Kedaluwarsa saat Customer B2B mencoba menyetujui."
+          }
+        }
+      },
+    });
+    throw new Error("Penawaran ini telah kedaluwarsa dan tidak dapat lagi diterima. Silakan hubungi admin untuk penawaran baru.");
+  }
+
   if (action === "REJECT") {
     await prisma.quote.update({
       where: { id: quoteId },
       data: { 
         status: "REJECTED",
-        customerNotes: customerNotes ? `${quote.customerNotes || ''}\n\n[REJECT NOTES]: ${customerNotes}` : quote.customerNotes
+        customerNotes: customerNotes ? `${quote.customerNotes || ''}\n\n[REJECT NOTES]: ${customerNotes}` : quote.customerNotes,
+        logs: {
+          create: {
+            action: QuoteLogAction.CUSTOMER_REJECTED,
+            actorId: session.user.id,
+            actorName: session.user.name,
+            actorRole: session.user.role,
+            notes: customerNotes || null,
+            totalValue: quote.totalQuotedValue
+          }
+        }
       }
     });
   } else if (action === "ACCEPT") {
@@ -103,7 +142,17 @@ export async function respondToQuote(quoteId: string, action: 'ACCEPT' | 'REJECT
         where: { id: quoteId },
         data: { 
           status: "ACCEPTED",
-          customerNotes: customerNotes ? `${quote.customerNotes || ''}\n\n[ACCEPT NOTES]: ${customerNotes}` : quote.customerNotes
+          customerNotes: customerNotes ? `${quote.customerNotes || ''}\n\n[ACCEPT NOTES]: ${customerNotes}` : quote.customerNotes,
+          logs: {
+            create: {
+              action: QuoteLogAction.CUSTOMER_ACCEPTED,
+              actorId: session.user.id,
+              actorName: session.user.name,
+              actorRole: session.user.role,
+              notes: customerNotes || null,
+              totalValue: quote.totalQuotedValue
+            }
+          }
         }
       });
 

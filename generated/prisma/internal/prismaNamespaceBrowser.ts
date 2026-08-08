@@ -64,6 +64,7 @@ export const ModelName = {
   OrderItem: 'OrderItem',
   Quote: 'Quote',
   QuoteItem: 'QuoteItem',
+  QuoteLog: 'QuoteLog',
   Invoice: 'Invoice',
   Payment: 'Payment',
   Review: 'Review',
@@ -255,6 +256,7 @@ export const QuoteScalarFieldEnum = {
   superAdminId: 'superAdminId',
   superAdminReviewedAt: 'superAdminReviewedAt',
   totalQuotedValue: 'totalQuotedValue',
+  expiresAt: 'expiresAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -272,6 +274,21 @@ export const QuoteItemScalarFieldEnum = {
 } as const
 
 export type QuoteItemScalarFieldEnum = (typeof QuoteItemScalarFieldEnum)[keyof typeof QuoteItemScalarFieldEnum]
+
+
+export const QuoteLogScalarFieldEnum = {
+  id: 'id',
+  quoteId: 'quoteId',
+  action: 'action',
+  actorId: 'actorId',
+  actorName: 'actorName',
+  actorRole: 'actorRole',
+  notes: 'notes',
+  totalValue: 'totalValue',
+  createdAt: 'createdAt'
+} as const
+
+export type QuoteLogScalarFieldEnum = (typeof QuoteLogScalarFieldEnum)[keyof typeof QuoteLogScalarFieldEnum]
 
 
 export const InvoiceScalarFieldEnum = {

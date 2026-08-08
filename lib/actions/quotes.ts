@@ -2,7 +2,8 @@
 
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { QuoteStatus } from "@prisma/client";
+import { QuoteStatus, QuoteLogAction } from "@prisma/client";
+import { auth } from "@/lib/auth";
 import { toPublicImageUrl } from "@/lib/blob";
 import {
   createAdminNotification,
@@ -29,6 +30,16 @@ export type SerializedInvoice = {
   status: string;
 };
 
+export type SerializedQuoteLog = {
+  id: string;
+  action: QuoteLogAction;
+  actorName: string | null;
+  actorRole: string | null;
+  notes: string | null;
+  totalValue: number | null;
+  createdAt: string;
+};
+
 export type SerializedQuote = {
   id: string;
   quoteNumber: string;
@@ -39,11 +50,13 @@ export type SerializedQuote = {
   superAdminId: string | null;
   superAdminReviewedAt: string | null;
   totalQuotedValue: number | null;
+  expiresAt: string | null;
   createdAt: string;
   updatedAt: string;
   user: { id: string; name: string; email: string; phone: string | null; companyName: string | null };
   items: SerializedQuoteItem[];
   invoice: SerializedInvoice | null;
+  logs?: SerializedQuoteLog[];
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -61,6 +74,7 @@ function serializeQuote(q: RawQuote): SerializedQuote {
     superAdminId: q.superAdminId ?? null,
     superAdminReviewedAt: q.superAdminReviewedAt ? q.superAdminReviewedAt.toISOString() : null,
     totalQuotedValue: q.totalQuotedValue ? q.totalQuotedValue.toNumber() : null,
+    expiresAt: q.expiresAt ? q.expiresAt.toISOString() : null,
     createdAt: q.createdAt.toISOString(),
     updatedAt: q.updatedAt.toISOString(),
     user: {
@@ -92,6 +106,17 @@ function serializeQuote(q: RawQuote): SerializedQuote {
           status: q.invoice.status,
         }
       : null,
+    logs: q.logs
+      ? q.logs.map((l: any) => ({
+          id: l.id,
+          action: l.action as QuoteLogAction,
+          actorName: l.actorName,
+          actorRole: l.actorRole,
+          notes: l.notes,
+          totalValue: l.totalValue ? l.totalValue.toNumber() : null,
+          createdAt: l.createdAt.toISOString(),
+        }))
+      : [],
   };
 }
 
@@ -131,6 +156,7 @@ async function rawFetchQuotes(q: string, status: string, page: number, pageSize:
         },
       },
       invoice: true,
+      logs: { orderBy: { createdAt: "desc" } },
     },
   });
 }
@@ -192,6 +218,7 @@ export async function getQuoteById(quoteId: string): Promise<SerializedQuote | n
         },
       },
       invoice: true,
+      logs: { orderBy: { createdAt: "desc" } },
     },
   });
   if (!raw) return null;
@@ -199,14 +226,16 @@ export async function getQuoteById(quoteId: string): Promise<SerializedQuote | n
   return serializeQuote(raw as Parameters<typeof serializeQuote>[0]);
 }
 
-// Submit a price quote (sets prices per item + admin notes)
-// If total > HIGH_VALUE_THRESHOLD, routes to WAITING_SUPERADMIN_APPROVAL
+// Submit a price quote (sets prices per item + admin notes + expiry date)
+// If total >= HIGH_VALUE_THRESHOLD, routes to WAITING_SUPERADMIN_APPROVAL
 export async function submitQuoteOffer(
   quoteId: string,
   itemPrices: { itemId: string; quotedPrice: number }[],
-  adminNotes: string
+  adminNotes: string,
+  expiresAt: Date | null = null
 ): Promise<{ success: boolean; error?: string; requiresSuperAdmin?: boolean }> {
   try {
+    const session = await auth();
     // Fetch quote before update to get user info for notification
     const quoteBeforeUpdate = await prisma.quote.findUnique({
       where: { id: quoteId },
@@ -240,10 +269,21 @@ export async function submitQuoteOffer(
           status: newStatus,
           adminNotes: adminNotes || null,
           totalQuotedValue: totalValue,
+          expiresAt: expiresAt ?? null,
           // Reset superadmin review fields when admin resubmits
           superAdminNotes: null,
           superAdminId: null,
           superAdminReviewedAt: null,
+          logs: {
+            create: {
+              action: QuoteLogAction.OFFER_SUBMITTED,
+              actorId: session?.user?.id,
+              actorName: session?.user?.name,
+              actorRole: session?.user?.role,
+              notes: adminNotes || null,
+              totalValue: totalValue,
+            }
+          }
         },
       }),
     ]);
@@ -297,6 +337,7 @@ export async function rejectQuote(
   adminNotes: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    const session = await auth();
     // Fetch quote before update to get user info for notification
     const quoteBeforeUpdate = await prisma.quote.findUnique({
       where: { id: quoteId },
@@ -305,7 +346,19 @@ export async function rejectQuote(
 
     await prisma.quote.update({
       where: { id: quoteId },
-      data: { status: QuoteStatus.REJECTED, adminNotes: adminNotes || null },
+      data: { 
+        status: QuoteStatus.REJECTED, 
+        adminNotes: adminNotes || null,
+        logs: {
+          create: {
+            action: QuoteLogAction.ADMIN_REJECTED,
+            actorId: session?.user?.id,
+            actorName: session?.user?.name,
+            actorRole: session?.user?.role,
+            notes: adminNotes || null,
+          }
+        }
+      },
     });
 
     // Revalidate both admin and business routes
@@ -383,6 +436,7 @@ export async function getSuperAdminPendingApprovals(
           },
         },
         invoice: true,
+        logs: { orderBy: { createdAt: "desc" } },
       },
     }),
     prisma.quote.count({ where }),
@@ -397,13 +451,14 @@ export async function approveQuoteBySuperadmin(
   superAdminNotes: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    const session = await auth();
     const quoteBeforeUpdate = await prisma.quote.findUnique({
       where: { id: quoteId },
       include: {
         user: { select: { id: true, name: true, companyName: true } },
       },
     });
-    if (!quoteBeforeUpdate) return { success: false, error: "RFQ tidak ditemukan." };
+    if (!quoteBeforeUpdate || !session?.user?.id) return { success: false, error: "RFQ tidak ditemukan." };
 
     await prisma.quote.update({
       where: { id: quoteId },
@@ -411,6 +466,17 @@ export async function approveQuoteBySuperadmin(
         status: QuoteStatus.QUOTED,
         superAdminNotes: superAdminNotes || null,
         superAdminReviewedAt: new Date(),
+        superAdminId: session.user.id,
+        logs: {
+          create: {
+            action: QuoteLogAction.SUPERADMIN_APPROVED,
+            actorId: session.user.id,
+            actorName: session.user.name,
+            actorRole: session.user.role,
+            notes: superAdminNotes || null,
+            totalValue: quoteBeforeUpdate.totalQuotedValue,
+          }
+        }
       },
     });
 
@@ -434,7 +500,7 @@ export async function approveQuoteBySuperadmin(
     createAdminNotification({
       type: "NEW_QUOTE",
       title: "✅ Quotation Disetujui Super Admin",
-      message: `Super Admin telah menyetujui penawaran RFQ dari ${customerName} (Rp ${quoteBeforeUpdate.totalQuotedValue?.toLocaleString("id-ID") ?? "-"}). Penawaran telah dikirim ke customer.`,
+      message: `Super Admin telah menyetujui penawaran RFQ dari ${customerName} (Rp ${quoteBeforeUpdate.totalQuotedValue ? Number(quoteBeforeUpdate.totalQuotedValue).toLocaleString("id-ID") : "-"}). Penawaran telah dikirim ke customer.`,
       linkUrl: `/admin/quotes`,
     }).catch(() => {});
 
@@ -450,13 +516,14 @@ export async function rejectQuoteBySuperadmin(
   superAdminNotes: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    const session = await auth();
     const quoteBeforeUpdate = await prisma.quote.findUnique({
       where: { id: quoteId },
       include: {
         user: { select: { id: true, name: true, companyName: true } },
       },
     });
-    if (!quoteBeforeUpdate) return { success: false, error: "RFQ tidak ditemukan." };
+    if (!quoteBeforeUpdate || !session?.user?.id) return { success: false, error: "RFQ tidak ditemukan." };
 
     await prisma.quote.update({
       where: { id: quoteId },
@@ -464,6 +531,17 @@ export async function rejectQuoteBySuperadmin(
         status: QuoteStatus.SUPERADMIN_REVISION,
         superAdminNotes: superAdminNotes || null,
         superAdminReviewedAt: new Date(),
+        superAdminId: session.user.id,
+        logs: {
+          create: {
+            action: QuoteLogAction.SUPERADMIN_REVISION_REQUESTED,
+            actorId: session.user.id,
+            actorName: session.user.name,
+            actorRole: session.user.role,
+            notes: superAdminNotes || null,
+            totalValue: quoteBeforeUpdate.totalQuotedValue,
+          }
+        }
       },
     });
 

@@ -45,6 +45,7 @@ export type QuoteMinAggregateOutputType = {
   superAdminId: string | null
   superAdminReviewedAt: Date | null
   totalQuotedValue: runtime.Decimal | null
+  expiresAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -60,6 +61,7 @@ export type QuoteMaxAggregateOutputType = {
   superAdminId: string | null
   superAdminReviewedAt: Date | null
   totalQuotedValue: runtime.Decimal | null
+  expiresAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -75,6 +77,7 @@ export type QuoteCountAggregateOutputType = {
   superAdminId: number
   superAdminReviewedAt: number
   totalQuotedValue: number
+  expiresAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -100,6 +103,7 @@ export type QuoteMinAggregateInputType = {
   superAdminId?: true
   superAdminReviewedAt?: true
   totalQuotedValue?: true
+  expiresAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -115,6 +119,7 @@ export type QuoteMaxAggregateInputType = {
   superAdminId?: true
   superAdminReviewedAt?: true
   totalQuotedValue?: true
+  expiresAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -130,6 +135,7 @@ export type QuoteCountAggregateInputType = {
   superAdminId?: true
   superAdminReviewedAt?: true
   totalQuotedValue?: true
+  expiresAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -232,6 +238,7 @@ export type QuoteGroupByOutputType = {
   superAdminId: string | null
   superAdminReviewedAt: Date | null
   totalQuotedValue: runtime.Decimal | null
+  expiresAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: QuoteCountAggregateOutputType | null
@@ -270,10 +277,12 @@ export type QuoteWhereInput = {
   superAdminId?: Prisma.StringNullableFilter<"Quote"> | string | null
   superAdminReviewedAt?: Prisma.DateTimeNullableFilter<"Quote"> | Date | string | null
   totalQuotedValue?: Prisma.DecimalNullableFilter<"Quote"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Prisma.DateTimeNullableFilter<"Quote"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Quote"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Quote"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   items?: Prisma.QuoteItemListRelationFilter
+  logs?: Prisma.QuoteLogListRelationFilter
   invoice?: Prisma.XOR<Prisma.InvoiceNullableScalarRelationFilter, Prisma.InvoiceWhereInput> | null
 }
 
@@ -288,10 +297,12 @@ export type QuoteOrderByWithRelationInput = {
   superAdminId?: Prisma.SortOrderInput | Prisma.SortOrder
   superAdminReviewedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   totalQuotedValue?: Prisma.SortOrderInput | Prisma.SortOrder
+  expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   items?: Prisma.QuoteItemOrderByRelationAggregateInput
+  logs?: Prisma.QuoteLogOrderByRelationAggregateInput
   invoice?: Prisma.InvoiceOrderByWithRelationInput
 }
 
@@ -309,10 +320,12 @@ export type QuoteWhereUniqueInput = Prisma.AtLeast<{
   superAdminId?: Prisma.StringNullableFilter<"Quote"> | string | null
   superAdminReviewedAt?: Prisma.DateTimeNullableFilter<"Quote"> | Date | string | null
   totalQuotedValue?: Prisma.DecimalNullableFilter<"Quote"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Prisma.DateTimeNullableFilter<"Quote"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Quote"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Quote"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   items?: Prisma.QuoteItemListRelationFilter
+  logs?: Prisma.QuoteLogListRelationFilter
   invoice?: Prisma.XOR<Prisma.InvoiceNullableScalarRelationFilter, Prisma.InvoiceWhereInput> | null
 }, "id" | "quoteNumber">
 
@@ -327,6 +340,7 @@ export type QuoteOrderByWithAggregationInput = {
   superAdminId?: Prisma.SortOrderInput | Prisma.SortOrder
   superAdminReviewedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   totalQuotedValue?: Prisma.SortOrderInput | Prisma.SortOrder
+  expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.QuoteCountOrderByAggregateInput
@@ -350,6 +364,7 @@ export type QuoteScalarWhereWithAggregatesInput = {
   superAdminId?: Prisma.StringNullableWithAggregatesFilter<"Quote"> | string | null
   superAdminReviewedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Quote"> | Date | string | null
   totalQuotedValue?: Prisma.DecimalNullableWithAggregatesFilter<"Quote"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Quote"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Quote"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Quote"> | Date | string
 }
@@ -364,10 +379,12 @@ export type QuoteCreateInput = {
   superAdminId?: string | null
   superAdminReviewedAt?: Date | string | null
   totalQuotedValue?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutQuotesInput
   items?: Prisma.QuoteItemCreateNestedManyWithoutQuoteInput
+  logs?: Prisma.QuoteLogCreateNestedManyWithoutQuoteInput
   invoice?: Prisma.InvoiceCreateNestedOneWithoutQuoteInput
 }
 
@@ -382,9 +399,11 @@ export type QuoteUncheckedCreateInput = {
   superAdminId?: string | null
   superAdminReviewedAt?: Date | string | null
   totalQuotedValue?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.QuoteItemUncheckedCreateNestedManyWithoutQuoteInput
+  logs?: Prisma.QuoteLogUncheckedCreateNestedManyWithoutQuoteInput
   invoice?: Prisma.InvoiceUncheckedCreateNestedOneWithoutQuoteInput
 }
 
@@ -398,10 +417,12 @@ export type QuoteUpdateInput = {
   superAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   superAdminReviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalQuotedValue?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutQuotesNestedInput
   items?: Prisma.QuoteItemUpdateManyWithoutQuoteNestedInput
+  logs?: Prisma.QuoteLogUpdateManyWithoutQuoteNestedInput
   invoice?: Prisma.InvoiceUpdateOneWithoutQuoteNestedInput
 }
 
@@ -416,9 +437,11 @@ export type QuoteUncheckedUpdateInput = {
   superAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   superAdminReviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalQuotedValue?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.QuoteItemUncheckedUpdateManyWithoutQuoteNestedInput
+  logs?: Prisma.QuoteLogUncheckedUpdateManyWithoutQuoteNestedInput
   invoice?: Prisma.InvoiceUncheckedUpdateOneWithoutQuoteNestedInput
 }
 
@@ -433,6 +456,7 @@ export type QuoteCreateManyInput = {
   superAdminId?: string | null
   superAdminReviewedAt?: Date | string | null
   totalQuotedValue?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -447,6 +471,7 @@ export type QuoteUpdateManyMutationInput = {
   superAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   superAdminReviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalQuotedValue?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -462,6 +487,7 @@ export type QuoteUncheckedUpdateManyInput = {
   superAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   superAdminReviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalQuotedValue?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -487,6 +513,7 @@ export type QuoteCountOrderByAggregateInput = {
   superAdminId?: Prisma.SortOrder
   superAdminReviewedAt?: Prisma.SortOrder
   totalQuotedValue?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -506,6 +533,7 @@ export type QuoteMaxOrderByAggregateInput = {
   superAdminId?: Prisma.SortOrder
   superAdminReviewedAt?: Prisma.SortOrder
   totalQuotedValue?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -521,6 +549,7 @@ export type QuoteMinOrderByAggregateInput = {
   superAdminId?: Prisma.SortOrder
   superAdminReviewedAt?: Prisma.SortOrder
   totalQuotedValue?: Prisma.SortOrder
+  expiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -598,6 +627,20 @@ export type QuoteUpdateOneRequiredWithoutItemsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.QuoteUpdateToOneWithWhereWithoutItemsInput, Prisma.QuoteUpdateWithoutItemsInput>, Prisma.QuoteUncheckedUpdateWithoutItemsInput>
 }
 
+export type QuoteCreateNestedOneWithoutLogsInput = {
+  create?: Prisma.XOR<Prisma.QuoteCreateWithoutLogsInput, Prisma.QuoteUncheckedCreateWithoutLogsInput>
+  connectOrCreate?: Prisma.QuoteCreateOrConnectWithoutLogsInput
+  connect?: Prisma.QuoteWhereUniqueInput
+}
+
+export type QuoteUpdateOneRequiredWithoutLogsNestedInput = {
+  create?: Prisma.XOR<Prisma.QuoteCreateWithoutLogsInput, Prisma.QuoteUncheckedCreateWithoutLogsInput>
+  connectOrCreate?: Prisma.QuoteCreateOrConnectWithoutLogsInput
+  upsert?: Prisma.QuoteUpsertWithoutLogsInput
+  connect?: Prisma.QuoteWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.QuoteUpdateToOneWithWhereWithoutLogsInput, Prisma.QuoteUpdateWithoutLogsInput>, Prisma.QuoteUncheckedUpdateWithoutLogsInput>
+}
+
 export type QuoteCreateNestedOneWithoutInvoiceInput = {
   create?: Prisma.XOR<Prisma.QuoteCreateWithoutInvoiceInput, Prisma.QuoteUncheckedCreateWithoutInvoiceInput>
   connectOrCreate?: Prisma.QuoteCreateOrConnectWithoutInvoiceInput
@@ -622,9 +665,11 @@ export type QuoteCreateWithoutUserInput = {
   superAdminId?: string | null
   superAdminReviewedAt?: Date | string | null
   totalQuotedValue?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.QuoteItemCreateNestedManyWithoutQuoteInput
+  logs?: Prisma.QuoteLogCreateNestedManyWithoutQuoteInput
   invoice?: Prisma.InvoiceCreateNestedOneWithoutQuoteInput
 }
 
@@ -638,9 +683,11 @@ export type QuoteUncheckedCreateWithoutUserInput = {
   superAdminId?: string | null
   superAdminReviewedAt?: Date | string | null
   totalQuotedValue?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.QuoteItemUncheckedCreateNestedManyWithoutQuoteInput
+  logs?: Prisma.QuoteLogUncheckedCreateNestedManyWithoutQuoteInput
   invoice?: Prisma.InvoiceUncheckedCreateNestedOneWithoutQuoteInput
 }
 
@@ -684,6 +731,7 @@ export type QuoteScalarWhereInput = {
   superAdminId?: Prisma.StringNullableFilter<"Quote"> | string | null
   superAdminReviewedAt?: Prisma.DateTimeNullableFilter<"Quote"> | Date | string | null
   totalQuotedValue?: Prisma.DecimalNullableFilter<"Quote"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Prisma.DateTimeNullableFilter<"Quote"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Quote"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Quote"> | Date | string
 }
@@ -698,9 +746,11 @@ export type QuoteCreateWithoutItemsInput = {
   superAdminId?: string | null
   superAdminReviewedAt?: Date | string | null
   totalQuotedValue?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutQuotesInput
+  logs?: Prisma.QuoteLogCreateNestedManyWithoutQuoteInput
   invoice?: Prisma.InvoiceCreateNestedOneWithoutQuoteInput
 }
 
@@ -715,8 +765,10 @@ export type QuoteUncheckedCreateWithoutItemsInput = {
   superAdminId?: string | null
   superAdminReviewedAt?: Date | string | null
   totalQuotedValue?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  logs?: Prisma.QuoteLogUncheckedCreateNestedManyWithoutQuoteInput
   invoice?: Prisma.InvoiceUncheckedCreateNestedOneWithoutQuoteInput
 }
 
@@ -746,9 +798,11 @@ export type QuoteUpdateWithoutItemsInput = {
   superAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   superAdminReviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalQuotedValue?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutQuotesNestedInput
+  logs?: Prisma.QuoteLogUpdateManyWithoutQuoteNestedInput
   invoice?: Prisma.InvoiceUpdateOneWithoutQuoteNestedInput
 }
 
@@ -763,8 +817,98 @@ export type QuoteUncheckedUpdateWithoutItemsInput = {
   superAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   superAdminReviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalQuotedValue?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  logs?: Prisma.QuoteLogUncheckedUpdateManyWithoutQuoteNestedInput
+  invoice?: Prisma.InvoiceUncheckedUpdateOneWithoutQuoteNestedInput
+}
+
+export type QuoteCreateWithoutLogsInput = {
+  id?: string
+  quoteNumber: string
+  status?: $Enums.QuoteStatus
+  customerNotes?: string | null
+  adminNotes?: string | null
+  superAdminNotes?: string | null
+  superAdminId?: string | null
+  superAdminReviewedAt?: Date | string | null
+  totalQuotedValue?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutQuotesInput
+  items?: Prisma.QuoteItemCreateNestedManyWithoutQuoteInput
+  invoice?: Prisma.InvoiceCreateNestedOneWithoutQuoteInput
+}
+
+export type QuoteUncheckedCreateWithoutLogsInput = {
+  id?: string
+  userId: string
+  quoteNumber: string
+  status?: $Enums.QuoteStatus
+  customerNotes?: string | null
+  adminNotes?: string | null
+  superAdminNotes?: string | null
+  superAdminId?: string | null
+  superAdminReviewedAt?: Date | string | null
+  totalQuotedValue?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  items?: Prisma.QuoteItemUncheckedCreateNestedManyWithoutQuoteInput
+  invoice?: Prisma.InvoiceUncheckedCreateNestedOneWithoutQuoteInput
+}
+
+export type QuoteCreateOrConnectWithoutLogsInput = {
+  where: Prisma.QuoteWhereUniqueInput
+  create: Prisma.XOR<Prisma.QuoteCreateWithoutLogsInput, Prisma.QuoteUncheckedCreateWithoutLogsInput>
+}
+
+export type QuoteUpsertWithoutLogsInput = {
+  update: Prisma.XOR<Prisma.QuoteUpdateWithoutLogsInput, Prisma.QuoteUncheckedUpdateWithoutLogsInput>
+  create: Prisma.XOR<Prisma.QuoteCreateWithoutLogsInput, Prisma.QuoteUncheckedCreateWithoutLogsInput>
+  where?: Prisma.QuoteWhereInput
+}
+
+export type QuoteUpdateToOneWithWhereWithoutLogsInput = {
+  where?: Prisma.QuoteWhereInput
+  data: Prisma.XOR<Prisma.QuoteUpdateWithoutLogsInput, Prisma.QuoteUncheckedUpdateWithoutLogsInput>
+}
+
+export type QuoteUpdateWithoutLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  quoteNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumQuoteStatusFieldUpdateOperationsInput | $Enums.QuoteStatus
+  customerNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  superAdminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  superAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  superAdminReviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totalQuotedValue?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutQuotesNestedInput
+  items?: Prisma.QuoteItemUpdateManyWithoutQuoteNestedInput
+  invoice?: Prisma.InvoiceUpdateOneWithoutQuoteNestedInput
+}
+
+export type QuoteUncheckedUpdateWithoutLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  quoteNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumQuoteStatusFieldUpdateOperationsInput | $Enums.QuoteStatus
+  customerNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  superAdminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  superAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  superAdminReviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totalQuotedValue?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  items?: Prisma.QuoteItemUncheckedUpdateManyWithoutQuoteNestedInput
   invoice?: Prisma.InvoiceUncheckedUpdateOneWithoutQuoteNestedInput
 }
 
@@ -778,10 +922,12 @@ export type QuoteCreateWithoutInvoiceInput = {
   superAdminId?: string | null
   superAdminReviewedAt?: Date | string | null
   totalQuotedValue?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutQuotesInput
   items?: Prisma.QuoteItemCreateNestedManyWithoutQuoteInput
+  logs?: Prisma.QuoteLogCreateNestedManyWithoutQuoteInput
 }
 
 export type QuoteUncheckedCreateWithoutInvoiceInput = {
@@ -795,9 +941,11 @@ export type QuoteUncheckedCreateWithoutInvoiceInput = {
   superAdminId?: string | null
   superAdminReviewedAt?: Date | string | null
   totalQuotedValue?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.QuoteItemUncheckedCreateNestedManyWithoutQuoteInput
+  logs?: Prisma.QuoteLogUncheckedCreateNestedManyWithoutQuoteInput
 }
 
 export type QuoteCreateOrConnectWithoutInvoiceInput = {
@@ -826,10 +974,12 @@ export type QuoteUpdateWithoutInvoiceInput = {
   superAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   superAdminReviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalQuotedValue?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutQuotesNestedInput
   items?: Prisma.QuoteItemUpdateManyWithoutQuoteNestedInput
+  logs?: Prisma.QuoteLogUpdateManyWithoutQuoteNestedInput
 }
 
 export type QuoteUncheckedUpdateWithoutInvoiceInput = {
@@ -843,9 +993,11 @@ export type QuoteUncheckedUpdateWithoutInvoiceInput = {
   superAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   superAdminReviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalQuotedValue?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.QuoteItemUncheckedUpdateManyWithoutQuoteNestedInput
+  logs?: Prisma.QuoteLogUncheckedUpdateManyWithoutQuoteNestedInput
 }
 
 export type QuoteCreateManyUserInput = {
@@ -858,6 +1010,7 @@ export type QuoteCreateManyUserInput = {
   superAdminId?: string | null
   superAdminReviewedAt?: Date | string | null
   totalQuotedValue?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -872,9 +1025,11 @@ export type QuoteUpdateWithoutUserInput = {
   superAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   superAdminReviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalQuotedValue?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.QuoteItemUpdateManyWithoutQuoteNestedInput
+  logs?: Prisma.QuoteLogUpdateManyWithoutQuoteNestedInput
   invoice?: Prisma.InvoiceUpdateOneWithoutQuoteNestedInput
 }
 
@@ -888,9 +1043,11 @@ export type QuoteUncheckedUpdateWithoutUserInput = {
   superAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   superAdminReviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalQuotedValue?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.QuoteItemUncheckedUpdateManyWithoutQuoteNestedInput
+  logs?: Prisma.QuoteLogUncheckedUpdateManyWithoutQuoteNestedInput
   invoice?: Prisma.InvoiceUncheckedUpdateOneWithoutQuoteNestedInput
 }
 
@@ -904,6 +1061,7 @@ export type QuoteUncheckedUpdateManyWithoutUserInput = {
   superAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   superAdminReviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totalQuotedValue?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -915,10 +1073,12 @@ export type QuoteUncheckedUpdateManyWithoutUserInput = {
 
 export type QuoteCountOutputType = {
   items: number
+  logs: number
 }
 
 export type QuoteCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   items?: boolean | QuoteCountOutputTypeCountItemsArgs
+  logs?: boolean | QuoteCountOutputTypeCountLogsArgs
 }
 
 /**
@@ -938,6 +1098,13 @@ export type QuoteCountOutputTypeCountItemsArgs<ExtArgs extends runtime.Types.Ext
   where?: Prisma.QuoteItemWhereInput
 }
 
+/**
+ * QuoteCountOutputType without action
+ */
+export type QuoteCountOutputTypeCountLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.QuoteLogWhereInput
+}
+
 
 export type QuoteSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -950,10 +1117,12 @@ export type QuoteSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   superAdminId?: boolean
   superAdminReviewedAt?: boolean
   totalQuotedValue?: boolean
+  expiresAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   items?: boolean | Prisma.Quote$itemsArgs<ExtArgs>
+  logs?: boolean | Prisma.Quote$logsArgs<ExtArgs>
   invoice?: boolean | Prisma.Quote$invoiceArgs<ExtArgs>
   _count?: boolean | Prisma.QuoteCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["quote"]>
@@ -969,6 +1138,7 @@ export type QuoteSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   superAdminId?: boolean
   superAdminReviewedAt?: boolean
   totalQuotedValue?: boolean
+  expiresAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -985,6 +1155,7 @@ export type QuoteSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   superAdminId?: boolean
   superAdminReviewedAt?: boolean
   totalQuotedValue?: boolean
+  expiresAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1001,14 +1172,16 @@ export type QuoteSelectScalar = {
   superAdminId?: boolean
   superAdminReviewedAt?: boolean
   totalQuotedValue?: boolean
+  expiresAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type QuoteOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "quoteNumber" | "status" | "customerNotes" | "adminNotes" | "superAdminNotes" | "superAdminId" | "superAdminReviewedAt" | "totalQuotedValue" | "createdAt" | "updatedAt", ExtArgs["result"]["quote"]>
+export type QuoteOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "quoteNumber" | "status" | "customerNotes" | "adminNotes" | "superAdminNotes" | "superAdminId" | "superAdminReviewedAt" | "totalQuotedValue" | "expiresAt" | "createdAt" | "updatedAt", ExtArgs["result"]["quote"]>
 export type QuoteInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   items?: boolean | Prisma.Quote$itemsArgs<ExtArgs>
+  logs?: boolean | Prisma.Quote$logsArgs<ExtArgs>
   invoice?: boolean | Prisma.Quote$invoiceArgs<ExtArgs>
   _count?: boolean | Prisma.QuoteCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1024,6 +1197,7 @@ export type $QuotePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
     items: Prisma.$QuoteItemPayload<ExtArgs>[]
+    logs: Prisma.$QuoteLogPayload<ExtArgs>[]
     invoice: Prisma.$InvoicePayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1037,6 +1211,7 @@ export type $QuotePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     superAdminId: string | null
     superAdminReviewedAt: Date | null
     totalQuotedValue: runtime.Decimal | null
+    expiresAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["quote"]>
@@ -1435,6 +1610,7 @@ export interface Prisma__QuoteClient<T, Null = never, ExtArgs extends runtime.Ty
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   items<T extends Prisma.Quote$itemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Quote$itemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$QuoteItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  logs<T extends Prisma.Quote$logsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Quote$logsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$QuoteLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   invoice<T extends Prisma.Quote$invoiceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Quote$invoiceArgs<ExtArgs>>): Prisma.Prisma__InvoiceClient<runtime.Types.Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1475,6 +1651,7 @@ export interface QuoteFieldRefs {
   readonly superAdminId: Prisma.FieldRef<"Quote", 'String'>
   readonly superAdminReviewedAt: Prisma.FieldRef<"Quote", 'DateTime'>
   readonly totalQuotedValue: Prisma.FieldRef<"Quote", 'Decimal'>
+  readonly expiresAt: Prisma.FieldRef<"Quote", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Quote", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Quote", 'DateTime'>
 }
@@ -1899,6 +2076,30 @@ export type Quote$itemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   distinct?: Prisma.QuoteItemScalarFieldEnum | Prisma.QuoteItemScalarFieldEnum[]
+}
+
+/**
+ * Quote.logs
+ */
+export type Quote$logsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the QuoteLog
+   */
+  select?: Prisma.QuoteLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the QuoteLog
+   */
+  omit?: Prisma.QuoteLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.QuoteLogInclude<ExtArgs> | null
+  where?: Prisma.QuoteLogWhereInput
+  orderBy?: Prisma.QuoteLogOrderByWithRelationInput | Prisma.QuoteLogOrderByWithRelationInput[]
+  cursor?: Prisma.QuoteLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.QuoteLogScalarFieldEnum | Prisma.QuoteLogScalarFieldEnum[]
 }
 
 /**

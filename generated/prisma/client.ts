@@ -107,6 +107,11 @@ export type Quote = Prisma.QuoteModel
  */
 export type QuoteItem = Prisma.QuoteItemModel
 /**
+ * Model QuoteLog
+ * 
+ */
+export type QuoteLog = Prisma.QuoteLogModel
+/**
  * Model Invoice
  * 
  */
