@@ -609,10 +609,6 @@ export type EnumQuoteStatusFieldUpdateOperationsInput = {
   set?: $Enums.QuoteStatus
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type QuoteCreateNestedOneWithoutItemsInput = {
   create?: Prisma.XOR<Prisma.QuoteCreateWithoutItemsInput, Prisma.QuoteUncheckedCreateWithoutItemsInput>
   connectOrCreate?: Prisma.QuoteCreateOrConnectWithoutItemsInput

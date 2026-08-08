@@ -1,264 +1,223 @@
-"use client"
+import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  Clock,
+  FileText,
+  MapPin,
+  Package,
+  Receipt,
+  Truck,
+  Wallet,
+  XCircle,
+} from "lucide-react";
+import { OrderStatus } from "@prisma/client";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { getCustomerOrder } from "@/lib/data/customer-orders";
+import { cn } from "@/lib/utils";
+import { CopyTrackingButton } from "./copy-tracking-button";
 
-import { use, useState } from "react"
-import Link from "next/link"
-import { ArrowLeft, CheckCircle2, Clock, MapPin, Package, Receipt, Truck, Wallet, ChevronRight, Copy } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { cn } from "@/lib/utils"
+const STEPS = [
+  { status: OrderStatus.PENDING, label: "Pesanan dibuat", icon: Clock },
+  { status: OrderStatus.PROCESSING, label: "Sedang diproses", icon: Package },
+  { status: OrderStatus.SHIPPED, label: "Dalam pengiriman", icon: Truck },
+  { status: OrderStatus.COMPLETED, label: "Pesanan selesai", icon: CheckCircle2 },
+];
 
-const MOCK_ORDER = {
-  id: "ORD-000123",
-  date: "12 Jul 2026, 14:30 WIB",
-  status: "dikirim", // diproses, dikirim, selesai
-  trackingNo: "RESI123456789",
-  courier: "JNE Reguler",
-  shippingAddress: {
-    recipient: "Budi Santoso",
-    phone: "0812-3456-7890",
-    address: "Jl. Sudirman No. 45, Gedung Menara Jaya Lt. 3",
-    region: "Kebayoran Baru, Jakarta Selatan, DKI Jakarta 12190"
-  },
-  paymentMethod: "BCA Virtual Account",
-  paymentStatus: "Lunas",
-  items: [
-    { name: "Conveyor Belt Heavy Duty (3 Ply)", qty: 2, price: 500000 },
-    { name: "Seal O-Ring Industrial Standard", qty: 5, price: 50000 },
-  ],
-  totals: {
-    subtotal: 1250000,
-    shipping: 45000,
-    insurance: 2500,
-    discount: 0,
-    grandTotal: 1297500
-  }
-}
+const PAYMENT_METHODS: Record<string, string> = {
+  GATEWAY: "Payment Gateway",
+  BANK_TRANSFER: "Transfer Bank",
+  TERM: "Termin / Tempo",
+};
 
-const TIMELINE_STEPS = [
-  { id: "diproses", label: "Pesanan Diproses", icon: Clock },
-  { id: "dikirim", label: "Pesanan Dikirim", icon: Truck },
-  { id: "selesai", label: "Pesanan Selesai", icon: CheckCircle2 },
-]
+export default async function OrderDetailsPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const result = await getCustomerOrder(id);
+  if (!result.authenticated) redirect(`/login?callbackUrl=${encodeURIComponent(`/customer/orders/${id}`)}`);
+  if (!result.order) notFound();
 
-export default function OrderDetailsPage({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = use(params)
-  const orderId = resolvedParams.id
-  const order = MOCK_ORDER // In real app, fetch order based on orderId
-  const [copied, setCopied] = useState(false)
-
-  const copyResi = () => {
-    navigator.clipboard.writeText(order.trackingNo)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
-
-  // Determine active step index
-  const activeStepIndex = TIMELINE_STEPS.findIndex(s => s.id === order.status)
+  const order = result.order;
+  const activeStep = STEPS.findIndex((step) => step.status === order.status);
+  const subtotal = order.items.reduce((sum, item) => sum + item.qty * item.priceAtOrder, 0);
+  const isCancelled = order.status === OrderStatus.CANCELLED;
+  const shippingLabel = [order.courier, order.shippingService].filter(Boolean).join(" · ");
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full min-h-screen bg-slate-50">
-      <div className="flex items-center gap-4 mb-8">
-        <Link href="/customer/orders">
-          <Button variant="ghost" size="icon" className="rounded-full hover:bg-slate-200">
-            <ArrowLeft className="w-5 h-5" />
+    <div className="w-full bg-slate-50">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="mb-7 flex items-start gap-3">
+          <Button variant="outline" size="icon" className="mt-1 rounded-full bg-white" asChild>
+            <Link href="/customer/orders" aria-label="Kembali ke riwayat pesanan">
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
           </Button>
-        </Link>
-        <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Detail Pesanan</h1>
-          <p className="text-slate-500 mt-1">{orderId} • {order.date}</p>
+          <div>
+            <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-red-600">Detail Pesanan</p>
+            <h1 className="mt-1 text-2xl sm:text-3xl font-black tracking-tight text-slate-950">{order.orderNumber}</h1>
+            <p className="mt-1 text-sm text-slate-500">
+              Dibuat {new Date(order.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+            </p>
+          </div>
         </div>
-      </div>
 
-      <div className="space-y-6">
-        
-        {/* TRACKING TIMELINE */}
-        <Card className="border-slate-200 shadow-sm overflow-hidden border-t-4 border-t-blue-600">
-          <CardHeader className="bg-white border-b border-slate-100 pb-4">
-            <CardTitle className="text-lg font-bold">Status Pesanan</CardTitle>
-          </CardHeader>
-          <CardContent className="p-6 bg-white sm:p-10">
-            <div className="relative max-w-3xl mx-auto">
-              {/* Timeline line */}
-              <div className="absolute top-6 left-10 right-10 h-1 bg-slate-200 -z-10 hidden sm:block"></div>
-              
-              <div className="flex flex-col sm:flex-row justify-between gap-6 sm:gap-0">
-                {TIMELINE_STEPS.map((step, index) => {
-                  const isCompleted = index <= activeStepIndex
-                  const isActive = index === activeStepIndex
-                  const Icon = step.icon
-
+        {isCancelled ? (
+          <div className="mb-6 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-5 text-red-800">
+            <XCircle className="mt-0.5 h-5 w-5 shrink-0" />
+            <div>
+              <p className="font-extrabold">Pesanan dibatalkan</p>
+              <p className="mt-1 text-sm text-red-700">Pesanan ini tidak akan diproses lebih lanjut.</p>
+            </div>
+          </div>
+        ) : (
+          <Card className="mb-6 overflow-hidden border-slate-200 shadow-sm">
+            <CardHeader className="border-b border-slate-100">
+              <CardTitle className="text-lg">Status Pesanan</CardTitle>
+            </CardHeader>
+            <CardContent className="p-5 sm:p-8">
+              <div className="grid gap-4 sm:grid-cols-4">
+                {STEPS.map((step, index) => {
+                  const complete = index <= activeStep;
+                  const active = index === activeStep;
+                  const Icon = step.icon;
                   return (
-                    <div key={step.id} className="flex flex-row sm:flex-col items-center gap-4 sm:gap-3 z-10 relative">
-                      {/* Mobile Line */}
-                      {index !== TIMELINE_STEPS.length - 1 && (
-                        <div className="absolute top-12 left-[1.15rem] bottom-[-2rem] w-1 bg-slate-200 sm:hidden -z-10"></div>
+                    <div key={step.status} className="relative flex items-center gap-3 sm:flex-col sm:text-center">
+                      {index > 0 && (
+                        <div className={cn("absolute right-1/2 top-5 hidden h-1 w-full sm:block", complete ? "bg-indigo-600" : "bg-slate-200")} />
                       )}
-                      {/* Desktop Progress Line */}
-                      {isCompleted && index > 0 && (
-                        <div className="absolute top-6 right-[50%] w-full h-1 bg-blue-600 -z-10 hidden sm:block"></div>
-                      )}
-
                       <div className={cn(
-                        "w-12 h-12 rounded-full border-4 flex items-center justify-center bg-white transition-colors duration-500",
-                        isCompleted ? "border-blue-600 text-blue-600" : "border-slate-200 text-slate-400"
+                        "relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 bg-white",
+                        complete ? "border-indigo-600 text-indigo-600" : "border-slate-200 text-slate-300",
+                        active && "ring-4 ring-indigo-100"
                       )}>
-                        <Icon className="w-5 h-5" />
+                        <Icon className="h-4 w-4" />
                       </div>
-                      
+                      <p className={cn("relative z-10 text-sm font-bold", complete ? "text-slate-900" : "text-slate-400")}>{step.label}</p>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {order.status === OrderStatus.SHIPPED && (
+                <div className="mt-7 rounded-2xl border border-indigo-200 bg-gradient-to-br from-indigo-50 to-blue-50 p-4 sm:p-5">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="rounded-xl bg-white p-3 text-indigo-600 shadow-sm">
+                        <Truck className="h-5 w-5" />
+                      </div>
                       <div>
-                        <div className={cn(
-                          "font-bold text-base sm:text-center",
-                          isActive ? "text-blue-950" : (isCompleted ? "text-slate-800" : "text-slate-400")
-                        )}>
-                          {step.label}
-                        </div>
-                        {isActive && step.id === "dikirim" && (
-                          <div className="text-xs text-slate-500 sm:text-center mt-1">
-                            Sedang dalam perjalanan ke alamat tujuan
-                          </div>
+                        <p className="text-xs font-bold uppercase tracking-wider text-indigo-600">Dikirim melalui</p>
+                        <p className="mt-0.5 font-extrabold text-slate-950">{shippingLabel || "Kurir DML"}</p>
+                        {order.shippedAt && (
+                          <p className="mt-0.5 text-xs text-slate-500">
+                            {new Date(order.shippedAt).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" })}
+                          </p>
                         )}
                       </div>
                     </div>
-                  )
-                })}
-              </div>
-            </div>
-
-            {order.status === "dikirim" && (
-              <div className="mt-8 bg-blue-50 border border-blue-100 rounded-xl p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center flex-shrink-0 shadow-sm text-blue-600">
-                    <Truck className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-semibold text-blue-900 mb-1">Kurir: {order.courier}</div>
-                    <div className="flex items-center gap-2 text-slate-700">
-                      <span className="font-mono font-bold tracking-wider">{order.trackingNo}</span>
-                      <Button variant="ghost" size="sm" className="h-6 px-2 text-blue-600 hover:text-blue-700" onClick={copyResi}>
-                        {copied ? "Tersalin!" : <><Copy className="w-3 h-3 mr-1" /> Salin</>}
-                      </Button>
-                    </div>
+                    {order.trackingNumber && <CopyTrackingButton trackingNumber={order.trackingNumber} />}
                   </div>
                 </div>
-                <Button className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto">Lacak Detail</Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* ITEMS AND TOTALS */}
-          <div className="lg:col-span-2 space-y-6">
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="space-y-6 lg:col-span-2">
             <Card className="border-slate-200 shadow-sm">
-              <CardHeader className="bg-white border-b border-slate-100 pb-4">
-                <CardTitle className="text-lg font-bold flex items-center gap-2">
-                  <Package className="w-5 h-5 text-slate-500" />
-                  Produk Dipesan
+              <CardHeader className="border-b border-slate-100">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Package className="h-5 w-5 text-slate-500" /> Produk Dipesan
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-0">
-                <div className="divide-y divide-slate-100">
-                  {order.items.map((item, idx) => (
-                    <div key={idx} className="p-4 sm:p-6 flex gap-4 hover:bg-slate-50 transition-colors">
-                      <div className="w-20 h-20 bg-slate-100 rounded-lg border border-slate-200 flex-shrink-0 flex items-center justify-center">
-                        <Package className="w-6 h-6 text-slate-300" />
-                      </div>
-                      <div className="flex-1 min-w-0 flex flex-col justify-center">
-                        <h4 className="text-base font-bold text-slate-900 line-clamp-2 mb-1">{item.name}</h4>
-                        <p className="text-sm text-slate-500">{item.qty} x Rp {item.price.toLocaleString("id-ID")}</p>
-                      </div>
-                      <div className="flex flex-col justify-center items-end pl-4">
-                        <span className="text-base font-extrabold text-slate-900">
-                          Rp {(item.qty * item.price).toLocaleString("id-ID")}
-                        </span>
-                      </div>
+              <CardContent className="divide-y divide-slate-100 p-0">
+                {order.items.map((item) => (
+                  <div key={item.id} className="flex gap-4 p-4 sm:p-5">
+                    <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-slate-100 text-slate-300">
+                      <Package className="h-6 w-6" />
                     </div>
-                  ))}
-                </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-extrabold text-slate-900">{item.product.name}</p>
+                      <p className="mt-1 font-mono text-xs text-slate-400">{item.product.sku}</p>
+                      <p className="mt-1 text-sm text-slate-500">{item.qty} {item.product.unit} × Rp {item.priceAtOrder.toLocaleString("id-ID")}</p>
+                    </div>
+                    <p className="shrink-0 font-extrabold text-slate-900">Rp {(item.qty * item.priceAtOrder).toLocaleString("id-ID")}</p>
+                  </div>
+                ))}
               </CardContent>
             </Card>
 
             <Card className="border-slate-200 shadow-sm">
-              <CardHeader className="bg-white border-b border-slate-100 pb-4">
-                <CardTitle className="text-lg font-bold flex items-center gap-2">
-                  <Receipt className="w-5 h-5 text-slate-500" />
-                  Rincian Pembayaran
+              <CardHeader className="border-b border-slate-100">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Receipt className="h-5 w-5 text-slate-500" /> Rincian Pembayaran
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-6">
-                <div className="space-y-3 text-sm">
-                  <div className="flex justify-between text-slate-600">
-                    <span>Subtotal Produk</span>
-                    <span className="font-medium text-slate-900">Rp {order.totals.subtotal.toLocaleString("id-ID")}</span>
-                  </div>
-                  <div className="flex justify-between text-slate-600">
-                    <span>Ongkos Kirim</span>
-                    <span className="font-medium text-slate-900">Rp {order.totals.shipping.toLocaleString("id-ID")}</span>
-                  </div>
-                  <div className="flex justify-between text-slate-600">
-                    <span>Asuransi</span>
-                    <span className="font-medium text-slate-900">Rp {order.totals.insurance.toLocaleString("id-ID")}</span>
-                  </div>
-                  {order.totals.discount > 0 && (
-                    <div className="flex justify-between text-emerald-600 font-medium">
-                      <span>Diskon</span>
-                      <span>- Rp {order.totals.discount.toLocaleString("id-ID")}</span>
-                    </div>
-                  )}
-                  <Separator className="my-4" />
-                  <div className="flex justify-between items-center">
-                    <span className="text-base font-bold text-slate-900">Total Belanja</span>
-                    <span className="text-xl font-extrabold text-blue-950">Rp {order.totals.grandTotal.toLocaleString("id-ID")}</span>
-                  </div>
+              <CardContent className="space-y-3 p-5 text-sm">
+                <div className="flex justify-between"><span className="text-slate-500">Subtotal produk</span><span className="font-semibold">Rp {subtotal.toLocaleString("id-ID")}</span></div>
+                <div className="flex justify-between"><span className="text-slate-500">Ongkos kirim</span><span className="font-semibold">Rp {order.shippingFee.toLocaleString("id-ID")}</span></div>
+                {order.discountAmount > 0 && (
+                  <div className="flex justify-between text-emerald-700"><span>Diskon</span><span className="font-semibold">- Rp {order.discountAmount.toLocaleString("id-ID")}</span></div>
+                )}
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <span className="font-extrabold text-slate-900">Total belanja</span>
+                  <span className="text-xl font-black text-slate-950">Rp {order.totalAmount.toLocaleString("id-ID")}</span>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* SIDEBAR: INFO & ACTIONS */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="space-y-6">
             <Card className="border-slate-200 shadow-sm">
-              <CardHeader className="bg-white border-b border-slate-100 pb-4">
-                <CardTitle className="text-lg font-bold">Info Pengiriman</CardTitle>
+              <CardHeader className="border-b border-slate-100">
+                <CardTitle className="flex items-center gap-2 text-lg"><MapPin className="h-5 w-5 text-slate-500" /> Alamat Pengiriman</CardTitle>
               </CardHeader>
-              <CardContent className="p-6 text-sm">
-                <div className="flex items-start gap-3 mb-4">
-                  <MapPin className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <div className="font-bold text-slate-900 mb-1">{order.shippingAddress.recipient}</div>
-                    <div className="text-slate-500 mb-1">{order.shippingAddress.phone}</div>
-                    <div className="text-slate-600 leading-relaxed">{order.shippingAddress.address}, {order.shippingAddress.region}</div>
-                  </div>
-                </div>
-                
-                <Separator className="my-4" />
-                
-                <div className="flex items-start gap-3">
-                  <Wallet className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <div className="font-bold text-slate-900 mb-1">Metode Pembayaran</div>
-                    <div className="text-slate-600">{order.paymentMethod}</div>
-                    <div className="mt-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-700 uppercase tracking-wider">
-                      {order.paymentStatus}
-                    </div>
-                  </div>
-                </div>
+              <CardContent className="p-5 text-sm">
+                <p className="font-extrabold text-slate-900">{order.address.recipientName}</p>
+                <p className="mt-1 text-slate-500">{order.address.phone}</p>
+                <p className="mt-3 leading-relaxed text-slate-600">
+                  {order.address.fullAddress}, {order.address.city}, {order.address.province} {order.address.postalCode}
+                </p>
               </CardContent>
             </Card>
 
-            <div className="space-y-3">
-              <Button className="w-full h-12 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm">
-                Hubungi Penjual
-              </Button>
-              <Button className="w-full h-12 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm">
-                Unduh Invoice (PDF)
-              </Button>
-            </div>
+            <Card className="border-slate-200 shadow-sm">
+              <CardHeader className="border-b border-slate-100">
+                <CardTitle className="flex items-center gap-2 text-lg"><Wallet className="h-5 w-5 text-slate-500" /> Pembayaran</CardTitle>
+              </CardHeader>
+              <CardContent className="p-5 text-sm">
+                <p className="font-bold text-slate-900">{PAYMENT_METHODS[order.payment?.method ?? ""] ?? "Belum tersedia"}</p>
+                <p className="mt-2 inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-extrabold text-slate-700">
+                  {order.paymentStatus === "PAID" ? "Lunas" : order.paymentStatus === "UNPAID" ? "Belum dibayar" : order.paymentStatus}
+                </p>
+              </CardContent>
+            </Card>
+
+            {order.deliveryNoteName && (
+              <a
+                href={`/api/orders/${order.id}/delivery-note`}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-3 rounded-2xl border border-indigo-200 bg-indigo-50 p-4 text-indigo-900 transition-colors hover:bg-indigo-100"
+              >
+                <div className="rounded-xl bg-white p-2.5 text-indigo-600"><FileText className="h-5 w-5" /></div>
+                <div className="min-w-0">
+                  <p className="text-xs font-bold uppercase tracking-wider text-indigo-600">Surat jalan</p>
+                  <p className="truncate text-sm font-extrabold">{order.deliveryNoteName}</p>
+                </div>
+              </a>
+            )}
           </div>
         </div>
-
       </div>
     </div>
-  )
+  );
 }

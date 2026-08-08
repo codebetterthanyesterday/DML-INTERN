@@ -1,8 +1,11 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import { auth } from "@/lib/auth";
+import { PRIVATE_BLOB_HOST_PATTERN } from "@/lib/blob";
 import { revalidatePath } from "next/cache";
 import { OrderStatus } from "@prisma/client";
+import { z } from "zod";
 
 // ─── Plain-object types (safe for Client Components) ─────────────────────────
 
@@ -27,7 +30,11 @@ export type SerializedOrder = {
   orderNumber: string;
   type: string;
   status: string;
+  courier: string | null;
+  shippingService: string | null;
   trackingNumber: string | null;
+  deliveryNoteName: string | null;
+  shippedAt: string | null;
   totalAmount: number;
   paymentStatus: string;
   createdAt: string;
@@ -55,7 +62,11 @@ function serializeOrder(order: RawOrder): SerializedOrder {
     orderNumber: order.orderNumber,
     type: order.type,
     status: order.status,
+    courier: order.courier,
+    shippingService: order.shippingService,
     trackingNumber: order.trackingNumber,
+    deliveryNoteName: order.deliveryNoteName,
+    shippedAt: order.shippedAt?.toISOString() ?? null,
     totalAmount: order.totalAmount.toNumber(),
     paymentStatus: order.paymentStatus,
     createdAt: order.createdAt.toISOString(),
@@ -178,41 +189,112 @@ export async function getAdminOrders(
 }
 
 export async function updateOrderStatus(
-  orderId: string,
-  newStatus: OrderStatus,
-  trackingNumber?: string
+  input: {
+    orderId: string;
+    status: OrderStatus;
+    courier?: string;
+    trackingNumber?: string;
+    deliveryNoteUrl?: string;
+    deliveryNoteName?: string;
+  }
 ): Promise<{ success: boolean; error?: string }> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "ADMIN") {
+    return { success: false, error: "Anda tidak memiliki akses untuk memperbarui pesanan." };
+  }
+
+  const baseSchema = z.object({
+    orderId: z.string().min(1),
+    status: z.nativeEnum(OrderStatus),
+    courier: z.string().trim().max(100).optional(),
+    trackingNumber: z.string().trim().max(100).optional(),
+    deliveryNoteUrl: z.string().url().max(2048).optional(),
+    deliveryNoteName: z.string().trim().max(255).optional(),
+  });
+  const parsed = baseSchema.safeParse(input);
+  if (!parsed.success) {
+    return { success: false, error: "Data pembaruan pesanan tidak valid." };
+  }
+
+  const data = parsed.data;
+  if (data.status === OrderStatus.SHIPPED) {
+    if (!data.courier || data.courier.length < 2) {
+      return { success: false, error: "Nama kurir wajib diisi." };
+    }
+    if (!data.trackingNumber || data.trackingNumber.length < 3) {
+      return { success: false, error: "Nomor resi wajib diisi." };
+    }
+    const isDeliveryNoteUrl =
+      !data.deliveryNoteUrl ||
+      (PRIVATE_BLOB_HOST_PATTERN.test(data.deliveryNoteUrl) &&
+        new URL(data.deliveryNoteUrl).pathname.startsWith("/delivery-notes/"));
+    if (!isDeliveryNoteUrl || Boolean(data.deliveryNoteUrl) !== Boolean(data.deliveryNoteName)) {
+      return { success: false, error: "Surat jalan yang valid wajib diunggah." };
+    }
+  }
+
+  const allowedTransitions: Record<OrderStatus, OrderStatus[]> = {
+    PENDING: [OrderStatus.PROCESSING, OrderStatus.CANCELLED],
+    PROCESSING: [OrderStatus.SHIPPED, OrderStatus.CANCELLED],
+    SHIPPED: [OrderStatus.SHIPPED, OrderStatus.COMPLETED],
+    COMPLETED: [],
+    CANCELLED: [],
+  };
+
   try {
     await prisma.$transaction(async (tx) => {
       const order = await tx.order.findUnique({
-        where: { id: orderId },
+        where: { id: data.orderId },
       });
 
       if (!order) {
         throw new Error("Pesanan tidak ditemukan.");
       }
+      if (!allowedTransitions[order.status].includes(data.status)) {
+        throw new Error("Perubahan status pesanan tidak diizinkan.");
+      }
+
+      const deliveryNoteUrl = data.deliveryNoteUrl ?? order.deliveryNoteUrl;
+      const deliveryNoteName = data.deliveryNoteName ?? order.deliveryNoteName;
+      if (
+        data.status === OrderStatus.SHIPPED &&
+        (!deliveryNoteUrl || !deliveryNoteName)
+      ) {
+        throw new Error("Surat jalan yang valid wajib diunggah.");
+      }
 
       await tx.order.update({
-        where: { id: orderId },
-        data: { 
-          status: newStatus,
-          ...(trackingNumber ? { trackingNumber } : {})
+        where: { id: data.orderId },
+        data: {
+          status: data.status,
+          ...(data.status === OrderStatus.SHIPPED
+            ? {
+                courier: data.courier,
+                trackingNumber: data.trackingNumber,
+                deliveryNoteUrl,
+                deliveryNoteName,
+                shippedAt: order.shippedAt ?? new Date(),
+              }
+            : {}),
         },
       });
 
       let title = "Status Pesanan Diperbarui";
-      let message = `Status pesanan #${order.orderNumber} Anda telah diperbarui menjadi ${newStatus}.`;
+      let message = `Status pesanan #${order.orderNumber} Anda telah diperbarui menjadi ${data.status}.`;
 
-      if (newStatus === "PROCESSING") {
+      if (data.status === OrderStatus.PROCESSING) {
         title = "Pesanan Sedang Diproses / Dikemas";
         message = `Pesanan #${order.orderNumber} Anda sedang kami siapkan dan kemas.`;
-      } else if (newStatus === "SHIPPED") {
-        title = "Pesanan Telah Dikirim";
-        message = `Pesanan #${order.orderNumber} Anda telah dikirim. ${trackingNumber ? `Nomor Resi: ${trackingNumber}` : ""}`;
-      } else if (newStatus === "COMPLETED") {
+      } else if (data.status === OrderStatus.SHIPPED) {
+        title =
+          order.status === OrderStatus.SHIPPED
+            ? "Data Pengiriman Diperbarui"
+            : "Pesanan Telah Dikirim";
+        message = `Pesanan #${order.orderNumber} Anda dikirim melalui ${data.courier}. Nomor Resi: ${data.trackingNumber}.`;
+      } else if (data.status === OrderStatus.COMPLETED) {
         title = "Pesanan Selesai";
         message = `Pesanan #${order.orderNumber} Anda telah selesai. Terima kasih telah berbelanja di DML!`;
-      } else if (newStatus === "CANCELLED") {
+      } else if (data.status === OrderStatus.CANCELLED) {
         title = "Pesanan Dibatalkan";
         message = `Pesanan #${order.orderNumber} Anda telah dibatalkan.`;
       }
@@ -229,9 +311,14 @@ export async function updateOrderStatus(
     });
 
     revalidatePath("/admin/orders");
+    revalidatePath("/customer/orders");
+    revalidatePath(`/customer/orders/${data.orderId}`);
     return { success: true };
-  } catch (error: any) {
+  } catch (error) {
     console.error("updateOrderStatus Error:", error);
-    return { success: false, error: error.message || "Gagal memperbarui status pesanan." };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Gagal memperbarui status pesanan.",
+    };
   }
 }

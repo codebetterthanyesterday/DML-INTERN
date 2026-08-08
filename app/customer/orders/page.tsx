@@ -1,220 +1,209 @@
-"use client"
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import {
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Package,
+  Search,
+  Truck,
+  XCircle,
+} from "lucide-react";
+import { OrderStatus } from "@prisma/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { getCustomerOrders } from "@/lib/data/customer-orders";
+import { cn } from "@/lib/utils";
 
-import { useState } from "react"
-import Link from "next/link"
-import { Package, Truck, CheckCircle2, XCircle, Clock, ChevronRight, Search } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+export const metadata = {
+  title: "Riwayat Pesanan — DML",
+  description: "Pantau status dan informasi pengiriman pesanan Anda.",
+};
 
 const TABS = [
-  { id: "semua", label: "Semua" },
-  { id: "diproses", label: "Diproses" },
-  { id: "dikirim", label: "Dikirim" },
-  { id: "selesai", label: "Selesai" },
-  { id: "dibatalkan", label: "Dibatalkan" },
-]
+  { value: "ALL", label: "Semua" },
+  { value: OrderStatus.PENDING, label: "Menunggu" },
+  { value: OrderStatus.PROCESSING, label: "Diproses" },
+  { value: OrderStatus.SHIPPED, label: "Dikirim" },
+  { value: OrderStatus.COMPLETED, label: "Selesai" },
+  { value: OrderStatus.CANCELLED, label: "Dibatalkan" },
+];
 
-const MOCK_ORDERS = [
-  {
-    id: "ORD-000124",
-    date: "15 Jul 2026",
-    status: "diproses",
-    totalAmount: 420000,
-    items: [
-      { name: "Rubber Sheet Premium 5mm (Tahan Oli & Panas)", qty: 2, image: "" },
-      { name: "Seal O-Ring Industrial Standard", qty: 1, image: "" },
-    ],
-    trackingNo: "-"
-  },
-  {
-    id: "ORD-000123",
-    date: "12 Jul 2026",
-    status: "dikirim",
-    totalAmount: 1250000,
-    items: [
-      { name: "Conveyor Belt Heavy Duty (3 Ply)", qty: 5, image: "" },
-    ],
-    trackingNo: "RESI123456789"
-  },
-  {
-    id: "ORD-000119",
-    date: "02 Jul 2026",
-    status: "selesai",
-    totalAmount: 85000,
-    items: [
-      { name: "Karet Bantalan Mesin (Mounting)", qty: 4, image: "" },
-      { name: "Lem Karet Khusus", qty: 1, image: "" },
-    ],
-    trackingNo: "RESI987654321"
-  },
-  {
-    id: "ORD-000105",
-    date: "15 Jun 2026",
-    status: "dibatalkan",
-    totalAmount: 550000,
-    items: [
-      { name: "Silicone Sheet Food Grade", qty: 2, image: "" },
-    ],
-    trackingNo: "-"
-  },
-]
+const STATUS_CONFIG = {
+  PENDING: { label: "Menunggu", icon: Clock, className: "bg-amber-50 text-amber-700 border-amber-200" },
+  PROCESSING: { label: "Diproses", icon: Package, className: "bg-blue-50 text-blue-700 border-blue-200" },
+  SHIPPED: { label: "Dikirim", icon: Truck, className: "bg-indigo-50 text-indigo-700 border-indigo-200" },
+  COMPLETED: { label: "Selesai", icon: CheckCircle2, className: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+  CANCELLED: { label: "Dibatalkan", icon: XCircle, className: "bg-red-50 text-red-700 border-red-200" },
+} satisfies Record<OrderStatus, { label: string; icon: typeof Clock; className: string }>;
 
-const getStatusConfig = (status: string) => {
-  switch (status) {
-    case "diproses":
-      return { icon: Clock, color: "text-amber-600", bg: "bg-amber-100", label: "Diproses" }
-    case "dikirim":
-      return { icon: Truck, color: "text-blue-600", bg: "bg-blue-100", label: "Dikirim" }
-    case "selesai":
-      return { icon: CheckCircle2, color: "text-emerald-600", bg: "bg-emerald-100", label: "Selesai" }
-    case "dibatalkan":
-      return { icon: XCircle, color: "text-red-600", bg: "bg-red-100", label: "Dibatalkan" }
-    default:
-      return { icon: Package, color: "text-slate-600", bg: "bg-slate-100", label: "Unknown" }
-  }
-}
+type PageProps = {
+  searchParams: Promise<{ q?: string; status?: string; page?: string }>;
+};
 
-export default function OrderHistoryPage() {
-  const [activeTab, setActiveTab] = useState("semua")
-  const [searchQuery, setSearchQuery] = useState("")
+export default async function OrderHistoryPage({ searchParams }: PageProps) {
+  const params = await searchParams;
+  const query = params.q?.trim() ?? "";
+  const currentStatus = TABS.some((tab) => tab.value === params.status) ? params.status! : "ALL";
+  const requestedPage = Number.parseInt(params.page ?? "1", 10);
+  const data = await getCustomerOrders({
+    query,
+    status: currentStatus === "ALL" ? undefined : currentStatus,
+    page: Number.isFinite(requestedPage) ? requestedPage : 1,
+  });
 
-  const filteredOrders = MOCK_ORDERS.filter((order) => {
-    const matchesTab = activeTab === "semua" || order.status === activeTab
-    const matchesSearch = order.id.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          order.items.some(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    return matchesTab && matchesSearch
-  })
+  if (!data) redirect(`/login?callbackUrl=${encodeURIComponent("/customer/orders")}`);
+
+  const totalPages = Math.max(1, Math.ceil(data.total / data.pageSize));
+  const buildHref = (overrides: { status?: string; page?: number }) => {
+    const next = new URLSearchParams();
+    if (query) next.set("q", query);
+    const status = overrides.status ?? currentStatus;
+    if (status !== "ALL") next.set("status", status);
+    const page = overrides.page ?? 1;
+    if (page > 1) next.set("page", String(page));
+    const suffix = next.toString();
+    return suffix ? `/customer/orders?${suffix}` : "/customer/orders";
+  };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full min-h-screen">
-      <div className="mb-8">
-        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Riwayat Pesanan</h1>
-        <p className="text-slate-500 mt-1">Lacak dan kelola semua pesanan Anda di sini.</p>
-      </div>
-
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-8">
-        {/* TABS & SEARCH */}
-        <div className="border-b border-slate-100 p-4 sm:px-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex overflow-x-auto hide-scrollbar gap-2 pb-2 md:pb-0">
-            {TABS.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={cn(
-                  "px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-colors",
-                  activeTab === tab.id 
-                    ? "bg-blue-950 text-white" 
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-          <div className="relative w-full md:w-64 flex-shrink-0">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <Input 
-              placeholder="Cari pesanan atau produk..." 
-              className="pl-9 bg-slate-50 border-slate-200 rounded-full h-10"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
+    <div className="w-full bg-slate-50">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="mb-7">
+          <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-red-600">Pesanan Saya</p>
+          <h1 className="mt-2 text-3xl sm:text-4xl font-black tracking-tight text-slate-950">Riwayat Pesanan</h1>
+          <p className="mt-2 text-slate-500">Pantau proses pesanan dan informasi pengiriman Anda secara real-time.</p>
         </div>
 
-        {/* ORDER LIST */}
-        <div className="divide-y divide-slate-100">
-          {filteredOrders.length === 0 ? (
-            <div className="py-20 text-center flex flex-col items-center">
-              <Package className="w-16 h-16 text-slate-200 mb-4" />
-              <h3 className="text-lg font-bold text-slate-900 mb-1">Pesanan Tidak Ditemukan</h3>
-              <p className="text-slate-500">Tidak ada pesanan yang cocok dengan filter Anda.</p>
+        <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="border-b border-slate-100 p-4 sm:p-5 space-y-4">
+            <form className="relative max-w-xl" action="/customer/orders">
+              {currentStatus !== "ALL" && <input type="hidden" name="status" value={currentStatus} />}
+              <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Input
+                name="q"
+                defaultValue={query}
+                maxLength={100}
+                placeholder="Cari nomor pesanan atau nama produk..."
+                className="h-11 rounded-xl border-slate-200 bg-slate-50 pl-10 focus:bg-white"
+              />
+            </form>
+
+            <nav className="flex gap-2 overflow-x-auto pb-1" aria-label="Filter status pesanan">
+              {TABS.map((tab) => (
+                <Link
+                  key={tab.value}
+                  href={buildHref({ status: tab.value })}
+                  className={cn(
+                    "shrink-0 rounded-full px-4 py-2 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900",
+                    currentStatus === tab.value
+                      ? "bg-slate-950 text-white"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  )}
+                >
+                  {tab.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+
+          {data.orders.length === 0 ? (
+            <div className="flex flex-col items-center px-6 py-20 text-center">
+              <div className="mb-4 rounded-2xl bg-slate-100 p-4 text-slate-300">
+                <Package className="h-10 w-10" />
+              </div>
+              <h2 className="text-lg font-extrabold text-slate-900">Pesanan tidak ditemukan</h2>
+              <p className="mt-1 max-w-sm text-sm text-slate-500">Coba gunakan kata kunci atau filter status yang berbeda.</p>
             </div>
           ) : (
-            filteredOrders.map((order) => {
-              const statusConfig = getStatusConfig(order.status)
-              const StatusIcon = statusConfig.icon
-              const remainingItemsCount = order.items.length - 1
-
-              return (
-                <div key={order.id} className="p-4 sm:p-6 hover:bg-slate-50 transition-colors">
-                  
-                  {/* Header */}
-                  <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className={cn("px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-1.5", statusConfig.bg, statusConfig.color)}>
-                        <StatusIcon className="w-3.5 h-3.5" />
-                        {statusConfig.label}
+            <div className="divide-y divide-slate-100">
+              {data.orders.map((order) => {
+                const status = STATUS_CONFIG[order.status];
+                const StatusIcon = status.icon;
+                const firstItem = order.items[0];
+                const shippingSummary = [order.courier?.trim(), order.trackingNumber?.trim()]
+                  .filter(Boolean)
+                  .join(" · ");
+                return (
+                  <article key={order.id} className="p-4 sm:p-6 transition-colors hover:bg-slate-50/80">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        <span className={cn("inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-extrabold", status.className)}>
+                          <StatusIcon className="h-3.5 w-3.5" />
+                          {status.label}
+                        </span>
+                        <span className="font-mono text-xs font-bold text-slate-700">{order.orderNumber}</span>
+                        <span className="text-xs text-slate-400">
+                          {new Date(order.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
+                        </span>
                       </div>
-                      <span className="text-sm font-medium text-slate-500">{order.date}</span>
-                      <span className="text-slate-300 hidden sm:inline">•</span>
-                      <span className="text-sm font-bold text-slate-700 hidden sm:inline">{order.id}</span>
+                      <p className="text-lg font-black text-slate-950">Rp {order.totalAmount.toLocaleString("id-ID")}</p>
                     </div>
-                  </div>
 
-                  {/* Main Product Info */}
-                  <div className="flex gap-4">
-                    <div className="w-20 h-20 bg-slate-100 rounded-xl border border-slate-200 flex-shrink-0 flex items-center justify-center relative overflow-hidden">
-                      <div className="absolute inset-0 bg-blue-900 opacity-5"></div>
-                      <Package className="w-8 h-8 text-slate-300" />
-                    </div>
-                    
-                    <div className="flex-1 min-w-0 flex flex-col justify-center">
-                      <h4 className="text-base font-bold text-slate-900 line-clamp-1 mb-1">
-                        {order.items[0].name}
-                      </h4>
-                      <p className="text-sm text-slate-500 mb-1">
-                        {order.items[0].qty} Barang
-                      </p>
-                      {remainingItemsCount > 0 && (
-                        <p className="text-xs font-medium text-blue-600 bg-blue-50 w-fit px-2 py-0.5 rounded">
-                          + {remainingItemsCount} produk lainnya
+                    <div className="mt-5 flex items-center gap-4">
+                      <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-slate-100 text-slate-300">
+                        <Package className="h-7 w-7" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h2 className="truncate font-extrabold text-slate-900">{firstItem?.name ?? "Pesanan DML"}</h2>
+                        <p className="mt-1 text-sm text-slate-500">
+                          {firstItem?.qty ?? 0} barang
+                          {order.items.length > 1 && ` · +${order.items.length - 1} produk lainnya`}
                         </p>
-                      )}
+                        {order.status === OrderStatus.SHIPPED && shippingSummary && (
+                          <p className="mt-2 flex items-center gap-1.5 text-xs font-bold text-indigo-700">
+                            <Truck className="h-3.5 w-3.5" />
+                            {shippingSummary}
+                          </p>
+                        )}
+                      </div>
+                      <Link href={`/customer/orders/${order.id}`} className="shrink-0">
+                        <Button className="bg-slate-950 font-bold text-white hover:bg-slate-800">
+                          <span className="hidden sm:inline">Lihat Detail</span>
+                          <ChevronRight className="h-4 w-4 sm:ml-1" />
+                        </Button>
+                      </Link>
                     </div>
-
-                    <div className="hidden sm:flex flex-col items-end justify-center pl-4 border-l border-slate-100 ml-4 min-w-[120px]">
-                      <span className="text-xs font-medium text-slate-500 mb-1">Total Belanja</span>
-                      <span className="text-lg font-extrabold text-blue-950">
-                        Rp {order.totalAmount.toLocaleString("id-ID")}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Mobile Total (visible only on small screens) */}
-                  <div className="mt-4 flex sm:hidden justify-between items-center bg-slate-100 p-3 rounded-lg">
-                    <span className="text-xs font-medium text-slate-500">Total Belanja</span>
-                    <span className="text-base font-extrabold text-blue-950">
-                      Rp {order.totalAmount.toLocaleString("id-ID")}
-                    </span>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
-                    {order.status === "selesai" && (
-                      <Button variant="outline" className="font-semibold text-slate-700">
-                        Beli Lagi
-                      </Button>
-                    )}
-                    {order.status === "dikirim" && (
-                      <Button variant="outline" className="font-semibold text-emerald-700 border-emerald-200 bg-emerald-50 hover:bg-emerald-100">
-                        Lacak Pengiriman
-                      </Button>
-                    )}
-                    <Link href={`/customer/orders/${order.id}`}>
-                      <Button className="font-bold bg-slate-900 hover:bg-slate-800 text-white w-full sm:w-auto">
-                        Lihat Detail
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-              )
-            })
+                  </article>
+                );
+              })}
+            </div>
           )}
-        </div>
+
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between border-t border-slate-100 px-4 py-4 sm:px-6">
+              <p className="text-xs font-semibold text-slate-500">
+                Halaman {data.page} dari {totalPages} · {data.total} pesanan
+              </p>
+              <div className="flex gap-2">
+                {data.page <= 1 ? (
+                  <Button variant="outline" size="sm" disabled>
+                    <ChevronLeft className="h-4 w-4" /> Sebelumnya
+                  </Button>
+                ) : (
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href={buildHref({ page: data.page - 1 })}>
+                      <ChevronLeft className="h-4 w-4" /> Sebelumnya
+                    </Link>
+                  </Button>
+                )}
+                {data.page >= totalPages ? (
+                  <Button variant="outline" size="sm" disabled>
+                    Selanjutnya <ChevronRight className="h-4 w-4" />
+                  </Button>
+                ) : (
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href={buildHref({ page: data.page + 1 })}>
+                      Selanjutnya <ChevronRight className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+        </section>
       </div>
     </div>
-  )
+  );
 }
