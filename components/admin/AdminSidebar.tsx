@@ -18,6 +18,7 @@ import {
   Layers,
   Tag,
   Wallet,
+  Gift,
 } from "lucide-react";
 
 const navigation = [
@@ -26,6 +27,7 @@ const navigation = [
   { name: "Kategori", href: "/admin/categories", icon: Layers },
   { name: "Harga Bertingkat", href: "/admin/pricing", icon: Tag },
   { name: "Pesanan", href: "/admin/orders", icon: ShoppingCart },
+  { name: "Kode Voucher", href: "/admin/vouchers", icon: Gift },
   { name: "RFQ", href: "/admin/quotes", icon: FileText },
   { name: "Akun & Pengguna", href: "/admin/accounts", icon: Users },
   { name: "Verifikasi Akun", href: "/admin/verifications", icon: ShieldCheck },

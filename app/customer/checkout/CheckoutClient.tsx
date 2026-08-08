@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { createCheckoutSession } from "@/lib/actions/checkout"
+import { validateVoucher } from "@/lib/actions/vouchers"
 import {
   ArrowLeft,
   MapPin,
@@ -72,6 +73,8 @@ export function CheckoutClient({ addresses, cartItems }: CheckoutClientProps) {
   const [isProcessing, setIsProcessing] = useState(false)
   const [promoCode, setPromoCode] = useState("")
   const [promoApplied, setPromoApplied] = useState(false)
+  const [promoDiscount, setPromoDiscount] = useState(0)
+  const [isValidatingPromo, setIsValidatingPromo] = useState(false)
   const [isLoadingShipping, setIsLoadingShipping] = useState(true)
 
   const selectedAddress = addresses.length > 0 ? addresses[0] : null;
@@ -141,12 +144,35 @@ export function CheckoutClient({ addresses, cartItems }: CheckoutClientProps) {
     return acc + (item.qty * calcUnitPrice(item));
   }, 0)
   const shippingCost = shippingMethods.find(s => s.id === shipping)?.price || 0
-  const discount = promoApplied ? 50000 : 0
+  const discount = promoApplied ? promoDiscount : 0
   const insurance = 2500 // fixed mock insurance
   const total = subtotal + shippingCost + insurance - discount
 
-  const handleApplyPromo = () => {
-    if (promoCode.trim()) setPromoApplied(true)
+  const handleApplyPromo = async () => {
+    if (!promoCode.trim()) return
+
+    setIsValidatingPromo(true)
+    try {
+      const res = await validateVoucher(promoCode, subtotal)
+      if (res.success && res.discountAmount !== undefined) {
+        setPromoDiscount(res.discountAmount)
+        setPromoApplied(true)
+        alert(`Kode promo berhasil digunakan! Anda hemat Rp ${res.discountAmount.toLocaleString("id-ID")}`)
+      } else {
+        alert(res.error || "Gagal memvalidasi kode promo")
+      }
+    } catch (err) {
+      console.error(err)
+      alert("Terjadi kesalahan saat memvalidasi kode promo")
+    } finally {
+      setIsValidatingPromo(false)
+    }
+  }
+
+  const handleRemovePromo = () => {
+    setPromoApplied(false)
+    setPromoDiscount(0)
+    setPromoCode("")
   }
 
   const handlePayment = async () => {
@@ -162,7 +188,8 @@ export function CheckoutClient({ addresses, cartItems }: CheckoutClientProps) {
         addressId: selectedAddress.id,
         courier: selectedMethod?.name || 'Reguler',
         shippingService: selectedMethod?.name || 'Reguler',
-        shippingFee: shippingCost
+        shippingFee: shippingCost,
+        voucherCode: promoApplied ? promoCode : undefined
       })
 
       if (res.success && res.paymentUrl) {
@@ -397,7 +424,14 @@ export function CheckoutClient({ addresses, cartItems }: CheckoutClientProps) {
 
                 {/* PROMO CODE */}
                 <div className="mb-6">
-                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 block">Gunakan Kode Promo</label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">Gunakan Kode Promo</label>
+                    {promoApplied && (
+                      <button onClick={handleRemovePromo} className="text-xs font-bold text-red-600 hover:text-red-700">
+                        Hapus Promo
+                      </button>
+                    )}
+                  </div>
                   <div className="flex gap-2">
                     <div className="relative flex-1">
                       <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -405,17 +439,17 @@ export function CheckoutClient({ addresses, cartItems }: CheckoutClientProps) {
                         placeholder="Contoh: DMLPROMO"
                         className="pl-9 bg-slate-50"
                         value={promoCode}
-                        onChange={(e) => setPromoCode(e.target.value)}
-                        disabled={promoApplied}
+                        onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                        disabled={promoApplied || isValidatingPromo}
                       />
                     </div>
                     <Button
                       variant={promoApplied ? "secondary" : "default"}
                       onClick={handleApplyPromo}
-                      disabled={promoApplied || !promoCode.trim()}
+                      disabled={promoApplied || !promoCode.trim() || isValidatingPromo}
                       className={promoApplied ? "bg-emerald-100 text-emerald-700" : "bg-slate-900"}
                     >
-                      {promoApplied ? "Terpakai" : "Pakai"}
+                      {isValidatingPromo ? "Cek..." : promoApplied ? "Terpakai" : "Pakai"}
                     </Button>
                   </div>
                 </div>

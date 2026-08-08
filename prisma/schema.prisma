@@ -16,6 +16,11 @@ datasource db {
 // ENUMS
 // ============================================
 
+enum DiscountType {
+  PERCENTAGE
+  FIXED
+}
+
 enum Role {
   CUSTOMER
   BUSINESS
@@ -331,6 +336,8 @@ model Order {
   status        OrderStatus        @default(PENDING)
   totalAmount     Decimal            @db.Decimal(12, 2)
   shippingFee     Decimal            @default(0) @db.Decimal(12, 2)
+  discountAmount  Decimal            @default(0) @db.Decimal(12, 2)
+  voucherCode     String?
   courier         String?
   shippingService String?
   trackingNumber  String?
@@ -342,9 +349,11 @@ model Order {
   address Address     @relation(fields: [addressId], references: [id])
   items   OrderItem[]
   payment Payment?
+  voucher Voucher?    @relation(fields: [voucherCode], references: [code])
 
   @@index([userId])
   @@index([status])
+  @@index([voucherCode])
   @@map("orders")
 }
 
@@ -560,4 +569,29 @@ model SiteSetting {
   updatedAt DateTime @updatedAt
 
   @@map("site_settings")
+}
+
+// ============================================
+// VOUCHER / PROMO
+// ============================================
+
+model Voucher {
+  id            String       @id @default(cuid())
+  code          String       @unique
+  discountType  DiscountType
+  discountValue Decimal      @db.Decimal(12, 2) // persentase (e.g. 10 untuk 10%) atau nominal
+  minPurchase   Decimal      @default(0) @db.Decimal(12, 2)
+  maxDiscount   Decimal?     @db.Decimal(12, 2) // berguna jika tipe PERCENTAGE
+  validFrom     DateTime?
+  validUntil    DateTime?
+  usageLimit    Int?         // Kuota maksimal dipakai oleh seluruh customer
+  usageCount    Int          @default(0)
+  isActive      Boolean      @default(true)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  orders        Order[]
+
+  @@index([code])
+  @@map("vouchers")
 }

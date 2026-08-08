@@ -9,6 +9,14 @@
 * 🟢 You can import this file directly.
 */
 
+export const DiscountType = {
+  PERCENTAGE: 'PERCENTAGE',
+  FIXED: 'FIXED'
+} as const
+
+export type DiscountType = (typeof DiscountType)[keyof typeof DiscountType]
+
+
 export const Role = {
   CUSTOMER: 'CUSTOMER',
   BUSINESS: 'BUSINESS',

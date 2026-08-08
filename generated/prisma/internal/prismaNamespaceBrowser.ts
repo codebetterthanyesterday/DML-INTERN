@@ -71,7 +71,8 @@ export const ModelName = {
   Notification: 'Notification',
   AuditLog: 'AuditLog',
   StockLog: 'StockLog',
-  SiteSetting: 'SiteSetting'
+  SiteSetting: 'SiteSetting',
+  Voucher: 'Voucher'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -223,6 +224,8 @@ export const OrderScalarFieldEnum = {
   status: 'status',
   totalAmount: 'totalAmount',
   shippingFee: 'shippingFee',
+  discountAmount: 'discountAmount',
+  voucherCode: 'voucherCode',
   courier: 'courier',
   shippingService: 'shippingService',
   trackingNumber: 'trackingNumber',
@@ -386,6 +389,25 @@ export const SiteSettingScalarFieldEnum = {
 } as const
 
 export type SiteSettingScalarFieldEnum = (typeof SiteSettingScalarFieldEnum)[keyof typeof SiteSettingScalarFieldEnum]
+
+
+export const VoucherScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  discountType: 'discountType',
+  discountValue: 'discountValue',
+  minPurchase: 'minPurchase',
+  maxDiscount: 'maxDiscount',
+  validFrom: 'validFrom',
+  validUntil: 'validUntil',
+  usageLimit: 'usageLimit',
+  usageCount: 'usageCount',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VoucherScalarFieldEnum = (typeof VoucherScalarFieldEnum)[keyof typeof VoucherScalarFieldEnum]
 
 
 export const SortOrder = {

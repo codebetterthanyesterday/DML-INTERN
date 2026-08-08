@@ -146,3 +146,8 @@ export type StockLog = Prisma.StockLogModel
  * 
  */
 export type SiteSetting = Prisma.SiteSettingModel
+/**
+ * Model Voucher
+ * 
+ */
+export type Voucher = Prisma.VoucherModel

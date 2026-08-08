@@ -10,12 +10,14 @@ export async function createCheckoutSession({
   addressId,
   courier,
   shippingService,
-  shippingFee
+  shippingFee,
+  voucherCode
 }: {
   addressId: string,
   courier: string,
   shippingService: string,
-  shippingFee: number
+  shippingFee: number,
+  voucherCode?: string
 }) {
   try {
     const session = await auth()
@@ -74,13 +76,67 @@ export async function createCheckoutSession({
       return acc + (calcUnitPrice(item) * item.qty)
     }, 0)
 
-    const totalAmount = subtotal + shippingFee
-
-    // Generate Order Number
-    const orderNumber = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`
+    let discountAmount = 0
+    let validVoucherCode: string | null = null
 
     // Start Transaction
     const { order, payment } = await prisma.$transaction(async (tx) => {
+      
+      // If a voucher is provided, validate and apply inside transaction
+      if (voucherCode) {
+        const voucher = await tx.voucher.findUnique({
+          where: { code: voucherCode.toUpperCase() }
+        })
+
+        if (!voucher) {
+          throw new Error("Kode promo tidak ditemukan.")
+        }
+        if (!voucher.isActive) {
+          throw new Error("Kode promo sudah tidak aktif.")
+        }
+        const now = new Date()
+        if (voucher.validFrom && now < voucher.validFrom) {
+          throw new Error("Kode promo belum dapat digunakan.")
+        }
+        if (voucher.validUntil && now > voucher.validUntil) {
+          throw new Error("Kode promo telah kadaluarsa.")
+        }
+        if (voucher.usageLimit !== null && voucher.usageCount >= voucher.usageLimit) {
+          throw new Error("Kuota penggunaan kode promo sudah habis.")
+        }
+        const minPurchase = voucher.minPurchase.toNumber()
+        if (subtotal < minPurchase) {
+          throw new Error(`Minimal pembelian untuk promo ini adalah Rp ${minPurchase.toLocaleString("id-ID")}`)
+        }
+
+        const val = voucher.discountValue.toNumber()
+        if (voucher.discountType === "FIXED") {
+          discountAmount = val
+        } else {
+          discountAmount = (subtotal * val) / 100
+          const maxDiscount = voucher.maxDiscount ? voucher.maxDiscount.toNumber() : null
+          if (maxDiscount !== null && discountAmount > maxDiscount) {
+            discountAmount = maxDiscount
+          }
+        }
+
+        if (discountAmount > subtotal) {
+          discountAmount = subtotal
+        }
+
+        validVoucherCode = voucher.code
+
+        // Increment usage count
+        await tx.voucher.update({
+          where: { id: voucher.id },
+          data: { usageCount: { increment: 1 } }
+        })
+      }
+
+      const totalAmount = subtotal + shippingFee - discountAmount
+      // Generate Order Number
+      const orderNumber = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`
+
       const newOrder = await tx.order.create({
         data: {
           userId,
@@ -88,6 +144,8 @@ export async function createCheckoutSession({
           orderNumber,
           totalAmount,
           shippingFee,
+          discountAmount,
+          voucherCode: validVoucherCode,
           courier,
           shippingService,
           items: {
@@ -103,7 +161,7 @@ export async function createCheckoutSession({
       // Create Xendit Invoice
       const invoiceData = {
         externalId: newOrder.orderNumber,
-        amount: totalAmount,
+        amount: Number(newOrder.totalAmount),
         payerEmail: session.user?.email || "customer@dml.com",
         description: `Order ${newOrder.orderNumber} from DML`,
         successRedirectUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/customer/checkout/success?order_id=${newOrder.id}`,
@@ -116,7 +174,7 @@ export async function createCheckoutSession({
         data: {
           orderId: newOrder.id,
           method: PaymentMethod.GATEWAY,
-          amount: totalAmount,
+          amount: Number(newOrder.totalAmount),
           gatewayRef: invoice.id,
           paymentUrl: invoice.invoiceUrl
         }
@@ -140,8 +198,8 @@ export async function createCheckoutSession({
 
     return { success: true, paymentUrl: payment.paymentUrl }
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Checkout error:", error)
-    return { success: false, error: "Terjadi kesalahan saat membuat sesi pembayaran" }
+    return { success: false, error: error.message || "Terjadi kesalahan saat membuat sesi pembayaran" }
   }
 }
