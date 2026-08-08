@@ -17,6 +17,7 @@ import {
   Settings,
   Layers,
   Tag,
+  Wallet,
 } from "lucide-react";
 
 const navigation = [
@@ -28,6 +29,7 @@ const navigation = [
   { name: "RFQ", href: "/admin/quotes", icon: FileText },
   { name: "Akun & Pengguna", href: "/admin/accounts", icon: Users },
   { name: "Verifikasi Akun", href: "/admin/verifications", icon: ShieldCheck },
+  { name: "Verifikasi Pembayaran", href: "/admin/payments", icon: Wallet },
   { name: "Laporan", href: "/admin/reports", icon: BarChart3 },
 ];
 
