@@ -2243,6 +2243,9 @@ export const OrderScalarFieldEnum = {
   courier: 'courier',
   shippingService: 'shippingService',
   trackingNumber: 'trackingNumber',
+  deliveryNoteUrl: 'deliveryNoteUrl',
+  deliveryNoteName: 'deliveryNoteName',
+  shippedAt: 'shippedAt',
   paymentStatus: 'paymentStatus',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

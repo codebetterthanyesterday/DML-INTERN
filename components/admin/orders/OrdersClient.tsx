@@ -2,9 +2,9 @@
 
 import { useState, useTransition } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -32,12 +32,14 @@ import {
   RefreshCw,
   Phone,
   Mail,
-  ArrowLeft,
+  FileText,
+  UploadCloud,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import type { SerializedOrder } from "@/lib/actions/orders";
 import { updateOrderStatus } from "@/lib/actions/orders";
 import { OrderStatus } from "@prisma/client/browser";
+import { upload } from "@vercel/blob/client";
 
 // ─── Status config ─────────────────────────────────────────────────────────
 
@@ -125,23 +127,78 @@ function OrderDetailPanel({
 }) {
   const [isPending, startTransition] = useTransition();
   const [selectedStatus, setSelectedStatus] = useState<OrderStatus>(order.status as OrderStatus);
-  const [trackingNumber, setTrackingNumber] = useState<string>("");
+  const [courier, setCourier] = useState(order.courier ?? "");
+  const [trackingNumber, setTrackingNumber] = useState(order.trackingNumber ?? "");
+  const [deliveryNoteFile, setDeliveryNoteFile] = useState<File | null>(null);
+  const [uploadedDeliveryNote, setUploadedDeliveryNote] = useState<{
+    url: string;
+    name: string;
+  } | null>(null);
+  const router = useRouter();
 
   const cfg = STATUS_CONFIG[order.status];
   const nextStatuses = cfg?.next ?? [];
 
   const handleStatusUpdate = () => {
-    if (selectedStatus === order.status) return;
-    
+    if (selectedStatus === order.status && selectedStatus !== OrderStatus.SHIPPED) return;
+
     startTransition(async () => {
-      const result = await updateOrderStatus(order.id, selectedStatus, trackingNumber);
-      if (result.success) {
-        toast.success("Status pesanan berhasil diperbarui!");
-        setTrackingNumber(""); // reset
-      } else {
-        toast.error(result.error ?? "Terjadi kesalahan.");
+      try {
+        let deliveryNote = uploadedDeliveryNote;
+        if (selectedStatus === OrderStatus.SHIPPED && !deliveryNote && deliveryNoteFile) {
+          const blob = await upload(
+            `delivery-notes/${order.orderNumber}/${deliveryNoteFile.name}`,
+            deliveryNoteFile,
+            {
+              access: "private",
+              handleUploadUrl: "/api/blob/delivery-notes",
+              clientPayload: JSON.stringify({ orderId: order.id }),
+            }
+          );
+          deliveryNote = { url: blob.url, name: deliveryNoteFile.name };
+          setUploadedDeliveryNote(deliveryNote);
+        }
+
+        const result = await updateOrderStatus({
+          orderId: order.id,
+          status: selectedStatus,
+          ...(selectedStatus === OrderStatus.SHIPPED
+            ? {
+                courier,
+                trackingNumber,
+                deliveryNoteUrl: deliveryNote?.url,
+                deliveryNoteName: deliveryNote?.name,
+              }
+            : {}),
+        });
+        if (result.success) {
+          toast.success(selectedStatus === OrderStatus.SHIPPED
+            ? "Data pengiriman berhasil disimpan."
+            : "Status pesanan berhasil diperbarui.");
+          onClose();
+          router.refresh();
+        } else {
+          toast.error(result.error ?? "Terjadi kesalahan.");
+        }
+      } catch (error) {
+        console.error("Shipment update error:", error);
+        toast.error(error instanceof Error ? error.message : "Gagal menyimpan data pengiriman.");
       }
     });
+  };
+
+  const handleDeliveryNoteChange = (file: File | undefined) => {
+    if (!file) return;
+    if (!["application/pdf", "image/jpeg", "image/png"].includes(file.type)) {
+      toast.error("Surat jalan harus berupa PDF, JPG, atau PNG.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Ukuran surat jalan maksimal 5 MB.");
+      return;
+    }
+    setDeliveryNoteFile(file);
+    setUploadedDeliveryNote(null);
   };
 
   const createdAt = new Date(order.createdAt);
@@ -186,6 +243,36 @@ function OrderDetailPanel({
             </span>
           )}
         </div>
+
+        {order.status === OrderStatus.SHIPPED && (
+          <div className="rounded-xl border border-indigo-200 bg-indigo-50/60 overflow-hidden">
+            <div className="px-4 py-2.5 bg-white/80 border-b border-indigo-100 flex items-center gap-2">
+              <Truck className="w-3.5 h-3.5 text-indigo-600" />
+              <span className="text-xs font-extrabold text-indigo-900 uppercase tracking-widest">Data Pengiriman</span>
+            </div>
+            <dl className="px-4 py-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
+              <dt className="text-slate-500">Kurir</dt>
+              <dd className="font-bold text-slate-950 text-right">{order.courier}</dd>
+              <dt className="text-slate-500">Nomor resi</dt>
+              <dd className="font-mono font-bold text-slate-950 text-right break-all">{order.trackingNumber}</dd>
+              <dt className="text-slate-500">Surat jalan</dt>
+              <dd className="text-right">
+                {order.deliveryNoteName ? (
+                  <a
+                    href={`/api/orders/${order.id}/delivery-note`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-bold text-indigo-700 hover:text-indigo-900 hover:underline"
+                  >
+                    {order.deliveryNoteName}
+                  </a>
+                ) : (
+                  <span className="font-semibold text-amber-700">Belum tersedia</span>
+                )}
+              </dd>
+            </dl>
+          </div>
+        )}
 
         {/* Buyer */}
         <div className="rounded-xl border border-slate-200 bg-slate-50 overflow-hidden">
@@ -315,24 +402,94 @@ function OrderDetailPanel({
               </Select>
               <Button
                 onClick={handleStatusUpdate}
-                disabled={isPending || selectedStatus === order.status || (selectedStatus === "SHIPPED" && !trackingNumber)}
+                disabled={
+                  isPending ||
+                  (selectedStatus === order.status && selectedStatus !== OrderStatus.SHIPPED) ||
+                  (selectedStatus === OrderStatus.SHIPPED &&
+                    (!courier.trim() ||
+                      !trackingNumber.trim() ||
+                      (!deliveryNoteFile && !order.deliveryNoteName)))
+                }
                 className="bg-red-600 hover:bg-red-700 text-white font-bold shadow-sm shadow-red-600/20 px-4"
               >
                 {isPending ? (
                   <RefreshCw className="w-4 h-4 animate-spin" />
                 ) : (
-                  "Simpan"
+                  selectedStatus === OrderStatus.SHIPPED ? "Simpan Pengiriman" : "Simpan"
                 )}
               </Button>
             </div>
             
-            {selectedStatus === "SHIPPED" && (
-              <Input
-                placeholder="Masukkan Nomor Resi Pengiriman"
-                value={trackingNumber}
-                onChange={(e) => setTrackingNumber(e.target.value)}
-                className="text-sm"
-              />
+            {selectedStatus === OrderStatus.SHIPPED && (
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="rounded-lg bg-indigo-100 p-2 text-indigo-700">
+                    <Truck className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-extrabold text-slate-950">Lengkapi data pengiriman</p>
+                    <p className="text-xs text-slate-500 mt-0.5">Data ini akan langsung terlihat oleh customer.</p>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor={`courier-${order.id}`} className="text-xs font-bold text-slate-700">
+                    Kurir
+                  </Label>
+                  <Input
+                    id={`courier-${order.id}`}
+                    placeholder="Contoh: JNE, J&T, SiCepat"
+                    value={courier}
+                    onChange={(event) => setCourier(event.target.value)}
+                    maxLength={100}
+                    disabled={isPending}
+                    className="bg-white text-sm"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor={`tracking-${order.id}`} className="text-xs font-bold text-slate-700">
+                    Nomor resi
+                  </Label>
+                  <Input
+                    id={`tracking-${order.id}`}
+                    placeholder="Masukkan nomor resi pengiriman"
+                    value={trackingNumber}
+                    onChange={(event) => setTrackingNumber(event.target.value)}
+                    maxLength={100}
+                    disabled={isPending}
+                    className="bg-white font-mono text-sm"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor={`delivery-note-${order.id}`} className="text-xs font-bold text-slate-700">
+                    Surat jalan
+                  </Label>
+                  <label
+                    htmlFor={`delivery-note-${order.id}`}
+                    className="flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-slate-300 bg-white p-3 hover:border-indigo-400 hover:bg-indigo-50/40 transition-colors"
+                  >
+                    <div className="rounded-lg bg-slate-100 p-2 text-slate-500">
+                      {deliveryNoteFile ? <FileText className="w-4 h-4" /> : <UploadCloud className="w-4 h-4" />}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-xs font-bold text-slate-800">
+                        {deliveryNoteFile?.name ?? "Pilih dokumen"}
+                      </p>
+                      <p className="text-[11px] text-slate-400">PDF, JPG, atau PNG · Maks. 5 MB</p>
+                    </div>
+                  </label>
+                  <input
+                    id={`delivery-note-${order.id}`}
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                    onChange={(event) => handleDeliveryNoteChange(event.target.files?.[0])}
+                    disabled={isPending}
+                    className="sr-only"
+                  />
+                </div>
+              </div>
             )}
           </div>
         </div>
