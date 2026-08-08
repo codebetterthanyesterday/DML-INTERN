@@ -341,6 +341,7 @@ model Order {
   courier         String?
   shippingService String?
   trackingNumber  String?
+  deliveryNote    String?
   paymentStatus   OrderPaymentStatus @default(UNPAID)
   createdAt     DateTime           @default(now())
   updatedAt     DateTime           @updatedAt
