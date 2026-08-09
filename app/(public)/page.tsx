@@ -30,9 +30,6 @@ export default async function LandingPage() {
       images: {
         take: 1,
         orderBy: { displayOrder: 'asc' }
-      },
-      reviews: {
-        select: { rating: true }
       }
     },
     orderBy: { createdAt: 'desc' }
@@ -129,9 +126,7 @@ export default async function LandingPage() {
               </Link>
             )}
             {featuredProducts.map((product) => {
-              const avgRating = product.reviews.length > 0
-                ? (product.reviews.reduce((acc, r) => acc + r.rating, 0) / product.reviews.length).toFixed(1)
-                : '0.0'
+              const avgRating = '0.0'
 
               const priceDisplay = product.price
                 ? new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(Number(product.price))

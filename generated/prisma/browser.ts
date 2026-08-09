@@ -132,3 +132,8 @@ export type Complaint = Prisma.ComplaintModel
  * 
  */
 export type ComplaintItem = Prisma.ComplaintItemModel
+/**
+ * Model Review
+ * 
+ */
+export type Review = Prisma.ReviewModel

@@ -73,7 +73,8 @@ export const ModelName = {
   SiteSetting: 'SiteSetting',
   Voucher: 'Voucher',
   Complaint: 'Complaint',
-  ComplaintItem: 'ComplaintItem'
+  ComplaintItem: 'ComplaintItem',
+  Review: 'Review'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -427,6 +428,24 @@ export const ComplaintItemScalarFieldEnum = {
 } as const
 
 export type ComplaintItemScalarFieldEnum = (typeof ComplaintItemScalarFieldEnum)[keyof typeof ComplaintItemScalarFieldEnum]
+
+
+export const ReviewScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  customerId: 'customerId',
+  rating: 'rating',
+  comment: 'comment',
+  images: 'images',
+  status: 'status',
+  moderatedById: 'moderatedById',
+  moderatedAt: 'moderatedAt',
+  rejectionReason: 'rejectionReason',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReviewScalarFieldEnum = (typeof ReviewScalarFieldEnum)[keyof typeof ReviewScalarFieldEnum]
 
 
 export const SortOrder = {
