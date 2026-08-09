@@ -34,6 +34,10 @@ export type ComplaintMinAggregateOutputType = {
   description: string | null
   proofUrl: string | null
   adminNotes: string | null
+  requiresReturn: boolean | null
+  replacementCourier: string | null
+  replacementTrackingNumber: string | null
+  replacementShippedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -48,6 +52,10 @@ export type ComplaintMaxAggregateOutputType = {
   description: string | null
   proofUrl: string | null
   adminNotes: string | null
+  requiresReturn: boolean | null
+  replacementCourier: string | null
+  replacementTrackingNumber: string | null
+  replacementShippedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -62,6 +70,10 @@ export type ComplaintCountAggregateOutputType = {
   description: number
   proofUrl: number
   adminNotes: number
+  requiresReturn: number
+  replacementCourier: number
+  replacementTrackingNumber: number
+  replacementShippedAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -78,6 +90,10 @@ export type ComplaintMinAggregateInputType = {
   description?: true
   proofUrl?: true
   adminNotes?: true
+  requiresReturn?: true
+  replacementCourier?: true
+  replacementTrackingNumber?: true
+  replacementShippedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -92,6 +108,10 @@ export type ComplaintMaxAggregateInputType = {
   description?: true
   proofUrl?: true
   adminNotes?: true
+  requiresReturn?: true
+  replacementCourier?: true
+  replacementTrackingNumber?: true
+  replacementShippedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -106,6 +126,10 @@ export type ComplaintCountAggregateInputType = {
   description?: true
   proofUrl?: true
   adminNotes?: true
+  requiresReturn?: true
+  replacementCourier?: true
+  replacementTrackingNumber?: true
+  replacementShippedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -193,6 +217,10 @@ export type ComplaintGroupByOutputType = {
   description: string | null
   proofUrl: string | null
   adminNotes: string | null
+  requiresReturn: boolean
+  replacementCourier: string | null
+  replacementTrackingNumber: string | null
+  replacementShippedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: ComplaintCountAggregateOutputType | null
@@ -228,11 +256,17 @@ export type ComplaintWhereInput = {
   description?: Prisma.StringNullableFilter<"Complaint"> | string | null
   proofUrl?: Prisma.StringNullableFilter<"Complaint"> | string | null
   adminNotes?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  requiresReturn?: Prisma.BoolFilter<"Complaint"> | boolean
+  replacementCourier?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  replacementTrackingNumber?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  replacementShippedAt?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Complaint"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Complaint"> | Date | string
   order?: Prisma.XOR<Prisma.OrderScalarRelationFilter, Prisma.OrderWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   items?: Prisma.ComplaintItemListRelationFilter
+  messages?: Prisma.ComplaintMessageListRelationFilter
+  return?: Prisma.XOR<Prisma.ReturnNullableScalarRelationFilter, Prisma.ReturnWhereInput> | null
 }
 
 export type ComplaintOrderByWithRelationInput = {
@@ -245,11 +279,17 @@ export type ComplaintOrderByWithRelationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   proofUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   adminNotes?: Prisma.SortOrderInput | Prisma.SortOrder
+  requiresReturn?: Prisma.SortOrder
+  replacementCourier?: Prisma.SortOrderInput | Prisma.SortOrder
+  replacementTrackingNumber?: Prisma.SortOrderInput | Prisma.SortOrder
+  replacementShippedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   order?: Prisma.OrderOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
   items?: Prisma.ComplaintItemOrderByRelationAggregateInput
+  messages?: Prisma.ComplaintMessageOrderByRelationAggregateInput
+  return?: Prisma.ReturnOrderByWithRelationInput
 }
 
 export type ComplaintWhereUniqueInput = Prisma.AtLeast<{
@@ -265,11 +305,17 @@ export type ComplaintWhereUniqueInput = Prisma.AtLeast<{
   description?: Prisma.StringNullableFilter<"Complaint"> | string | null
   proofUrl?: Prisma.StringNullableFilter<"Complaint"> | string | null
   adminNotes?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  requiresReturn?: Prisma.BoolFilter<"Complaint"> | boolean
+  replacementCourier?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  replacementTrackingNumber?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  replacementShippedAt?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Complaint"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Complaint"> | Date | string
   order?: Prisma.XOR<Prisma.OrderScalarRelationFilter, Prisma.OrderWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   items?: Prisma.ComplaintItemListRelationFilter
+  messages?: Prisma.ComplaintMessageListRelationFilter
+  return?: Prisma.XOR<Prisma.ReturnNullableScalarRelationFilter, Prisma.ReturnWhereInput> | null
 }, "id">
 
 export type ComplaintOrderByWithAggregationInput = {
@@ -282,6 +328,10 @@ export type ComplaintOrderByWithAggregationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   proofUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   adminNotes?: Prisma.SortOrderInput | Prisma.SortOrder
+  requiresReturn?: Prisma.SortOrder
+  replacementCourier?: Prisma.SortOrderInput | Prisma.SortOrder
+  replacementTrackingNumber?: Prisma.SortOrderInput | Prisma.SortOrder
+  replacementShippedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ComplaintCountOrderByAggregateInput
@@ -302,6 +352,10 @@ export type ComplaintScalarWhereWithAggregatesInput = {
   description?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
   proofUrl?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
   adminNotes?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
+  requiresReturn?: Prisma.BoolWithAggregatesFilter<"Complaint"> | boolean
+  replacementCourier?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
+  replacementTrackingNumber?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
+  replacementShippedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Complaint"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Complaint"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Complaint"> | Date | string
 }
@@ -314,11 +368,17 @@ export type ComplaintCreateInput = {
   description?: string | null
   proofUrl?: string | null
   adminNotes?: string | null
+  requiresReturn?: boolean
+  replacementCourier?: string | null
+  replacementTrackingNumber?: string | null
+  replacementShippedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   order: Prisma.OrderCreateNestedOneWithoutComplaintsInput
   user: Prisma.UserCreateNestedOneWithoutComplaintsInput
   items?: Prisma.ComplaintItemCreateNestedManyWithoutComplaintInput
+  messages?: Prisma.ComplaintMessageCreateNestedManyWithoutComplaintInput
+  return?: Prisma.ReturnCreateNestedOneWithoutComplaintInput
 }
 
 export type ComplaintUncheckedCreateInput = {
@@ -331,9 +391,15 @@ export type ComplaintUncheckedCreateInput = {
   description?: string | null
   proofUrl?: string | null
   adminNotes?: string | null
+  requiresReturn?: boolean
+  replacementCourier?: string | null
+  replacementTrackingNumber?: string | null
+  replacementShippedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.ComplaintItemUncheckedCreateNestedManyWithoutComplaintInput
+  messages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutComplaintInput
+  return?: Prisma.ReturnUncheckedCreateNestedOneWithoutComplaintInput
 }
 
 export type ComplaintUpdateInput = {
@@ -344,11 +410,17 @@ export type ComplaintUpdateInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiresReturn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  replacementCourier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementTrackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementShippedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   order?: Prisma.OrderUpdateOneRequiredWithoutComplaintsNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutComplaintsNestedInput
   items?: Prisma.ComplaintItemUpdateManyWithoutComplaintNestedInput
+  messages?: Prisma.ComplaintMessageUpdateManyWithoutComplaintNestedInput
+  return?: Prisma.ReturnUpdateOneWithoutComplaintNestedInput
 }
 
 export type ComplaintUncheckedUpdateInput = {
@@ -361,9 +433,15 @@ export type ComplaintUncheckedUpdateInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiresReturn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  replacementCourier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementTrackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementShippedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.ComplaintItemUncheckedUpdateManyWithoutComplaintNestedInput
+  messages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutComplaintNestedInput
+  return?: Prisma.ReturnUncheckedUpdateOneWithoutComplaintNestedInput
 }
 
 export type ComplaintCreateManyInput = {
@@ -376,6 +454,10 @@ export type ComplaintCreateManyInput = {
   description?: string | null
   proofUrl?: string | null
   adminNotes?: string | null
+  requiresReturn?: boolean
+  replacementCourier?: string | null
+  replacementTrackingNumber?: string | null
+  replacementShippedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -388,6 +470,10 @@ export type ComplaintUpdateManyMutationInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiresReturn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  replacementCourier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementTrackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementShippedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -402,6 +488,10 @@ export type ComplaintUncheckedUpdateManyInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiresReturn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  replacementCourier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementTrackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementShippedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -426,6 +516,10 @@ export type ComplaintCountOrderByAggregateInput = {
   description?: Prisma.SortOrder
   proofUrl?: Prisma.SortOrder
   adminNotes?: Prisma.SortOrder
+  requiresReturn?: Prisma.SortOrder
+  replacementCourier?: Prisma.SortOrder
+  replacementTrackingNumber?: Prisma.SortOrder
+  replacementShippedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -440,6 +534,10 @@ export type ComplaintMaxOrderByAggregateInput = {
   description?: Prisma.SortOrder
   proofUrl?: Prisma.SortOrder
   adminNotes?: Prisma.SortOrder
+  requiresReturn?: Prisma.SortOrder
+  replacementCourier?: Prisma.SortOrder
+  replacementTrackingNumber?: Prisma.SortOrder
+  replacementShippedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -454,6 +552,10 @@ export type ComplaintMinOrderByAggregateInput = {
   description?: Prisma.SortOrder
   proofUrl?: Prisma.SortOrder
   adminNotes?: Prisma.SortOrder
+  requiresReturn?: Prisma.SortOrder
+  replacementCourier?: Prisma.SortOrder
+  replacementTrackingNumber?: Prisma.SortOrder
+  replacementShippedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -555,6 +657,34 @@ export type EnumComplaintStatusFieldUpdateOperationsInput = {
   set?: $Enums.ComplaintStatus
 }
 
+export type ComplaintCreateNestedOneWithoutMessagesInput = {
+  create?: Prisma.XOR<Prisma.ComplaintCreateWithoutMessagesInput, Prisma.ComplaintUncheckedCreateWithoutMessagesInput>
+  connectOrCreate?: Prisma.ComplaintCreateOrConnectWithoutMessagesInput
+  connect?: Prisma.ComplaintWhereUniqueInput
+}
+
+export type ComplaintUpdateOneRequiredWithoutMessagesNestedInput = {
+  create?: Prisma.XOR<Prisma.ComplaintCreateWithoutMessagesInput, Prisma.ComplaintUncheckedCreateWithoutMessagesInput>
+  connectOrCreate?: Prisma.ComplaintCreateOrConnectWithoutMessagesInput
+  upsert?: Prisma.ComplaintUpsertWithoutMessagesInput
+  connect?: Prisma.ComplaintWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ComplaintUpdateToOneWithWhereWithoutMessagesInput, Prisma.ComplaintUpdateWithoutMessagesInput>, Prisma.ComplaintUncheckedUpdateWithoutMessagesInput>
+}
+
+export type ComplaintCreateNestedOneWithoutReturnInput = {
+  create?: Prisma.XOR<Prisma.ComplaintCreateWithoutReturnInput, Prisma.ComplaintUncheckedCreateWithoutReturnInput>
+  connectOrCreate?: Prisma.ComplaintCreateOrConnectWithoutReturnInput
+  connect?: Prisma.ComplaintWhereUniqueInput
+}
+
+export type ComplaintUpdateOneRequiredWithoutReturnNestedInput = {
+  create?: Prisma.XOR<Prisma.ComplaintCreateWithoutReturnInput, Prisma.ComplaintUncheckedCreateWithoutReturnInput>
+  connectOrCreate?: Prisma.ComplaintCreateOrConnectWithoutReturnInput
+  upsert?: Prisma.ComplaintUpsertWithoutReturnInput
+  connect?: Prisma.ComplaintWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ComplaintUpdateToOneWithWhereWithoutReturnInput, Prisma.ComplaintUpdateWithoutReturnInput>, Prisma.ComplaintUncheckedUpdateWithoutReturnInput>
+}
+
 export type ComplaintCreateNestedOneWithoutItemsInput = {
   create?: Prisma.XOR<Prisma.ComplaintCreateWithoutItemsInput, Prisma.ComplaintUncheckedCreateWithoutItemsInput>
   connectOrCreate?: Prisma.ComplaintCreateOrConnectWithoutItemsInput
@@ -577,10 +707,16 @@ export type ComplaintCreateWithoutUserInput = {
   description?: string | null
   proofUrl?: string | null
   adminNotes?: string | null
+  requiresReturn?: boolean
+  replacementCourier?: string | null
+  replacementTrackingNumber?: string | null
+  replacementShippedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   order: Prisma.OrderCreateNestedOneWithoutComplaintsInput
   items?: Prisma.ComplaintItemCreateNestedManyWithoutComplaintInput
+  messages?: Prisma.ComplaintMessageCreateNestedManyWithoutComplaintInput
+  return?: Prisma.ReturnCreateNestedOneWithoutComplaintInput
 }
 
 export type ComplaintUncheckedCreateWithoutUserInput = {
@@ -592,9 +728,15 @@ export type ComplaintUncheckedCreateWithoutUserInput = {
   description?: string | null
   proofUrl?: string | null
   adminNotes?: string | null
+  requiresReturn?: boolean
+  replacementCourier?: string | null
+  replacementTrackingNumber?: string | null
+  replacementShippedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.ComplaintItemUncheckedCreateNestedManyWithoutComplaintInput
+  messages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutComplaintInput
+  return?: Prisma.ReturnUncheckedCreateNestedOneWithoutComplaintInput
 }
 
 export type ComplaintCreateOrConnectWithoutUserInput = {
@@ -636,6 +778,10 @@ export type ComplaintScalarWhereInput = {
   description?: Prisma.StringNullableFilter<"Complaint"> | string | null
   proofUrl?: Prisma.StringNullableFilter<"Complaint"> | string | null
   adminNotes?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  requiresReturn?: Prisma.BoolFilter<"Complaint"> | boolean
+  replacementCourier?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  replacementTrackingNumber?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  replacementShippedAt?: Prisma.DateTimeNullableFilter<"Complaint"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Complaint"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Complaint"> | Date | string
 }
@@ -648,10 +794,16 @@ export type ComplaintCreateWithoutOrderInput = {
   description?: string | null
   proofUrl?: string | null
   adminNotes?: string | null
+  requiresReturn?: boolean
+  replacementCourier?: string | null
+  replacementTrackingNumber?: string | null
+  replacementShippedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutComplaintsInput
   items?: Prisma.ComplaintItemCreateNestedManyWithoutComplaintInput
+  messages?: Prisma.ComplaintMessageCreateNestedManyWithoutComplaintInput
+  return?: Prisma.ReturnCreateNestedOneWithoutComplaintInput
 }
 
 export type ComplaintUncheckedCreateWithoutOrderInput = {
@@ -663,9 +815,15 @@ export type ComplaintUncheckedCreateWithoutOrderInput = {
   description?: string | null
   proofUrl?: string | null
   adminNotes?: string | null
+  requiresReturn?: boolean
+  replacementCourier?: string | null
+  replacementTrackingNumber?: string | null
+  replacementShippedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.ComplaintItemUncheckedCreateNestedManyWithoutComplaintInput
+  messages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutComplaintInput
+  return?: Prisma.ReturnUncheckedCreateNestedOneWithoutComplaintInput
 }
 
 export type ComplaintCreateOrConnectWithoutOrderInput = {
@@ -694,6 +852,198 @@ export type ComplaintUpdateManyWithWhereWithoutOrderInput = {
   data: Prisma.XOR<Prisma.ComplaintUpdateManyMutationInput, Prisma.ComplaintUncheckedUpdateManyWithoutOrderInput>
 }
 
+export type ComplaintCreateWithoutMessagesInput = {
+  id?: string
+  type: $Enums.ComplaintType
+  status?: $Enums.ComplaintStatus
+  reason: string
+  description?: string | null
+  proofUrl?: string | null
+  adminNotes?: string | null
+  requiresReturn?: boolean
+  replacementCourier?: string | null
+  replacementTrackingNumber?: string | null
+  replacementShippedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  order: Prisma.OrderCreateNestedOneWithoutComplaintsInput
+  user: Prisma.UserCreateNestedOneWithoutComplaintsInput
+  items?: Prisma.ComplaintItemCreateNestedManyWithoutComplaintInput
+  return?: Prisma.ReturnCreateNestedOneWithoutComplaintInput
+}
+
+export type ComplaintUncheckedCreateWithoutMessagesInput = {
+  id?: string
+  orderId: string
+  userId: string
+  type: $Enums.ComplaintType
+  status?: $Enums.ComplaintStatus
+  reason: string
+  description?: string | null
+  proofUrl?: string | null
+  adminNotes?: string | null
+  requiresReturn?: boolean
+  replacementCourier?: string | null
+  replacementTrackingNumber?: string | null
+  replacementShippedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  items?: Prisma.ComplaintItemUncheckedCreateNestedManyWithoutComplaintInput
+  return?: Prisma.ReturnUncheckedCreateNestedOneWithoutComplaintInput
+}
+
+export type ComplaintCreateOrConnectWithoutMessagesInput = {
+  where: Prisma.ComplaintWhereUniqueInput
+  create: Prisma.XOR<Prisma.ComplaintCreateWithoutMessagesInput, Prisma.ComplaintUncheckedCreateWithoutMessagesInput>
+}
+
+export type ComplaintUpsertWithoutMessagesInput = {
+  update: Prisma.XOR<Prisma.ComplaintUpdateWithoutMessagesInput, Prisma.ComplaintUncheckedUpdateWithoutMessagesInput>
+  create: Prisma.XOR<Prisma.ComplaintCreateWithoutMessagesInput, Prisma.ComplaintUncheckedCreateWithoutMessagesInput>
+  where?: Prisma.ComplaintWhereInput
+}
+
+export type ComplaintUpdateToOneWithWhereWithoutMessagesInput = {
+  where?: Prisma.ComplaintWhereInput
+  data: Prisma.XOR<Prisma.ComplaintUpdateWithoutMessagesInput, Prisma.ComplaintUncheckedUpdateWithoutMessagesInput>
+}
+
+export type ComplaintUpdateWithoutMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumComplaintTypeFieldUpdateOperationsInput | $Enums.ComplaintType
+  status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
+  reason?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  proofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiresReturn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  replacementCourier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementTrackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementShippedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  order?: Prisma.OrderUpdateOneRequiredWithoutComplaintsNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutComplaintsNestedInput
+  items?: Prisma.ComplaintItemUpdateManyWithoutComplaintNestedInput
+  return?: Prisma.ReturnUpdateOneWithoutComplaintNestedInput
+}
+
+export type ComplaintUncheckedUpdateWithoutMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumComplaintTypeFieldUpdateOperationsInput | $Enums.ComplaintType
+  status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
+  reason?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  proofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiresReturn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  replacementCourier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementTrackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementShippedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  items?: Prisma.ComplaintItemUncheckedUpdateManyWithoutComplaintNestedInput
+  return?: Prisma.ReturnUncheckedUpdateOneWithoutComplaintNestedInput
+}
+
+export type ComplaintCreateWithoutReturnInput = {
+  id?: string
+  type: $Enums.ComplaintType
+  status?: $Enums.ComplaintStatus
+  reason: string
+  description?: string | null
+  proofUrl?: string | null
+  adminNotes?: string | null
+  requiresReturn?: boolean
+  replacementCourier?: string | null
+  replacementTrackingNumber?: string | null
+  replacementShippedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  order: Prisma.OrderCreateNestedOneWithoutComplaintsInput
+  user: Prisma.UserCreateNestedOneWithoutComplaintsInput
+  items?: Prisma.ComplaintItemCreateNestedManyWithoutComplaintInput
+  messages?: Prisma.ComplaintMessageCreateNestedManyWithoutComplaintInput
+}
+
+export type ComplaintUncheckedCreateWithoutReturnInput = {
+  id?: string
+  orderId: string
+  userId: string
+  type: $Enums.ComplaintType
+  status?: $Enums.ComplaintStatus
+  reason: string
+  description?: string | null
+  proofUrl?: string | null
+  adminNotes?: string | null
+  requiresReturn?: boolean
+  replacementCourier?: string | null
+  replacementTrackingNumber?: string | null
+  replacementShippedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  items?: Prisma.ComplaintItemUncheckedCreateNestedManyWithoutComplaintInput
+  messages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutComplaintInput
+}
+
+export type ComplaintCreateOrConnectWithoutReturnInput = {
+  where: Prisma.ComplaintWhereUniqueInput
+  create: Prisma.XOR<Prisma.ComplaintCreateWithoutReturnInput, Prisma.ComplaintUncheckedCreateWithoutReturnInput>
+}
+
+export type ComplaintUpsertWithoutReturnInput = {
+  update: Prisma.XOR<Prisma.ComplaintUpdateWithoutReturnInput, Prisma.ComplaintUncheckedUpdateWithoutReturnInput>
+  create: Prisma.XOR<Prisma.ComplaintCreateWithoutReturnInput, Prisma.ComplaintUncheckedCreateWithoutReturnInput>
+  where?: Prisma.ComplaintWhereInput
+}
+
+export type ComplaintUpdateToOneWithWhereWithoutReturnInput = {
+  where?: Prisma.ComplaintWhereInput
+  data: Prisma.XOR<Prisma.ComplaintUpdateWithoutReturnInput, Prisma.ComplaintUncheckedUpdateWithoutReturnInput>
+}
+
+export type ComplaintUpdateWithoutReturnInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumComplaintTypeFieldUpdateOperationsInput | $Enums.ComplaintType
+  status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
+  reason?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  proofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiresReturn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  replacementCourier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementTrackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementShippedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  order?: Prisma.OrderUpdateOneRequiredWithoutComplaintsNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutComplaintsNestedInput
+  items?: Prisma.ComplaintItemUpdateManyWithoutComplaintNestedInput
+  messages?: Prisma.ComplaintMessageUpdateManyWithoutComplaintNestedInput
+}
+
+export type ComplaintUncheckedUpdateWithoutReturnInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumComplaintTypeFieldUpdateOperationsInput | $Enums.ComplaintType
+  status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
+  reason?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  proofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiresReturn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  replacementCourier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementTrackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementShippedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  items?: Prisma.ComplaintItemUncheckedUpdateManyWithoutComplaintNestedInput
+  messages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutComplaintNestedInput
+}
+
 export type ComplaintCreateWithoutItemsInput = {
   id?: string
   type: $Enums.ComplaintType
@@ -702,10 +1052,16 @@ export type ComplaintCreateWithoutItemsInput = {
   description?: string | null
   proofUrl?: string | null
   adminNotes?: string | null
+  requiresReturn?: boolean
+  replacementCourier?: string | null
+  replacementTrackingNumber?: string | null
+  replacementShippedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   order: Prisma.OrderCreateNestedOneWithoutComplaintsInput
   user: Prisma.UserCreateNestedOneWithoutComplaintsInput
+  messages?: Prisma.ComplaintMessageCreateNestedManyWithoutComplaintInput
+  return?: Prisma.ReturnCreateNestedOneWithoutComplaintInput
 }
 
 export type ComplaintUncheckedCreateWithoutItemsInput = {
@@ -718,8 +1074,14 @@ export type ComplaintUncheckedCreateWithoutItemsInput = {
   description?: string | null
   proofUrl?: string | null
   adminNotes?: string | null
+  requiresReturn?: boolean
+  replacementCourier?: string | null
+  replacementTrackingNumber?: string | null
+  replacementShippedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  messages?: Prisma.ComplaintMessageUncheckedCreateNestedManyWithoutComplaintInput
+  return?: Prisma.ReturnUncheckedCreateNestedOneWithoutComplaintInput
 }
 
 export type ComplaintCreateOrConnectWithoutItemsInput = {
@@ -746,10 +1108,16 @@ export type ComplaintUpdateWithoutItemsInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiresReturn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  replacementCourier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementTrackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementShippedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   order?: Prisma.OrderUpdateOneRequiredWithoutComplaintsNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutComplaintsNestedInput
+  messages?: Prisma.ComplaintMessageUpdateManyWithoutComplaintNestedInput
+  return?: Prisma.ReturnUpdateOneWithoutComplaintNestedInput
 }
 
 export type ComplaintUncheckedUpdateWithoutItemsInput = {
@@ -762,8 +1130,14 @@ export type ComplaintUncheckedUpdateWithoutItemsInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiresReturn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  replacementCourier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementTrackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementShippedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutComplaintNestedInput
+  return?: Prisma.ReturnUncheckedUpdateOneWithoutComplaintNestedInput
 }
 
 export type ComplaintCreateManyUserInput = {
@@ -775,6 +1149,10 @@ export type ComplaintCreateManyUserInput = {
   description?: string | null
   proofUrl?: string | null
   adminNotes?: string | null
+  requiresReturn?: boolean
+  replacementCourier?: string | null
+  replacementTrackingNumber?: string | null
+  replacementShippedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -787,10 +1165,16 @@ export type ComplaintUpdateWithoutUserInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiresReturn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  replacementCourier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementTrackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementShippedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   order?: Prisma.OrderUpdateOneRequiredWithoutComplaintsNestedInput
   items?: Prisma.ComplaintItemUpdateManyWithoutComplaintNestedInput
+  messages?: Prisma.ComplaintMessageUpdateManyWithoutComplaintNestedInput
+  return?: Prisma.ReturnUpdateOneWithoutComplaintNestedInput
 }
 
 export type ComplaintUncheckedUpdateWithoutUserInput = {
@@ -802,9 +1186,15 @@ export type ComplaintUncheckedUpdateWithoutUserInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiresReturn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  replacementCourier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementTrackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementShippedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.ComplaintItemUncheckedUpdateManyWithoutComplaintNestedInput
+  messages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutComplaintNestedInput
+  return?: Prisma.ReturnUncheckedUpdateOneWithoutComplaintNestedInput
 }
 
 export type ComplaintUncheckedUpdateManyWithoutUserInput = {
@@ -816,6 +1206,10 @@ export type ComplaintUncheckedUpdateManyWithoutUserInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiresReturn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  replacementCourier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementTrackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementShippedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -829,6 +1223,10 @@ export type ComplaintCreateManyOrderInput = {
   description?: string | null
   proofUrl?: string | null
   adminNotes?: string | null
+  requiresReturn?: boolean
+  replacementCourier?: string | null
+  replacementTrackingNumber?: string | null
+  replacementShippedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -841,10 +1239,16 @@ export type ComplaintUpdateWithoutOrderInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiresReturn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  replacementCourier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementTrackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementShippedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutComplaintsNestedInput
   items?: Prisma.ComplaintItemUpdateManyWithoutComplaintNestedInput
+  messages?: Prisma.ComplaintMessageUpdateManyWithoutComplaintNestedInput
+  return?: Prisma.ReturnUpdateOneWithoutComplaintNestedInput
 }
 
 export type ComplaintUncheckedUpdateWithoutOrderInput = {
@@ -856,9 +1260,15 @@ export type ComplaintUncheckedUpdateWithoutOrderInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiresReturn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  replacementCourier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementTrackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementShippedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.ComplaintItemUncheckedUpdateManyWithoutComplaintNestedInput
+  messages?: Prisma.ComplaintMessageUncheckedUpdateManyWithoutComplaintNestedInput
+  return?: Prisma.ReturnUncheckedUpdateOneWithoutComplaintNestedInput
 }
 
 export type ComplaintUncheckedUpdateManyWithoutOrderInput = {
@@ -870,6 +1280,10 @@ export type ComplaintUncheckedUpdateManyWithoutOrderInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proofUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiresReturn?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  replacementCourier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementTrackingNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replacementShippedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -881,10 +1295,12 @@ export type ComplaintUncheckedUpdateManyWithoutOrderInput = {
 
 export type ComplaintCountOutputType = {
   items: number
+  messages: number
 }
 
 export type ComplaintCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   items?: boolean | ComplaintCountOutputTypeCountItemsArgs
+  messages?: boolean | ComplaintCountOutputTypeCountMessagesArgs
 }
 
 /**
@@ -904,6 +1320,13 @@ export type ComplaintCountOutputTypeCountItemsArgs<ExtArgs extends runtime.Types
   where?: Prisma.ComplaintItemWhereInput
 }
 
+/**
+ * ComplaintCountOutputType without action
+ */
+export type ComplaintCountOutputTypeCountMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ComplaintMessageWhereInput
+}
+
 
 export type ComplaintSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -915,11 +1338,17 @@ export type ComplaintSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   description?: boolean
   proofUrl?: boolean
   adminNotes?: boolean
+  requiresReturn?: boolean
+  replacementCourier?: boolean
+  replacementTrackingNumber?: boolean
+  replacementShippedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   items?: boolean | Prisma.Complaint$itemsArgs<ExtArgs>
+  messages?: boolean | Prisma.Complaint$messagesArgs<ExtArgs>
+  return?: boolean | Prisma.Complaint$returnArgs<ExtArgs>
   _count?: boolean | Prisma.ComplaintCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["complaint"]>
 
@@ -933,6 +1362,10 @@ export type ComplaintSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   description?: boolean
   proofUrl?: boolean
   adminNotes?: boolean
+  requiresReturn?: boolean
+  replacementCourier?: boolean
+  replacementTrackingNumber?: boolean
+  replacementShippedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
@@ -949,6 +1382,10 @@ export type ComplaintSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   description?: boolean
   proofUrl?: boolean
   adminNotes?: boolean
+  requiresReturn?: boolean
+  replacementCourier?: boolean
+  replacementTrackingNumber?: boolean
+  replacementShippedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
@@ -965,15 +1402,21 @@ export type ComplaintSelectScalar = {
   description?: boolean
   proofUrl?: boolean
   adminNotes?: boolean
+  requiresReturn?: boolean
+  replacementCourier?: boolean
+  replacementTrackingNumber?: boolean
+  replacementShippedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ComplaintOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderId" | "userId" | "type" | "status" | "reason" | "description" | "proofUrl" | "adminNotes" | "createdAt" | "updatedAt", ExtArgs["result"]["complaint"]>
+export type ComplaintOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderId" | "userId" | "type" | "status" | "reason" | "description" | "proofUrl" | "adminNotes" | "requiresReturn" | "replacementCourier" | "replacementTrackingNumber" | "replacementShippedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["complaint"]>
 export type ComplaintInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   items?: boolean | Prisma.Complaint$itemsArgs<ExtArgs>
+  messages?: boolean | Prisma.Complaint$messagesArgs<ExtArgs>
+  return?: boolean | Prisma.Complaint$returnArgs<ExtArgs>
   _count?: boolean | Prisma.ComplaintCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ComplaintIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -991,6 +1434,8 @@ export type $ComplaintPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     order: Prisma.$OrderPayload<ExtArgs>
     user: Prisma.$UserPayload<ExtArgs>
     items: Prisma.$ComplaintItemPayload<ExtArgs>[]
+    messages: Prisma.$ComplaintMessagePayload<ExtArgs>[]
+    return: Prisma.$ReturnPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1002,6 +1447,10 @@ export type $ComplaintPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     description: string | null
     proofUrl: string | null
     adminNotes: string | null
+    requiresReturn: boolean
+    replacementCourier: string | null
+    replacementTrackingNumber: string | null
+    replacementShippedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["complaint"]>
@@ -1401,6 +1850,8 @@ export interface Prisma__ComplaintClient<T, Null = never, ExtArgs extends runtim
   order<T extends Prisma.OrderDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrderDefaultArgs<ExtArgs>>): Prisma.Prisma__OrderClient<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   items<T extends Prisma.Complaint$itemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Complaint$itemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComplaintItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  messages<T extends Prisma.Complaint$messagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Complaint$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComplaintMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  return<T extends Prisma.Complaint$returnArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Complaint$returnArgs<ExtArgs>>): Prisma.Prisma__ReturnClient<runtime.Types.Result.GetResult<Prisma.$ReturnPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1439,6 +1890,10 @@ export interface ComplaintFieldRefs {
   readonly description: Prisma.FieldRef<"Complaint", 'String'>
   readonly proofUrl: Prisma.FieldRef<"Complaint", 'String'>
   readonly adminNotes: Prisma.FieldRef<"Complaint", 'String'>
+  readonly requiresReturn: Prisma.FieldRef<"Complaint", 'Boolean'>
+  readonly replacementCourier: Prisma.FieldRef<"Complaint", 'String'>
+  readonly replacementTrackingNumber: Prisma.FieldRef<"Complaint", 'String'>
+  readonly replacementShippedAt: Prisma.FieldRef<"Complaint", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Complaint", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Complaint", 'DateTime'>
 }
@@ -1863,6 +2318,49 @@ export type Complaint$itemsArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   distinct?: Prisma.ComplaintItemScalarFieldEnum | Prisma.ComplaintItemScalarFieldEnum[]
+}
+
+/**
+ * Complaint.messages
+ */
+export type Complaint$messagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ComplaintMessage
+   */
+  select?: Prisma.ComplaintMessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ComplaintMessage
+   */
+  omit?: Prisma.ComplaintMessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ComplaintMessageInclude<ExtArgs> | null
+  where?: Prisma.ComplaintMessageWhereInput
+  orderBy?: Prisma.ComplaintMessageOrderByWithRelationInput | Prisma.ComplaintMessageOrderByWithRelationInput[]
+  cursor?: Prisma.ComplaintMessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ComplaintMessageScalarFieldEnum | Prisma.ComplaintMessageScalarFieldEnum[]
+}
+
+/**
+ * Complaint.return
+ */
+export type Complaint$returnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Return
+   */
+  select?: Prisma.ReturnSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Return
+   */
+  omit?: Prisma.ReturnOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReturnInclude<ExtArgs> | null
+  where?: Prisma.ReturnWhereInput
 }
 
 /**

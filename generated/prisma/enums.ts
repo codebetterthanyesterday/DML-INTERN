@@ -201,7 +201,8 @@ export type QuoteLogAction = (typeof QuoteLogAction)[keyof typeof QuoteLogAction
 export const ComplaintType = {
   CANCELLATION: 'CANCELLATION',
   RETURN: 'RETURN',
-  REFUND: 'REFUND'
+  REFUND: 'REFUND',
+  REPLACEMENT: 'REPLACEMENT'
 } as const
 
 export type ComplaintType = (typeof ComplaintType)[keyof typeof ComplaintType]
@@ -212,11 +213,22 @@ export const ComplaintStatus = {
   REVIEWING: 'REVIEWING',
   REVIEWED: 'REVIEWED',
   APPROVED: 'APPROVED',
+  APPROVED_FOR_RETURN: 'APPROVED_FOR_RETURN',
   REJECTED: 'REJECTED',
   RESOLVED: 'RESOLVED'
 } as const
 
 export type ComplaintStatus = (typeof ComplaintStatus)[keyof typeof ComplaintStatus]
+
+
+export const ReturnStatus = {
+  PENDING_SHIPMENT: 'PENDING_SHIPMENT',
+  SHIPPED: 'SHIPPED',
+  DELIVERED: 'DELIVERED',
+  CONFIRMED: 'CONFIRMED'
+} as const
+
+export type ReturnStatus = (typeof ReturnStatus)[keyof typeof ReturnStatus]
 
 
 export const ReviewStatus = {

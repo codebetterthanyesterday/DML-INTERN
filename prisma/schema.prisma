@@ -155,6 +155,7 @@ enum ComplaintType {
   CANCELLATION
   RETURN
   REFUND
+  REPLACEMENT
 }
 
 enum ComplaintStatus {
@@ -162,8 +163,16 @@ enum ComplaintStatus {
   REVIEWING
   REVIEWED
   APPROVED
+  APPROVED_FOR_RETURN
   REJECTED
   RESOLVED
+}
+
+enum ReturnStatus {
+  PENDING_SHIPMENT
+  SHIPPED
+  DELIVERED
+  CONFIRMED
 }
 
 enum ReviewStatus {
@@ -200,6 +209,7 @@ model User {
   auditLogs         AuditLog[]
   stockLogs         StockLog[]
   complaints        Complaint[]
+  complaintMessages ComplaintMessage[]
   reviews           Review[]
 
   @@map("users")
@@ -622,16 +632,56 @@ model Complaint {
   description String?         @db.Text
   proofUrl    String?
   adminNotes  String?         @db.Text
+  requiresReturn            Boolean  @default(true)
+  replacementCourier        String?
+  replacementTrackingNumber String?
+  replacementShippedAt      DateTime?
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
 
   order Order           @relation(fields: [orderId], references: [id])
   user  User            @relation(fields: [userId], references: [id])
   items ComplaintItem[]
+  messages ComplaintMessage[]
+  return   Return?
 
   @@index([orderId])
   @@index([userId])
   @@map("complaints")
+}
+
+model ComplaintMessage {
+  id          String    @id @default(cuid())
+  complaintId String
+  senderId    String    // User ID of the sender (Admin or Customer)
+  senderRole  Role      // Role of the sender at the time of message
+  message     String    @db.Text
+  attachmentUrl String? // Opsional lampiran gambar/dokumen
+  createdAt   DateTime  @default(now())
+
+  complaint Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  sender    User      @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([complaintId])
+  @@map("complaint_messages")
+}
+
+model Return {
+  id              String       @id @default(cuid())
+  complaintId     String       @unique
+  status          ReturnStatus @default(PENDING_SHIPMENT)
+  courier         String?
+  trackingNumber  String?
+  shippingReceipt String?      // Bukti resi pengiriman retur
+  shippedAt       DateTime?
+  receivedAt      DateTime?    // Kapan gudang DML menerima retur
+  adminNotes      String?      @db.Text
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  complaint Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+
+  @@map("returns")
 }
 
 model ComplaintItem {

@@ -17,7 +17,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Eye, Search, AlertCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import toast from "react-hot-toast";
-import { ComplaintDetailModal } from "./ComplaintDetailModal";
+import Link from "next/link";
 
 type Complaint = {
   id: string;
@@ -57,7 +57,6 @@ export function ComplaintClient() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState("ALL");
-  const [selectedComplaintId, setSelectedComplaintId] = useState<string | null>(null);
 
   const fetchComplaints = async () => {
     setLoading(true);
@@ -161,15 +160,13 @@ export function ComplaintClient() {
                   <TableCell>{getTypeBadge(complaint.type)}</TableCell>
                   <TableCell>{getStatusBadge(complaint.status)}</TableCell>
                   <TableCell className="text-right">
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => setSelectedComplaintId(complaint.id)}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-blue-50 hover:text-blue-600"
+                    <Link
+                      href={`/admin/complaints/${complaint.id}`}
+                      className="inline-flex h-9 items-center justify-center rounded-md px-3 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity hover:bg-blue-50 hover:text-blue-600"
                     >
                       <Eye className="h-4 w-4 mr-2" />
                       Detail
-                    </Button>
+                    </Link>
                   </TableCell>
                 </TableRow>
               ))
@@ -178,11 +175,6 @@ export function ComplaintClient() {
         </Table>
       </div>
 
-      <ComplaintDetailModal 
-        complaintId={selectedComplaintId} 
-        onClose={() => setSelectedComplaintId(null)}
-        onUpdated={fetchComplaints}
-      />
     </div>
   );
 }

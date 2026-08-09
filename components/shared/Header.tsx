@@ -153,12 +153,20 @@ function UserMenu({ session }: { session: Session }) {
         </DropdownMenuItem>
 
         {user.role !== "ADMIN" && (
-          <DropdownMenuItem asChild>
-            <Link href={`/${user.role.toLowerCase()}/reviews`} className="flex items-center gap-2 cursor-pointer" id="user-menu-reviews">
-              <Star className="w-4 h-4 text-slate-400" />
-              <span>Ulasan & Komplain</span>
-            </Link>
-          </DropdownMenuItem>
+          <>
+            <DropdownMenuItem asChild>
+              <Link href={`/${user.role.toLowerCase()}/reviews`} className="flex items-center gap-2 cursor-pointer" id="user-menu-reviews">
+                <Star className="w-4 h-4 text-slate-400" />
+                <span>Ulasan Saya</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href={`/customer/complaints`} className="flex items-center gap-2 cursor-pointer" id="user-menu-complaints">
+                <ShieldAlert className="w-4 h-4 text-slate-400" />
+                <span>Komplain & Retur</span>
+              </Link>
+            </DropdownMenuItem>
+          </>
         )}
 
         <DropdownMenuSeparator />

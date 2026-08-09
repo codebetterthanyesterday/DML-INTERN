@@ -128,6 +128,16 @@ export type Voucher = Prisma.VoucherModel
  */
 export type Complaint = Prisma.ComplaintModel
 /**
+ * Model ComplaintMessage
+ * 
+ */
+export type ComplaintMessage = Prisma.ComplaintMessageModel
+/**
+ * Model Return
+ * 
+ */
+export type Return = Prisma.ReturnModel
+/**
  * Model ComplaintItem
  * 
  */

@@ -73,6 +73,8 @@ export const ModelName = {
   SiteSetting: 'SiteSetting',
   Voucher: 'Voucher',
   Complaint: 'Complaint',
+  ComplaintMessage: 'ComplaintMessage',
+  Return: 'Return',
   ComplaintItem: 'ComplaintItem',
   Review: 'Review'
 } as const
@@ -413,11 +415,45 @@ export const ComplaintScalarFieldEnum = {
   description: 'description',
   proofUrl: 'proofUrl',
   adminNotes: 'adminNotes',
+  requiresReturn: 'requiresReturn',
+  replacementCourier: 'replacementCourier',
+  replacementTrackingNumber: 'replacementTrackingNumber',
+  replacementShippedAt: 'replacementShippedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type ComplaintScalarFieldEnum = (typeof ComplaintScalarFieldEnum)[keyof typeof ComplaintScalarFieldEnum]
+
+
+export const ComplaintMessageScalarFieldEnum = {
+  id: 'id',
+  complaintId: 'complaintId',
+  senderId: 'senderId',
+  senderRole: 'senderRole',
+  message: 'message',
+  attachmentUrl: 'attachmentUrl',
+  createdAt: 'createdAt'
+} as const
+
+export type ComplaintMessageScalarFieldEnum = (typeof ComplaintMessageScalarFieldEnum)[keyof typeof ComplaintMessageScalarFieldEnum]
+
+
+export const ReturnScalarFieldEnum = {
+  id: 'id',
+  complaintId: 'complaintId',
+  status: 'status',
+  courier: 'courier',
+  trackingNumber: 'trackingNumber',
+  shippingReceipt: 'shippingReceipt',
+  shippedAt: 'shippedAt',
+  receivedAt: 'receivedAt',
+  adminNotes: 'adminNotes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReturnScalarFieldEnum = (typeof ReturnScalarFieldEnum)[keyof typeof ReturnScalarFieldEnum]
 
 
 export const ComplaintItemScalarFieldEnum = {

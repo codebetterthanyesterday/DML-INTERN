@@ -40,7 +40,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
 const formSchema = z.object({
-  type: z.enum(["CANCELLATION", "RETURN", "REFUND"], {
+  type: z.enum(["CANCELLATION", "RETURN", "REFUND", "REPLACEMENT"], {
     message: "Pilih jenis pengajuan",
   }),
   reason: z.string().min(5, "Alasan harus diisi minimal 5 karakter").max(200),
@@ -81,6 +81,7 @@ export function ComplaintSubmissionForm({ orderId, orderStatus }: ComplaintSubmi
   if (["SHIPPED", "COMPLETED"].includes(orderStatus)) {
     availableTypes.push({ value: "RETURN", label: "Pengembalian Barang (Retur)" });
     availableTypes.push({ value: "REFUND", label: "Pengembalian Dana (Refund)" });
+    availableTypes.push({ value: "REPLACEMENT", label: "Penggantian Barang (Replacement)" });
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -78,9 +78,9 @@ export async function POST(
       );
     }
 
-    if (["RETURN", "REFUND"].includes(type) && !["SHIPPED", "COMPLETED"].includes(order.status)) {
+    if (["RETURN", "REFUND", "REPLACEMENT"].includes(type) && !["SHIPPED", "COMPLETED"].includes(order.status)) {
       return NextResponse.json(
-        { success: false, error: "Retur dan Refund hanya bisa dilakukan setelah pesanan dikirim" },
+        { success: false, error: "Retur, Refund, dan Penggantian hanya bisa dilakukan setelah pesanan dikirim" },
         { status: 400 }
       );
     }
@@ -117,6 +117,11 @@ export async function POST(
     }
 
     // Create Complaint
+    // First, fetch order items to create ComplaintItems
+    const orderItems = await prisma.orderItem.findMany({
+      where: { orderId: order.id }
+    });
+
     const complaint = await prisma.complaint.create({
       data: {
         orderId: order.id,
@@ -126,6 +131,12 @@ export async function POST(
         reason: parsed.data.reason,
         description: parsed.data.description || null,
         proofUrl: uploadedProofUrl,
+        items: {
+          create: orderItems.map(item => ({
+            productId: item.productId,
+            qty: item.qty
+          }))
+        }
       },
     });
 
