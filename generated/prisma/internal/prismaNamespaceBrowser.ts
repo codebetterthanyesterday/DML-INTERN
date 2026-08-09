@@ -432,15 +432,13 @@ export type ComplaintItemScalarFieldEnum = (typeof ComplaintItemScalarFieldEnum)
 
 export const ReviewScalarFieldEnum = {
   id: 'id',
+  userId: 'userId',
   productId: 'productId',
-  customerId: 'customerId',
+  orderId: 'orderId',
   rating: 'rating',
   comment: 'comment',
-  images: 'images',
+  mediaUrls: 'mediaUrls',
   status: 'status',
-  moderatedById: 'moderatedById',
-  moderatedAt: 'moderatedAt',
-  rejectionReason: 'rejectionReason',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { signOut } from "next-auth/react"
 import { useState } from "react"
-import { Menu, ShieldAlert, LayoutDashboard, LogOut, User, Building2, Settings, ShoppingBag } from "lucide-react"
+import { Menu, ShieldAlert, LayoutDashboard, LogOut, User, Building2, Settings, ShoppingBag, Star } from "lucide-react"
 import Image from "next/image"
 import logoImg from "../../public/logo.png"
 import type { Session } from "next-auth"
@@ -151,6 +151,15 @@ function UserMenu({ session }: { session: Session }) {
             <span>Profil Saya</span>
           </Link>
         </DropdownMenuItem>
+
+        {user.role !== "ADMIN" && (
+          <DropdownMenuItem asChild>
+            <Link href={`/${user.role.toLowerCase()}/reviews`} className="flex items-center gap-2 cursor-pointer" id="user-menu-reviews">
+              <Star className="w-4 h-4 text-slate-400" />
+              <span>Ulasan & Komplain</span>
+            </Link>
+          </DropdownMenuItem>
+        )}
 
         <DropdownMenuSeparator />
 

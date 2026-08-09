@@ -166,6 +166,12 @@ enum ComplaintStatus {
   RESOLVED
 }
 
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 // ============================================
 // USER & AKUN BISNIS
 // ============================================
@@ -194,6 +200,7 @@ model User {
   auditLogs         AuditLog[]
   stockLogs         StockLog[]
   complaints        Complaint[]
+  reviews           Review[]
 
   @@map("users")
 }
@@ -281,6 +288,7 @@ model Product {
 
   stockLogs      StockLog[]
   complaintItems ComplaintItem[]
+  reviews        Review[]
 
   @@index([categoryId])
   @@index([productType])
@@ -371,6 +379,7 @@ model Order {
   payment    Payment?
   voucher    Voucher?    @relation(fields: [voucherCode], references: [code])
   complaints Complaint[]
+  reviews    Review[]
 
   @@index([userId])
   @@index([status])
@@ -635,4 +644,30 @@ model ComplaintItem {
   product   Product   @relation(fields: [productId], references: [id])
 
   @@map("complaint_items")
+}
+
+// ============================================
+// REVIEW (ULASAN)
+// ============================================
+
+model Review {
+  id        String       @id @default(cuid())
+  userId    String
+  productId String
+  orderId   String?
+  rating    Int
+  comment   String?      @db.Text
+  mediaUrls String[]     @default([])
+  status    ReviewStatus @default(PENDING)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  order   Order?  @relation(fields: [orderId], references: [id])
+
+  @@index([productId])
+  @@index([userId])
+  @@index([status])
+  @@map("reviews")
 }

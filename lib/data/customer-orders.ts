@@ -129,7 +129,7 @@ export async function getCustomerOrder(orderId: string) {
           id: true,
           qty: true,
           priceAtOrder: true,
-          product: { select: { name: true, sku: true, unit: true } },
+          product: { select: { id: true, name: true, sku: true, unit: true } },
         },
       },
       complaints: {
@@ -140,6 +140,12 @@ export async function getCustomerOrder(orderId: string) {
           type: true,
           status: true,
           createdAt: true,
+        }
+      },
+      reviews: {
+        select: {
+          id: true,
+          productId: true,
         }
       },
     },
@@ -170,6 +176,7 @@ export async function getCustomerOrder(orderId: string) {
         ...order.complaints[0],
         createdAt: order.complaints[0].createdAt.toISOString(),
       } : null,
+      reviews: order.reviews,
     },
   };
 }

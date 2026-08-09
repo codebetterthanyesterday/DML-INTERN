@@ -20,11 +20,12 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
         orderBy: { minQty: "asc" }
       },
       reviews: {
+        where: { status: "APPROVED" },
         include: { user: true },
         orderBy: { createdAt: "desc" }
       },
       _count: {
-        select: { reviews: true }
+        select: { reviews: { where: { status: "APPROVED" } } }
       }
     }
   })
@@ -67,7 +68,8 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
         month: "short",
         year: "numeric"
       }),
-      comment: rev.comment
+      comment: rev.comment,
+      mediaUrls: (rev.mediaUrls || []).map((url: string) => toPublicImageUrl(url)).filter((url: string | null): url is string => !!url)
     }))
   }
 

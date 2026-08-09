@@ -45,6 +45,7 @@ export interface ProductDetailProps {
     rating: number
     date: string
     comment: string | null
+    mediaUrls: string[]
   }>
 }
 
@@ -355,9 +356,23 @@ export function ProductDetailClient({ product, session }: ProductDetailClientPro
                           ))}
                         </div>
                       </div>
-                      <p className="text-sm text-slate-600 leading-relaxed ml-11">
+                      <p className="text-sm text-slate-600 leading-relaxed ml-11 mb-3">
                         {rev.comment}
                       </p>
+                      
+                      {rev.mediaUrls.length > 0 && (
+                        <div className="flex flex-wrap gap-3 ml-11">
+                          {rev.mediaUrls.map((url, i) => (
+                            <div key={i} className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl border border-slate-200 overflow-hidden bg-slate-50 relative group cursor-pointer">
+                              {url.includes(".mp4") || url.includes(".webm") ? (
+                                <video src={url} className="w-full h-full object-cover" controls preload="metadata" />
+                              ) : (
+                                <img src={url} alt={`Review Attachment ${i}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform" loading="lazy" />
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

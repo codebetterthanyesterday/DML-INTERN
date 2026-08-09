@@ -20,6 +20,7 @@ import {
   Wallet,
   Gift,
   Undo2,
+  Star,
 } from "lucide-react";
 
 const navigation = [
@@ -34,6 +35,7 @@ const navigation = [
   { name: "Verifikasi Akun", href: "/admin/verifications", icon: ShieldCheck },
   { name: "Verifikasi Pembayaran", href: "/admin/payments", icon: Wallet },
   { name: "Keluhan & Pengajuan", href: "/admin/complaints", icon: Undo2 },
+  { name: "Ulasan Produk", href: "/admin/reviews", icon: Star },
   { name: "Laporan", href: "/admin/reports", icon: BarChart3 },
 ];
 

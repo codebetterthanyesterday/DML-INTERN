@@ -21,6 +21,7 @@ import { getCustomerOrder } from "@/lib/data/customer-orders";
 import { cn } from "@/lib/utils";
 import { CopyTrackingButton } from "./copy-tracking-button";
 import { ComplaintSubmissionForm } from "./components/ComplaintSubmissionForm";
+import { ReviewSubmissionForm } from "@/components/customer/reviews/ReviewSubmissionForm";
 
 const STEPS = [
   { status: OrderStatus.PENDING, label: "Pesanan dibuat", icon: Clock },
@@ -164,7 +165,16 @@ export default async function OrderDetailsPage({
                       <p className="mt-1 font-mono text-xs text-slate-400">{item.product.sku}</p>
                       <p className="mt-1 text-sm text-slate-500">{item.qty} {item.product.unit} × Rp {item.priceAtOrder.toLocaleString("id-ID")}</p>
                     </div>
-                    <p className="shrink-0 font-extrabold text-slate-900">Rp {(item.qty * item.priceAtOrder).toLocaleString("id-ID")}</p>
+                    <div className="flex flex-col items-end gap-2 shrink-0">
+                      <p className="font-extrabold text-slate-900">Rp {(item.qty * item.priceAtOrder).toLocaleString("id-ID")}</p>
+                      {order.status === "COMPLETED" && !order.reviews.some((r: any) => r.productId === item.product.id) && (
+                        <ReviewSubmissionForm
+                          productId={item.product.id}
+                          orderId={order.id}
+                          productName={item.product.name}
+                        />
+                      )}
+                    </div>
                   </div>
                 ))}
               </CardContent>
