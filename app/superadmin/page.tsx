@@ -13,6 +13,7 @@ import { AuditLogTable, AuditLogData } from "@/components/superadmin/AuditLogTab
 import { SalesRevenueChart, SalesRevenueData } from "@/components/superadmin/SalesRevenueChart";
 import { ActiveQuotationsList, ActiveQuotation } from "@/components/superadmin/ActiveQuotationsList";
 import { LowStockAlerts, LowStockProduct } from "@/components/superadmin/LowStockAlerts";
+import { toPublicImageUrl } from "@/lib/blob";
 
 export const metadata = {
   title: "Super Admin Dashboard | DML",
@@ -202,7 +203,7 @@ export default async function SuperAdminDashboardPage() {
     id: p.id,
     name: p.name,
     stock: p.stock,
-    image: p.images.length > 0 ? p.images[0].url : null
+    image: p.images.length > 0 ? toPublicImageUrl(p.images[0].url) : null
   }));
 
   return (

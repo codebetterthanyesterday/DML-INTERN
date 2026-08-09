@@ -67,7 +67,6 @@ export const ModelName = {
   QuoteLog: 'QuoteLog',
   Invoice: 'Invoice',
   Payment: 'Payment',
-  Review: 'Review',
   Notification: 'Notification',
   AuditLog: 'AuditLog',
   StockLog: 'StockLog',
@@ -327,18 +326,6 @@ export const PaymentScalarFieldEnum = {
 } as const
 
 export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
-
-
-export const ReviewScalarFieldEnum = {
-  id: 'id',
-  productId: 'productId',
-  userId: 'userId',
-  rating: 'rating',
-  comment: 'comment',
-  createdAt: 'createdAt'
-} as const
-
-export type ReviewScalarFieldEnum = (typeof ReviewScalarFieldEnum)[keyof typeof ReviewScalarFieldEnum]
 
 
 export const NotificationScalarFieldEnum = {

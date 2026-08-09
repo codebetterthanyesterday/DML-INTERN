@@ -189,7 +189,7 @@ model User {
   cart              Cart?
   orders            Order[]
   quotes            Quote[]
-  reviews           Review[]
+
   notifications     Notification[]
   auditLogs         AuditLog[]
   stockLogs         StockLog[]
@@ -278,7 +278,7 @@ model Product {
   cartItems      CartItem[]
   orderItems     OrderItem[]
   quoteItems     QuoteItem[]
-  reviews        Review[]
+
   stockLogs      StockLog[]
   complaintItems ComplaintItem[]
 
@@ -492,24 +492,6 @@ model Payment {
   @@map("payments")
 }
 
-// ============================================
-// ULASAN PRODUK
-// ============================================
-
-model Review {
-  id        String   @id @default(cuid())
-  productId String
-  userId    String
-  rating    Int // 1-5
-  comment   String?
-  createdAt DateTime @default(now())
-
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  user    User    @relation(fields: [userId], references: [id])
-
-  @@index([productId])
-  @@map("reviews")
-}
 
 // ============================================
 // NOTIFIKASI (SISTEM)

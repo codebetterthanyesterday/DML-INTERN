@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import { redirect } from "next/navigation"
 import { CartPageClient } from "./CartPageClient"
+import { toPublicImageUrl } from "@/lib/blob"
 
 export const metadata = {
   title: "Keranjang Belanja | Duta Rubber Shop",
@@ -55,7 +56,9 @@ export default async function CartPage() {
         maxQty: t.maxQty,
         pricePerUnit: Number(t.pricePerUnit)
       })),
-      images: item.product.images
+      images: item.product.images.map((img: { url: string }) => ({
+        url: toPublicImageUrl(img.url) ?? img.url
+      }))
     }
   })) || []
 

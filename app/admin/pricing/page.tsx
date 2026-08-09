@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import { TieredPricingClient } from "@/components/admin/pricing/TieredPricingClient";
 import type { ProductWithTiers } from "@/components/admin/pricing/TieredPricingClient";
+import { toPublicImageUrl } from "@/lib/blob";
 
 export const metadata = {
   title: "Harga Bertingkat — DML Admin",
@@ -26,7 +27,7 @@ async function getProductsWithTiers(): Promise<ProductWithTiers[]> {
     basePrice: p.price ? p.price.toNumber() : null,
     productType: p.productType as "RETAIL" | "INDUSTRIAL" | "BOTH",
     categoryName: p.category.name,
-    imageUrl: p.images[0]?.url ?? null,
+    imageUrl: toPublicImageUrl(p.images[0]?.url) ?? null,
     tiers: p.tiers.map((t) => ({
       id: t.id,
       minQty: t.minQty,

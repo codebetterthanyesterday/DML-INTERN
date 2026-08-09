@@ -122,11 +122,6 @@ export type Invoice = Prisma.InvoiceModel
  */
 export type Payment = Prisma.PaymentModel
 /**
- * Model Review
- * 
- */
-export type Review = Prisma.ReviewModel
-/**
  * Model Notification
  * 
  */

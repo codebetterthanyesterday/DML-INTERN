@@ -8,10 +8,22 @@ const nextConfig: NextConfig = {
     "localhost",
   ],
   images: {
+    // /api/images proxies private Vercel Blob URLs and validates the `url`
+    // query param itself (see app/api/images/route.ts), so it's safe to
+    // allow any search string here — each image has a different `url` value.
+    localPatterns: [
+      {
+        pathname: "/api/images",
+      },
+    ],
     remotePatterns: [
       {
         protocol: "https",
         hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "5aqdpzx1vjwncibw.private.blob.vercel-storage.com",
       },
     ],
   },
